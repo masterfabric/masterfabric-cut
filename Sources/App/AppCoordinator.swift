@@ -131,7 +131,7 @@ final class AppCoordinator: ObservableObject {
     func showStudio() {
         if studioWindow == nil {
             let w = NSWindow(contentViewController: NSHostingController(rootView: RecordingStudioView(studio: studio)))
-            w.title = "Recording Studio"; w.styleMask = [.titled, .closable, .miniaturizable]
+            w.isReleasedWhenClosed = false; w.title = "Recording Studio"; w.styleMask = [.titled, .closable, .miniaturizable]
             studioWindow = w
         }
         NSApp.activate(ignoringOtherApps: true)

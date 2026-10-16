@@ -140,22 +140,23 @@ public struct TrimEditorView: View {
             PlayerLayerView(player: model.player)
                 .frame(minHeight: 260)
                 .background(Color.black)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             RangeSlider(start: $model.start, end: $model.end, playhead: model.playhead,
                         duration: model.duration, onScrub: model.seek)
             HStack {
                 Button { model.togglePlay() } label: { Image(systemName: model.isPlaying ? "pause.fill" : "play.fill") }
                     .keyboardShortcut(.space, modifiers: [])
+                    .help(model.isPlaying ? "Pause (Space)" : "Play the trimmed range (Space)")
                 Text("\(fmt(model.start)) – \(fmt(model.end))  (\(fmt(model.end - model.start)))")
                     .font(.system(.callout, design: .monospaced)).foregroundStyle(.secondary)
                 Spacer()
                 if let p = model.exportProgress {
                     ProgressView(value: p).frame(width: 120)
                 } else {
-                    Button("Export GIF…") { save(.gif) }
-                    Button("Export MP4…") { save(.mp4) }.keyboardShortcut(.defaultAction)
+                    Button("Export GIF…") { save(.gif) }.help("Export the trimmed range as an animated GIF")
+                    Button("Export MP4…") { save(.mp4) }.keyboardShortcut(.defaultAction).help("Export the trimmed range as an MP4 video")
                 }
-                Button("Close") { onClose() }
+                Button("Close") { onClose() }.help("Close the trim editor")
             }
             if let e = model.errorMessage { Text(e).foregroundStyle(.red).font(.caption) }
         }

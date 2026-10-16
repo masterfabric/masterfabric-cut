@@ -218,10 +218,10 @@ public struct RecordingControlsView: View {
             Spacer()
             Button { manager.togglePause() } label: {
                 Image(systemName: manager.state == .paused ? "play.fill" : "pause.fill")
-            }.buttonStyle(.plain).foregroundStyle(.white)
+            }.buttonStyle(.plain).foregroundStyle(.white).help(manager.state == .paused ? "Resume recording" : "Pause recording")
             Button { Task { try? await manager.stop() } } label: {
                 Image(systemName: "stop.fill")
-            }.buttonStyle(.plain).foregroundStyle(.red)
+            }.buttonStyle(.plain).foregroundStyle(.red).help("Stop recording")
         }
         .padding(.horizontal, 16)
         .frame(width: 240, height: 48)
@@ -244,30 +244,30 @@ public struct RecordingStudioView: View {
             Section("Source") {
                 Picker("Record", selection: $studio.sourceKind) {
                     ForEach(RecordingStudio.SourceKind.allCases) { Text($0.rawValue).tag($0) }
-                }.pickerStyle(.segmented)
+                }.pickerStyle(.segmented).help("Record a single window or an entire display")
                 if studio.sourceKind == .window {
                     Picker("Window", selection: $studio.selectedWindowID) {
                         ForEach(studio.windows) { Text($0.label).tag(Optional($0.id)) }
-                    }
+                    }.help("The window to record")
                 } else {
                     Picker("Display", selection: $studio.selectedDisplayID) {
                         ForEach(studio.displays) { Text($0.name).tag(Optional($0.id)) }
-                    }
+                    }.help("The display to record")
                 }
             }
             Section("Camera") {
                 Picker("Webcam", selection: $studio.selectedCameraID) {
                     Text("None").tag(String?.none)
                     ForEach(studio.cameras, id: \.uniqueID) { Text($0.localizedName).tag(Optional($0.uniqueID)) }
-                }
+                }.help("Show a webcam bubble in the recording")
                 if studio.selectedCameraID != nil {
                     Picker("Layout", selection: $studio.layout) {
                         ForEach(CameraLayoutPreset.allCases) { Text($0.title).tag($0) }
-                    }
+                    }.help("Where the webcam bubble sits on screen")
                     Picker("Shape", selection: $studio.bubbleShape) {
                         ForEach(CameraBubbleShape.allCases) { Text($0.title).tag($0) }
-                    }
-                    Toggle("Mirror camera", isOn: $studio.mirrorCamera)
+                    }.help("Shape of the webcam bubble")
+                    Toggle("Mirror camera", isOn: $studio.mirrorCamera).help("Flip the webcam image horizontally")
                     Text("Drag the bubble to move it; scroll or pinch on it to resize; right-click for sizes.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
@@ -276,24 +276,24 @@ public struct RecordingStudioView: View {
                 Picker("Microphone", selection: $studio.selectedMicID) {
                     Text("None").tag(String?.none)
                     ForEach(studio.microphones, id: \.uniqueID) { Text($0.localizedName).tag(Optional($0.uniqueID)) }
-                }
-                Toggle("System audio", isOn: $studio.systemAudio)
+                }.help("Record voice narration from this microphone")
+                Toggle("System audio", isOn: $studio.systemAudio).help("Include sound playing on your Mac")
             }
             Section("Options") {
                 Picker("Countdown", selection: $studio.countdown) {
                     Text("Off").tag(0); Text("3 s").tag(3); Text("5 s").tag(5); Text("10 s").tag(10)
-                }
-                Toggle("Show clicks", isOn: $studio.showClicks)
-                Toggle("Show keystrokes", isOn: $studio.showKeystrokes)
+                }.help("Seconds to wait before recording starts")
+                Toggle("Show clicks", isOn: $studio.showClicks).help("Highlight mouse clicks in the recording")
+                Toggle("Show keystrokes", isOn: $studio.showKeystrokes).help("Display pressed keys in the recording")
             }
             if let e = studio.errorMessage { Text(e).foregroundStyle(.red) }
             HStack {
-                Button("Refresh") { Task { await studio.refresh() } }
+                Button("Refresh") { Task { await studio.refresh() } }.help("Rescan windows, displays, cameras and microphones")
                 Spacer()
                 if studio.manager.state.isActive || studio.manager.state == .countdown {
-                    Button("Stop") { Task { await studio.stop() } }
+                    Button("Stop") { Task { await studio.stop() } }.help("Stop recording and open the result")
                 } else {
-                    Button("Start Recording") { Task { await studio.start() } }
+                    Button("Start Recording") { Task { await studio.start() } }.help("Start recording after the countdown")
                         .keyboardShortcut(.defaultAction)
                         .disabled(studio.manager.state == .finishing)
                 }

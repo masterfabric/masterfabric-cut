@@ -57,8 +57,15 @@ final class SelectionOverlayController {
     private func finish(_ outcome: SelectionOutcome?) {
         guard let c = continuation else { return }
         continuation = nil
-        windows.forEach { $0.orderOut(nil); $0.close() }
+        // finish() runs inside the view's mouse/key handler: never tear the window down synchronously.
+        // Keep the windows alive past the current event, then release them.
+        let dying = windows
+        views.forEach { $0.onFinish = nil; $0.onToggle = nil }
         windows.removeAll(); views.removeAll()
+        dying.forEach { $0.orderOut(nil) }
+        DispatchQueue.main.async {
+            dying.forEach { $0.contentView = nil; $0.close() }
+        }
         c.resume(returning: outcome)
     }
 }
@@ -66,6 +73,10 @@ final class SelectionOverlayController {
 private final class OverlayWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backing, defer: flag)
+        isReleasedWhenClosed = false // ARC owns the window; the default would over-release it
+    }
 }
 
 private final class SelectionView: NSView {

@@ -13,7 +13,7 @@ public enum SelfTimer {
         let panel = NSPanel(contentRect: NSRect(x: screen.frame.midX - side / 2, y: screen.frame.midY - side / 2, width: side, height: side),
                             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.isOpaque = false; panel.backgroundColor = .clear; panel.level = .screenSaver
-        panel.ignoresMouseEvents = true; panel.hasShadow = false
+        panel.isReleasedWhenClosed = false; panel.ignoresMouseEvents = true; panel.hasShadow = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
         let bg = NSView(frame: NSRect(x: 0, y: 0, width: side, height: side))

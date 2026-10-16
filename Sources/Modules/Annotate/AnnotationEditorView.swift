@@ -33,31 +33,28 @@ struct AnnotationEditorView: View {
     private var toolbar: some View {
         HStack(spacing: 4) {
             ForEach(AnnotationTool.allCases) { tool in
-                Button {
-                    document.tool = tool
-                } label: {
-                    Image(systemName: tool.symbolName)
-                        .frame(width: 28, height: 24)
-                        .background(document.tool == tool ? Color.accentColor.opacity(0.25) : Color.clear)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                }
-                .buttonStyle(.plain)
-                .help(tool.title)
+                ToolbarToggleButton(symbol: tool.symbolName, selected: document.tool == tool,
+                                    help: "\(tool.title) tool") { document.tool = tool }
             }
             Divider().frame(height: 20).padding(.horizontal, 6)
             Button { document.undo() } label: { Image(systemName: "arrow.uturn.backward") }
                 .keyboardShortcut("z", modifiers: .command)
                 .disabled(!document.canUndo)
-                .help("Undo")
+                .help("Undo the last change (⌘Z)")
             Button { document.redo() } label: { Image(systemName: "arrow.uturn.forward") }
                 .keyboardShortcut("z", modifiers: [.command, .shift])
                 .disabled(!document.canRedo)
-                .help("Redo")
+                .help("Redo the change (⇧⌘Z)")
             Spacer()
-            Button("Pin", action: actions.pin)
-            Button("Copy", action: actions.copy)
-            Button("Save…", action: actions.save)
-            Button("Done", action: actions.done).keyboardShortcut(.defaultAction)
+            Button { actions.pin() } label: { Label("Pin", systemImage: "pin") }
+                .help("Pin the annotated image to the screen as a floating window")
+            Button { actions.copy() } label: { Label("Copy", systemImage: "doc.on.doc") }
+                .help("Copy the annotated image to the clipboard")
+            Button { actions.save() } label: { Label("Save…", systemImage: "square.and.arrow.down") }
+                .help("Save the annotated image to a file")
+            Button { actions.done() } label: { Text("Done") }
+                .keyboardShortcut(.defaultAction)
+                .help("Copy the image to the clipboard and close the editor")
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
@@ -80,28 +77,31 @@ struct AnnotationEditorView: View {
                                 .overlay(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
                                 .frame(width: 18, height: 18)
                                 .onTapGesture { document.setColor(swatches[i]) }
+                                .onHover { if $0 { NSCursor.pointingHand.push() } else { NSCursor.pop() } }
+                                .help("Use this color")
                         }
                     }
-                    ColorPicker("Color", selection: colorBinding)
+                    ColorPicker("Color", selection: colorBinding).help("Pick any custom color")
                     slider("Stroke", value: Binding(get: { document.lineWidth },
                                                     set: { document.setLineWidth($0) }), range: 1...20)
                     slider("Text size", value: Binding(get: { document.fontSize },
                                                        set: { document.setFontSize($0) }), range: 12...120)
-                    Toggle("Fill shapes", isOn: $document.filledShapes)
+                    Toggle("Fill shapes", isOn: $document.filledShapes).help("Fill rectangles and ellipses instead of outlining them")
                 }
 
                 section("Crop") {
                     Button("Reset Crop") { document.resetCrop() }
                         .disabled(document.cropRect == document.imageBounds)
+                        .help("Restore the full image after cropping")
                 }
 
                 section("Background") {
                     Picker("Style", selection: $document.background.preset) {
                         ForEach(BackgroundPreset.allCases) { Text($0.title).tag($0) }
-                    }
+                    }.help("Choose a backdrop to place behind the screenshot")
                     slider("Padding", value: $document.background.padding, range: 0...200)
                     slider("Corners", value: $document.background.cornerRadius, range: 0...60)
-                    Toggle("Shadow", isOn: $document.background.shadow)
+                    Toggle("Shadow", isOn: $document.background.shadow).help("Add a soft drop shadow behind the image")
                 }
             }
             .padding(12)
@@ -118,7 +118,7 @@ struct AnnotationEditorView: View {
     private func slider(_ title: String, value: Binding<CGFloat>, range: ClosedRange<CGFloat>) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title).font(.caption)
-            Slider(value: value, in: range)
+            Slider(value: value, in: range).help(title)
         }
     }
 }
@@ -202,5 +202,28 @@ final class AnnotationEditorWindowController: NSWindowController, NSWindowDelega
         } catch {
             NSAlert(error: error).runModal()
         }
+    }
+}
+
+/// Soft rounded toolbar button with hover + selected states.
+struct ToolbarToggleButton: View {
+    let symbol: String
+    let selected: Bool
+    let help: String
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .frame(width: 30, height: 26)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(selected ? Color.accentColor.opacity(0.25) : (hovering ? Color.primary.opacity(0.08) : .clear)))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .help(help)
+        .animation(.easeOut(duration: 0.12), value: hovering)
     }
 }
