@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>MasterFabric Cut</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>MasterFabric Cut</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>MasterFabric Cut uses Apple Events to hide and show desktop icons.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MasterFabric Cut uses the camera to show your webcam bubble in Recording Studio.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>MasterFabric Cut saves captures to your Desktop by default.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>MasterFabric Cut can save captures to your Documents folder.</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 Gürkan Fikret Günak, MasterFabric (masterfabric.co). All rights reserved.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MasterFabric Cut uses the microphone to record voice narration with your screen recordings.</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>MasterFabric Cut needs screen recording access to capture screenshots and record your screen.</string>
+</dict>
+</plist>

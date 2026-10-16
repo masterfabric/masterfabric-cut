@@ -1,0 +1,61 @@
+name: MasterFabricCut
+options:
+  bundleIdPrefix: co.masterfabric
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+targets:
+  MasterFabricCut:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      - path: Resources
+        optional: true
+    settings:
+      base:
+        PRODUCT_NAME: MasterFabric Cut
+        PRODUCT_BUNDLE_IDENTIFIER: co.masterfabric.cut
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Sources/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/App/MasterFabricCut.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    info:
+      path: Sources/App/Info.plist
+      properties:
+        CFBundleName: MasterFabric Cut
+        CFBundleDisplayName: MasterFabric Cut
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "14.0"
+        LSUIElement: true
+        NSHumanReadableCopyright: "Copyright © 2026 Gürkan Fikret Günak, MasterFabric (masterfabric.co). All rights reserved."
+        NSScreenCaptureUsageDescription: "MasterFabric Cut needs screen recording access to capture screenshots and record your screen."
+        NSCameraUsageDescription: "MasterFabric Cut uses the camera to show your webcam bubble in Recording Studio."
+        NSMicrophoneUsageDescription: "MasterFabric Cut uses the microphone to record voice narration with your screen recordings."
+        NSAppleEventsUsageDescription: "MasterFabric Cut uses Apple Events to hide and show desktop icons."
+        NSDesktopFolderUsageDescription: "MasterFabric Cut saves captures to your Desktop by default."
+        NSDocumentsFolderUsageDescription: "MasterFabric Cut can save captures to your Documents folder."
+    entitlements:
+      path: Sources/App/MasterFabricCut.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.device.camera: true
+        com.apple.security.device.audio-input: true
+schemes:
+  MasterFabricCut:
+    build:
+      targets:
+        MasterFabricCut: all
+    run:
+      config: Debug

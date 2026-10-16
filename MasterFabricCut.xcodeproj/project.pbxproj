@@ -1,0 +1,367 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		014D0635683801230040E1BB /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08572107B71C763F78837FE /* AboutView.swift */; };
+		3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D234706B4558C75A4E68A22 /* AppCoordinator.swift */; };
+		60E25DE6461E91BA3F8F5D27 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E02231860198CFF6E7D8DA /* PreferencesView.swift */; };
+		7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D98BB2F5B464F9FCCCC098E /* Utilities.swift */; };
+		AA4AE1F72FE49C5422503638 /* MasterFabricCutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7E11C18D4E8D21D3C2F9A1 /* MasterFabricCutApp.swift */; };
+		D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */; };
+		D803A1D0908D955E92C20D1C /* Shortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9D963955CD710E5A7E6E1A /* Shortcuts.swift */; };
+		E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */; };
+		F1087621F17DB226DD1940B9 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		11E02231860198CFF6E7D8DA /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		2D234706B4558C75A4E68A22 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterFabricCut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5D98BB2F5B464F9FCCCC098E /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		A08572107B71C763F78837FE /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		E2B12F70C05BAE0184C45125 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
+		EE7E11C18D4E8D21D3C2F9A1 /* MasterFabricCutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterFabricCutApp.swift; sourceTree = "<group>"; };
+		F6150E5C17BF2A866C275743 /* MasterFabricCut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MasterFabricCut.entitlements; sourceTree = "<group>"; };
+		FA9D963955CD710E5A7E6E1A /* Shortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shortcuts.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1A44B6C98A501D64FC292A95 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A08572107B71C763F78837FE /* AboutView.swift */,
+				2D234706B4558C75A4E68A22 /* AppCoordinator.swift */,
+				5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */,
+				E2B12F70C05BAE0184C45125 /* Info.plist */,
+				EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */,
+				F6150E5C17BF2A866C275743 /* MasterFabricCut.entitlements */,
+				EE7E11C18D4E8D21D3C2F9A1 /* MasterFabricCutApp.swift */,
+				11E02231860198CFF6E7D8DA /* PreferencesView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		2E9F41A0D565A3DF50A02B5F /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		4EB072276C5C29D241099870 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */,
+				FA9D963955CD710E5A7E6E1A /* Shortcuts.swift */,
+				5D98BB2F5B464F9FCCCC098E /* Utilities.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		6BCADBB57C64C47A51DAD70D = {
+			isa = PBXGroup;
+			children = (
+				FA4715C31A34737A077D4A90 /* Resources */,
+				CA3E06C1925EDCDF3818C6D8 /* Sources */,
+				9E58B505D8624EF404B5A316 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9E58B505D8624EF404B5A316 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CA3E06C1925EDCDF3818C6D8 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1A44B6C98A501D64FC292A95 /* App */,
+				2E9F41A0D565A3DF50A02B5F /* Modules */,
+				4EB072276C5C29D241099870 /* Shared */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		FA4715C31A34737A077D4A90 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C9D6C9A5840E1BD26C0708C3 /* MasterFabricCut */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27AC443C2B47AD65EFAC0183 /* Build configuration list for PBXNativeTarget "MasterFabricCut" */;
+			buildPhases = (
+				445A351713F3C8BC6B2AB1F2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MasterFabricCut;
+			packageProductDependencies = (
+			);
+			productName = MasterFabricCut;
+			productReference = 439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		002685FBD817AC7EF7F90789 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C9D6C9A5840E1BD26C0708C3 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 057211EDCB40083553388B94 /* Build configuration list for PBXProject "MasterFabricCut" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6BCADBB57C64C47A51DAD70D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9E58B505D8624EF404B5A316 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C9D6C9A5840E1BD26C0708C3 /* MasterFabricCut */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		445A351713F3C8BC6B2AB1F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				014D0635683801230040E1BB /* AboutView.swift in Sources */,
+				3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */,
+				E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */,
+				F1087621F17DB226DD1940B9 /* AppSettings.swift in Sources */,
+				D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */,
+				AA4AE1F72FE49C5422503638 /* MasterFabricCutApp.swift in Sources */,
+				60E25DE6461E91BA3F8F5D27 /* PreferencesView.swift in Sources */,
+				D803A1D0908D955E92C20D1C /* Shortcuts.swift in Sources */,
+				7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		03FFB4A525D409FC2BD29236 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/MasterFabricCut.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.masterfabric.cut;
+				PRODUCT_NAME = "MasterFabric Cut";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		2C0DAF6595C51058C48329F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		57653209CC18695E2CFD0087 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/MasterFabricCut.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.masterfabric.cut;
+				PRODUCT_NAME = "MasterFabric Cut";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FA339D629E17324B3CEA0D33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		057211EDCB40083553388B94 /* Build configuration list for PBXProject "MasterFabricCut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C0DAF6595C51058C48329F5 /* Debug */,
+				FA339D629E17324B3CEA0D33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		27AC443C2B47AD65EFAC0183 /* Build configuration list for PBXNativeTarget "MasterFabricCut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				57653209CC18695E2CFD0087 /* Debug */,
+				03FFB4A525D409FC2BD29236 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 002685FBD817AC7EF7F90789 /* Project object */;
+}
