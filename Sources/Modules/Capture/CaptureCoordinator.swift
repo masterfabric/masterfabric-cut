@@ -119,7 +119,7 @@ public final class CaptureCoordinator {
     // MARK: Helpers
 
     private func select(initial: SelectionOverlayController.Mode) async throws -> SelectionOutcome? {
-        if !CapturePermissions.hasScreenRecording { throw CaptureError.permissionDenied }
+        if await !CapturePermissions.probeScreenRecording() { throw CaptureError.permissionDenied }
         let windows = (try? await service.listWindows()) ?? []
         var snaps: [CGDirectDisplayID: CGImage] = [:]
         for s in NSScreen.screens { snaps[s.displayID] = try? await service.captureRect(s.frame).image }

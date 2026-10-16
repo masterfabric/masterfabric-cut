@@ -29,15 +29,23 @@ public final class RecordingStudio: ObservableObject {
     public let manager = RecordingManager()
     public let bubble = CameraBubbleController()
 
-    @Published public var sourceKind: SourceKind = .display
+    @Published public var sourceKind: SourceKind = .display { didSet { if oldValue != sourceKind { retarget() } } }
     @Published public var windows: [StudioWindowInfo] = []
     @Published public var displays: [StudioDisplayInfo] = []
-    @Published public var selectedWindowID: CGWindowID?
-    @Published public var selectedDisplayID: CGDirectDisplayID?
+    @Published public var selectedWindowID: CGWindowID? { didSet { if oldValue != selectedWindowID { retarget() } } }
+    @Published public var selectedDisplayID: CGDirectDisplayID? { didSet { if oldValue != selectedDisplayID { retarget() } } }
 
     @Published public var cameras: [AVCaptureDevice] = []
     /// nil = no webcam.
-    @Published public var selectedCameraID: String?
+    @Published public var selectedCameraID: String? { didSet { if oldValue != selectedCameraID { Task { await syncBubble() } } } }
+    /// Show the floating camera bubble (before and during recording). Off = webcam is not recorded.
+    @Published public var bubbleVisible = true { didSet { if oldValue != bubbleVisible { Task { await syncBubble() } } } }
+    @Published public private(set) var cameraDenied = false
+    /// Live camera session shared with the Studio preview (nil when the bubble is off).
+    @Published public private(set) var previewSession: AVCaptureSession?
+    @Published public private(set) var previewImage: CGImage?
+    /// Bubble frame as fractions of the recorded area (top-left origin), for the preview composite.
+    @Published public private(set) var bubbleRect: CGRect?
     @Published public var microphones: [AVCaptureDevice] = []
     /// nil = no microphone.
     @Published public var selectedMicID: String?
@@ -56,17 +64,98 @@ public final class RecordingStudio: ObservableObject {
     /// Called when a recording finishes (e.g. open the trim editor / Quick Access).
     public var onFinished: ((RecordingResult) -> Void)?
     public let hud = RecordingHUDController()
+    private var content: SCShareableContent?
+    private var studioOpen = false
 
     public init() {
         manager.onFinished = { [weak self] result in
             guard let self else { return }
+            self.bubble.chromeEnabled = true
             self.bubble.hide()
             self.hud.hide()
+            Task { await self.syncBubble() }
             switch result {
             case .success(let r): self.lastResult = r; self.onFinished?(r)
             case .failure(let e): self.report(e)
             }
         }
+        bubble.onFrameChange = { [weak self] _ in self?.updateBubbleRect() }
+        bubble.onShapeChange = { [weak self] in self?.bubbleShape = $0 }
+        bubble.onMirrorChange = { [weak self] in self?.mirrorCamera = $0 }
+        bubble.onHideRequested = { [weak self] in self?.bubbleVisible = false }
+    }
+
+    // MARK: Bubble + preview
+
+    /// Called when the Studio window opens/closes so the camera only runs while it is useful.
+    public func setStudioOpen(_ open: Bool) {
+        studioOpen = open
+        Task { await syncBubble() }
+    }
+
+    private func retarget() {
+        guard bubble.isVisible, !manager.state.isActive, let c = containerRect() else { return }
+        bubble.apply(preset: layout, in: c)
+        updateBubbleRect()
+    }
+
+    /// Brings the floating bubble in line with the camera / visibility settings.
+    public func syncBubble() async {
+        guard !manager.state.isActive, manager.state != .countdown else { return }
+        guard studioOpen, let id = selectedCameraID, bubbleVisible else {
+            bubble.hide(); previewSession = nil; updateBubbleRect(); return
+        }
+        guard await CameraBubbleController.requestAccess() else {
+            cameraDenied = true; bubble.hide(); previewSession = nil; updateBubbleRect(); return
+        }
+        cameraDenied = false
+        guard let c = containerRect(), selectedCameraID == id, bubbleVisible, studioOpen else { return }
+        do {
+            if bubble.isVisible {
+                if bubble.cameraID != id { try bubble.switchCamera(id) }
+            } else {
+                bubble.shape = bubbleShape
+                bubble.mirrored = mirrorCamera
+                bubble.chromeEnabled = true
+                try bubble.show(cameraID: id, preset: layout, in: c)
+            }
+            previewSession = bubble.session
+        } catch {
+            NSLog("MasterFabric Cut camera error: \(error)")
+            errorMessage = "The camera couldn't be started. Try another camera."
+            bubble.hide(); previewSession = nil
+        }
+        updateBubbleRect()
+    }
+
+    private func updateBubbleRect() {
+        guard let f = bubble.frame, bubble.isVisible, let c = containerRect(), c.width > 0, c.height > 0 else { bubbleRect = nil; return }
+        bubbleRect = CGRect(x: (f.minX - c.minX) / c.width, y: (c.maxY - f.maxY) / c.height,
+                            width: f.width / c.width, height: f.height / c.height)
+    }
+
+    /// One low-res snapshot of the chosen window/display (own windows excluded) for the setup preview.
+    public func capturePreview() async {
+        guard studioOpen, !manager.state.isActive, CapturePermissions.hasScreenRecording, let content else { return }
+        let filter: SCContentFilter
+        let size: CGSize
+        switch sourceKind {
+        case .display:
+            guard let id = selectedDisplayID, let d = content.displays.first(where: { $0.displayID == id }) else { return }
+            let own = content.applications.filter { $0.bundleIdentifier == Bundle.main.bundleIdentifier }
+            filter = SCContentFilter(display: d, excludingApplications: own, exceptingWindows: [])
+            size = CGSize(width: d.width, height: d.height)
+        case .window:
+            guard let id = selectedWindowID, let w = content.windows.first(where: { $0.windowID == id }) else { return }
+            filter = SCContentFilter(desktopIndependentWindow: w)
+            size = w.frame.size
+        }
+        guard size.width > 0, size.height > 0 else { return }
+        let scale = min(1, 900 / max(size.width, size.height))
+        let cfg = SCStreamConfiguration()
+        cfg.width = max(1, Int(size.width * scale)); cfg.height = max(1, Int(size.height * scale))
+        cfg.showsCursor = false
+        if let img = try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: cfg) { previewImage = img }
     }
 
     // MARK: Sources
@@ -76,6 +165,7 @@ public final class RecordingStudio: ObservableObject {
         microphones = RecordingManager.microphones()
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
+            self.content = content
             let me = Bundle.main.bundleIdentifier
             windows = content.windows
                 .filter { $0.windowLayer == 0 && $0.frame.width > 120 && $0.frame.height > 80
@@ -88,6 +178,7 @@ public final class RecordingStudio: ObservableObject {
             }
             if selectedWindowID == nil || !windows.contains(where: { $0.id == selectedWindowID }) { selectedWindowID = windows.first?.id }
             if selectedDisplayID == nil || !displays.contains(where: { $0.id == selectedDisplayID }) { selectedDisplayID = displays.first?.id }
+            updateBubbleRect()
         } catch {
             report(error)
         }
@@ -123,31 +214,30 @@ public final class RecordingStudio: ObservableObject {
             if showKeystrokes && !InputOverlayController.hasInputMonitoringAccess {
                 InputOverlayController.requestInputMonitoringAccess()
             }
-            if selectedCameraID != nil {
+            if selectedCameraID != nil && bubbleVisible {
                 guard await CameraBubbleController.requestAccess() else { throw RecordingError.cameraPermissionDenied }
-                guard let c = containerRect() else { throw RecordingError.targetNotFound }
-                bubble.shape = bubbleShape
-                bubble.mirrored = mirrorCamera
-                try bubble.show(cameraID: selectedCameraID, preset: layout, in: c)
-                if let id = bubble.windowID { cfg.includedWindowIDs = [id] }
-                try? await Task.sleep(nanoseconds: 400_000_000) // let the camera warm up
+                if !bubble.isVisible { studioOpen = true; await syncBubble() }
+                guard bubble.isVisible, let id = bubble.windowID else { throw RecordingError.cameraPermissionDenied }
+                bubble.chromeEnabled = false
+                cfg.includedWindowIDs = [id]
+                try? await Task.sleep(nanoseconds: 200_000_000)
             }
             hud.show(manager: manager)
             cfg.excludedWindowIDs = hud.windowID.map { [$0] } ?? []
             try await manager.start(cfg)
         } catch {
-            bubble.hide(); hud.hide()
+            bubble.chromeEnabled = true; hud.hide()
             report(error)
         }
     }
 
     public func stop() async {
         do { try await manager.stop() } catch {
-            if ErrorPresenter.isCancellation(error) { bubble.hide(); hud.hide() } else { report(error) }
+            if ErrorPresenter.isCancellation(error) { bubble.chromeEnabled = true; hud.hide() } else { report(error) }
         }
     }
 
-    public func cancel() { manager.cancel(); bubble.hide(); hud.hide() }
+    public func cancel() { manager.cancel(); bubble.chromeEnabled = true; hud.hide(); Task { await syncBubble() } }
 
     // MARK: Geometry
 
@@ -250,6 +340,10 @@ public struct RecordingStudioView: View {
 
     public var body: some View {
         Form {
+            Section("Preview") {
+                StudioPreview(studio: studio)
+                    .help("Exactly what will be recorded, with the camera in its current spot")
+            }
             Section("Source") {
                 Picker("Record", selection: $studio.sourceKind) {
                     ForEach(RecordingStudio.SourceKind.allCases) { Text($0.rawValue).tag($0) }
@@ -269,7 +363,18 @@ public struct RecordingStudioView: View {
                     Text("None").tag(String?.none)
                     ForEach(studio.cameras, id: \.uniqueID) { Text($0.localizedName).tag(Optional($0.uniqueID)) }
                 }.help("Show a webcam bubble in the recording")
+                if studio.cameraDenied {
+                    HStack {
+                        Text("Camera access is off for MasterFabric Cut.").font(.caption).foregroundStyle(.orange)
+                        Spacer()
+                        Button("Open Settings") {
+                            if let u = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") { NSWorkspace.shared.open(u) }
+                        }.controlSize(.small)
+                    }
+                }
                 if studio.selectedCameraID != nil {
+                    Toggle("Show camera bubble", isOn: $studio.bubbleVisible)
+                        .help("Show the floating camera bubble. Turn it off to record without the webcam")
                     Picker("Layout", selection: $studio.layout) {
                         ForEach(CameraLayoutPreset.allCases) { Text($0.title).tag($0) }
                     }.help("Where the webcam bubble sits on screen")
@@ -277,7 +382,7 @@ public struct RecordingStudioView: View {
                         ForEach(CameraBubbleShape.allCases) { Text($0.title).tag($0) }
                     }.help("Shape of the webcam bubble")
                     Toggle("Mirror camera", isOn: $studio.mirrorCamera).help("Flip the webcam image horizontally")
-                    Text("Drag the bubble to move it; scroll or pinch on it to resize; right-click for sizes.")
+                    Text("Drag the bubble to move it, drag its corner grip to resize, hover for shape / mirror / hide, right-click for sizes.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
@@ -309,7 +414,84 @@ public struct RecordingStudioView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 420, minHeight: 520)
+        .frame(minWidth: 460, minHeight: 680)
         .task { await studio.refresh() }
     }
+}
+
+// MARK: - Live preview
+
+/// Snapshot of the recorded window/display with the live camera composited where the bubble sits.
+private struct StudioPreview: View {
+    @ObservedObject var studio: RecordingStudio
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.black.opacity(0.06))
+            if let img = studio.previewImage {
+                GeometryReader { geo in
+                    let aspect = CGFloat(img.width) / CGFloat(max(img.height, 1))
+                    let w = min(geo.size.width, geo.size.height * aspect), h = w / aspect
+                    ZStack(alignment: .topLeading) {
+                        Image(decorative: img, scale: 1).resizable().frame(width: w, height: h)
+                        if let r = studio.bubbleRect, let session = studio.previewSession, studio.bubbleVisible {
+                            let side = r.width * w
+                            let shape: AnyShape = studio.bubbleShape == .circle
+                                ? AnyShape(Circle()) : AnyShape(RoundedRectangle(cornerRadius: side * 0.18, style: .continuous))
+                            CameraPreviewView(session: session)
+                                .scaleEffect(x: studio.mirrorCamera ? -1 : 1, y: 1)
+                                .frame(width: side, height: r.height * h)
+                                .clipShape(shape)
+                                .overlay(shape.stroke(Color.white.opacity(0.9), lineWidth: 1.5))
+                                .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
+                                .offset(x: r.minX * w, y: r.minY * h)
+                        }
+                    }
+                    .frame(width: w, height: h)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .shadow(color: .black.opacity(0.2), radius: 6, y: 2)
+                    .frame(width: geo.size.width, height: geo.size.height)
+                }
+                .padding(8)
+            } else {
+                VStack(spacing: 6) {
+                    Image(systemName: "rectangle.dashed").font(.title2)
+                    Text("Preview appears once Screen Recording is allowed").font(.caption)
+                }.foregroundStyle(.secondary)
+            }
+        }
+        .frame(height: 210)
+        .task {
+            while !Task.isCancelled {
+                await studio.capturePreview()
+                try? await Task.sleep(nanoseconds: 700_000_000)
+            }
+        }
+    }
+}
+
+private struct CameraPreviewView: NSViewRepresentable {
+    let session: AVCaptureSession
+    func makeNSView(context: Context) -> PreviewHost { PreviewHost(session: session) }
+    func updateNSView(_ v: PreviewHost, context: Context) { v.setSession(session) }
+}
+
+private final class PreviewHost: NSView {
+    private let layerView: AVCaptureVideoPreviewLayer
+    init(session: AVCaptureSession) {
+        layerView = AVCaptureVideoPreviewLayer(session: session)
+        super.init(frame: .zero)
+        wantsLayer = true
+        layerView.videoGravity = .resizeAspectFill
+        layer?.addSublayer(layerView)
+        unmirror()
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    func setSession(_ s: AVCaptureSession) { if layerView.session !== s { layerView.session = s }; unmirror() }
+    /// Mirroring is applied by SwiftUI so the preview matches the bubble's setting.
+    private func unmirror() {
+        guard let c = layerView.connection, c.isVideoMirroringSupported else { return }
+        c.automaticallyAdjustsVideoMirroring = false; c.isVideoMirrored = false
+    }
+    override func layout() { super.layout(); layerView.frame = bounds }
 }

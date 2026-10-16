@@ -17,6 +17,18 @@ open "build/Build/Products/Debug/MasterFabric Cut.app"
 On first use grant **Screen Recording** (and Camera / Microphone / Accessibility for scrolling capture) in System Settings › Privacy & Security.
 The app is not sandboxed (needed for hiding desktop icons and global capture).
 
+### Permissions & rebuilds
+
+Debug builds are **ad-hoc signed** (no Developer ID / Apple Development identity), so macOS ties each TCC grant
+(Screen Recording, Camera, …) to the binary's hash. **Every rebuild invalidates the grant and you must re-grant it**
+until the app is signed with a stable identity (set `CODE_SIGN_IDENTITY` / `DEVELOPMENT_TEAM` in `project.yml`).
+To reset a stale entry: `tccutil reset ScreenCapture com.masterfabric.cut`.
+
+macOS also only applies a new Screen Recording grant after the app is relaunched. The permission window therefore:
+checks status with `CGPreflightScreenCaptureAccess` plus a `SCShareableContent` probe, calls
+`CGRequestScreenCaptureAccess` once per launch (never in a loop), opens the Screen Recording pane, polls for the
+grant, and offers a **Restart MasterFabric Cut** button that relaunches the app.
+
 ## Layout
 
 | Path | Contents |

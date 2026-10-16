@@ -94,7 +94,7 @@ final class AppCoordinator: ObservableObject {
         if recorder.state.isActive { stopRecording(); return }
         let s = AppSettings.shared
         let overlay = SelectionOverlayController()
-        guard CapturePermissions.hasScreenRecording else {
+        guard await CapturePermissions.probeScreenRecording() else {
             PermissionOnboarding.shared.show { [weak self] in Task { await self?.startRecording(format: format) } }
             return
         }
@@ -135,9 +135,13 @@ final class AppCoordinator: ObservableObject {
             let w = NSWindow(contentViewController: NSHostingController(rootView: RecordingStudioView(studio: studio)))
             w.isReleasedWhenClosed = false; w.title = "Recording Studio"; w.styleMask = [.titled, .closable, .miniaturizable]
             studioWindow = w
+            NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: w, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.studio.setStudioOpen(false) }
+            }
         }
         NSApp.activate(ignoringOtherApps: true)
         studioWindow?.center(); studioWindow?.makeKeyAndOrderFront(nil)
-        Task { await studio.refresh() }
+        studio.setStudioOpen(true)
+        Task { await studio.refresh(); await studio.syncBubble() }
     }
 }

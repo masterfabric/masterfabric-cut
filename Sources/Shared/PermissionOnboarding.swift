@@ -102,7 +102,9 @@ private struct PermissionOnboardingView: View {
             VStack(alignment: .leading, spacing: 10) {
                 step(1, "Click **Open System Settings** below.")
                 step(2, "Turn on **MasterFabric Cut** under Privacy & Security › Screen & System Audio Recording.")
-                step(3, "If macOS asks, choose **Quit & Reopen**, then try your capture again.")
+                step(3, "Click **Restart MasterFabric Cut** here (or **Quit & Reopen** if macOS asks), then try again.")
+                Text("Unsigned development builds lose this permission on every rebuild and must be re-granted.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading)
             .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -113,17 +115,23 @@ private struct PermissionOnboardingView: View {
             HStack {
                 Button("Not Now", action: onClose)
                 Spacer()
-                Button("Restart App") { relaunch() }.help("macOS sometimes only applies the permission after a restart")
+                if requested {
+                    Button("Restart MasterFabric Cut") { AppRelauncher.relaunch() }
+                        .help("macOS only applies a new Screen Recording grant after the app is relaunched")
+                        .keyboardShortcut(.defaultAction)
+                }
                 Button(requested ? "Open System Settings Again" : "Open System Settings") {
                     if !requested { _ = CapturePermissions.requestScreenRecording() }
                     requested = true
-                    if let u = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") { NSWorkspace.shared.open(u) }
-                }.keyboardShortcut(.defaultAction)
+                    NSWorkspace.shared.open(CapturePermissions.screenRecordingSettingsURL)
+                }.keyboardShortcut(requested ? nil : .defaultAction)
             }
         }
         .padding(24).frame(width: 460)
         .onReceive(timer) { _ in
-            if CapturePermissions.hasScreenRecording { granted = true; onGranted() }
+            Task {
+                if await CapturePermissions.probeScreenRecording() { granted = true; onGranted() }
+            }
         }
     }
 
@@ -134,11 +142,13 @@ private struct PermissionOnboardingView: View {
             Text(text).fixedSize(horizontal: false, vertical: true)
         }
     }
+}
 
-    private func relaunch() {
+enum AppRelauncher {
+    @MainActor static func relaunch() {
         let path = Bundle.main.bundlePath
         let p = Process(); p.executableURL = URL(fileURLWithPath: "/bin/sh")
-        p.arguments = ["-c", "sleep 1; open \"\(path)\""]
+        p.arguments = ["-c", "sleep 1; open \"$0\"", path]
         try? p.run()
         NSApp.terminate(nil)
     }

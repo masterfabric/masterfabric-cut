@@ -15,7 +15,7 @@ public final class ScreenCaptureService {
     public var showsCursor = false
 
     private func shareable() async throws -> SCShareableContent {
-        guard CapturePermissions.hasScreenRecording else { throw CaptureError.permissionDenied }
+        guard await CapturePermissions.probeScreenRecording() else { throw CaptureError.permissionDenied }
         do {
             return try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
         } catch {

@@ -40,7 +40,10 @@ public final class RecordingManager: ObservableObject {
     /// Runs the optional countdown, then starts recording.
     public func start(_ config: RecordingConfig) async throws {
         guard state == .idle else { throw RecordingError.invalidState }
-        guard CGPreflightScreenCaptureAccess() else { throw RecordingError.screenPermissionDenied }
+        guard await CapturePermissions.probeScreenRecording() else {
+            CapturePermissions.requestScreenRecording()
+            throw RecordingError.screenPermissionDenied
+        }
         if config.microphone && config.format == .mp4 {
             guard await AVCaptureDevice.requestAccess(for: .audio) else { throw RecordingError.microphonePermissionDenied }
         }
