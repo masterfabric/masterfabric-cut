@@ -12,6 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         setupStatusItem()
         AppCoordinator.shared.start()
+        FloatingLauncher.shared.refresh()
+        if !AppSettings.shared.onboardingCompleted { OnboardingWindow.shared.show() }
         AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
     }
 
@@ -39,6 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         acts.selfTimer = { AppCoordinator.shared.selfTimerCapture() }
         acts.pinClipboard = { AppCoordinator.shared.pinClipboardImage() }
         acts.preferences = { [weak self] in self?.showPreferences() }
+        acts.welcome = { OnboardingWindow.shared.show() }
         acts.about = { [weak self] in self?.showAbout() }
         acts.openItem = { item in
             if let url = item.fileURL { NSWorkspace.shared.open(url) } else { AnnotateModule.shared.showHistory() }

@@ -20,6 +20,7 @@ private struct GeneralPrefs: View {
     var body: some View {
         Form {
             Toggle("Launch at login", isOn: Binding(get: { s.launchAtLogin }, set: { LaunchAtLogin.set($0) })).help("Start MasterFabric Cut automatically when you log in")
+            Toggle("Show floating launcher button", isOn: Binding(get: { s.showLauncher }, set: { s.showLauncher = $0; FloatingLauncher.shared.refresh() })).help("Show a draggable button at the bottom-right of the screen that opens the action palette")
             Toggle("Play sounds", isOn: Binding(get: { s.playSounds }, set: { s.playSounds = $0 })).help("Play a shutter sound after each capture")
             Toggle("Show menu bar icon", isOn: Binding(get: { s.showMenuBarIcon }, set: { s.showMenuBarIcon = $0 })).help("Show the scissors icon in the menu bar")
             Toggle("Freeze screen while selecting", isOn: Binding(get: { s.freezeScreen }, set: { s.freezeScreen = $0 })).help("Freeze the screen contents while you choose a region")

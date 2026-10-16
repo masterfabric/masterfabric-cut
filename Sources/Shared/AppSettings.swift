@@ -40,7 +40,7 @@ final class AppSettings: ObservableObject {
             "overlayAutoCloseSeconds": 6, "overlayCloseAfterAction": true,
             "recordFPS": 30, "gifFPS": 15, "recordMic": false, "recordSystemAudio": true,
             "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
-            "historyLimit": 200, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
+            "historyLimit": 200, "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
         ])
     }
@@ -77,6 +77,12 @@ final class AppSettings: ObservableObject {
     var showClicks: Bool { get { d.bool(forKey: "showClicks") } set { set(newValue, "showClicks") } }
     var showKeystrokes: Bool { get { d.bool(forKey: "showKeystrokes") } set { set(newValue, "showKeystrokes") } }
     var hideDesktopIcons: Bool { get { d.bool(forKey: "hideDesktopIcons") } set { set(newValue, "hideDesktopIcons") } }
+    var onboardingCompleted: Bool { get { d.bool(forKey: "onboardingCompleted") } set { set(newValue, "onboardingCompleted") } }
+    var showLauncher: Bool { get { d.bool(forKey: "showLauncher") } set { set(newValue, "showLauncher") } }
+    var launcherOrigin: CGPoint? {
+        get { d.string(forKey: "launcherOrigin").map { NSPointFromString($0) } }
+        set { d.set(newValue.map { NSStringFromPoint($0) }, forKey: "launcherOrigin") }
+    }
     var historyLimit: Int { get { d.integer(forKey: "historyLimit") } set { set(newValue, "historyLimit") } }
     var filenameTemplate: String { get { d.string(forKey: "filenameTemplate") ?? "" } set { set(newValue, "filenameTemplate") } }
     var saveDirectory: URL {

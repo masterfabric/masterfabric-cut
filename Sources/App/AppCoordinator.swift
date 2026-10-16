@@ -32,7 +32,7 @@ final class AppCoordinator: ObservableObject {
 
     func start() {
         HotkeyManager.shared.start { [weak self] action in self?.perform(action) }
-        if !CapturePermissions.hasScreenRecording { PermissionOnboarding.shared.show() }
+        if AppSettings.shared.onboardingCompleted && !CapturePermissions.hasScreenRecording { PermissionOnboarding.shared.show() }
     }
 
     func perform(_ action: CaptureAction) {

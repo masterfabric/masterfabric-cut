@@ -68,6 +68,7 @@ struct MenuBarActions {
     var selfTimer: () -> Void = {}
     var pinClipboard: () -> Void = {}
     var preferences: () -> Void = {}
+    var welcome: () -> Void = {}
     var about: () -> Void = {}
     var openItem: (CaptureHistoryItem) -> Void = { _ in }
     var dismiss: () -> Void = {}
@@ -120,6 +121,10 @@ struct MenuBarView: View {
                     section("History")
                     recents
                     action(.openHistory, "Show All History", "Screenshots, recordings and text", "clock.arrow.circlepath", .brown)
+                    section("Help")
+                    MenuRow(title: "Welcome & Permissions", subtitle: "Permission status, tips and tricks", symbol: "hand.wave.fill", tint: .blue, shortcut: nil) {
+                        run(actions.welcome)
+                    }
                 }
                 .padding(.horizontal, 8).padding(.bottom, 8)
             }
