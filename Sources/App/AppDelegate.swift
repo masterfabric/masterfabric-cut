@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
     private var prefsWindow: NSWindow?
@@ -9,9 +10,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         setupStatusItem()
-        NotificationCenter.default.addObserver(forName: ShortcutStore.didChange, object: nil, queue: .main) { [weak self] _ in
-            self?.rebuildMenu()
-        }
+        AppCoordinator.shared.start()
+        AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
     }
 
     // MARK: Menu bar
@@ -25,11 +25,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func rebuildMenu() {
         let menu = NSMenu()
-        func add(_ a: ShortcutAction, _ symbol: String) {
+        let rec = AppCoordinator.shared.recorder
+        if rec.state.isActive {
+            let stop = NSMenuItem(title: "Stop Recording", action: #selector(stopRecording), keyEquivalent: "")
+            stop.target = self; menu.addItem(stop)
+            let pause = NSMenuItem(title: rec.state == .paused ? "Resume Recording" : "Pause Recording",
+                                   action: #selector(pauseRecording), keyEquivalent: "")
+            pause.target = self; menu.addItem(pause)
+            menu.addItem(.separator())
+        }
+        func add(_ a: CaptureAction, _ symbol: String) {
             let i = NSMenuItem(title: a.title, action: #selector(menuAction(_:)), keyEquivalent: "")
             i.representedObject = a.rawValue
             i.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
-            if let c = ShortcutStore.shared.combo(for: a) { i.title += "    " + c.displayString }
+            if let c = HotkeyManager.shared.bindings[a] { i.title += "    " + c.displayString }
             i.target = self
             menu.addItem(i)
         }
@@ -37,15 +46,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         add(.captureWindow, "macwindow")
         add(.captureFullscreen, "display")
         add(.capturePreviousArea, "arrow.counterclockwise")
-        add(.scrollingCapture, "arrow.up.and.down.text.horizontal")
+        add(.captureScrolling, "arrow.up.and.down.text.horizontal")
         add(.captureText, "text.viewfinder")
-        add(.selfTimer, "timer")
+        let timer = NSMenuItem(title: "Self-Timer Capture", action: #selector(selfTimer), keyEquivalent: "")
+        timer.target = self; timer.image = NSImage(systemSymbolName: "timer", accessibilityDescription: nil); menu.addItem(timer)
         menu.addItem(.separator())
         add(.recordScreen, "record.circle")
         add(.recordGIF, "gift")
-        add(.recordingStudio, "video.badge.waveform")
+        add(.openStudio, "video.badge.waveform")
         menu.addItem(.separator())
         add(.toggleDesktopIcons, "eye.slash")
+        let pin = NSMenuItem(title: "Pin Clipboard Image", action: #selector(pinClipboard), keyEquivalent: "")
+        pin.target = self; pin.image = NSImage(systemSymbolName: "pin", accessibilityDescription: nil); menu.addItem(pin)
         add(.openHistory, "clock.arrow.circlepath")
         menu.addItem(.separator())
         let prefs = NSMenuItem(title: "Preferences…", action: #selector(showPreferences), keyEquivalent: ",")
@@ -57,9 +69,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func menuAction(_ sender: NSMenuItem) {
-        guard let raw = sender.representedObject as? String, let a = ShortcutAction(rawValue: raw) else { return }
-        AppCoordinator.shared.perform(a)
+        guard let raw = sender.representedObject as? String, let a = CaptureAction(rawValue: raw) else { return }
+        // Let the menu close before capture overlays appear.
+        DispatchQueue.main.async { AppCoordinator.shared.perform(a) }
     }
+    @objc private func selfTimer() { DispatchQueue.main.async { AppCoordinator.shared.selfTimerCapture() } }
+    @objc private func stopRecording() { AppCoordinator.shared.stopRecording() }
+    @objc private func pauseRecording() { AppCoordinator.shared.togglePauseRecording() }
+    @objc private func pinClipboard() { AppCoordinator.shared.pinClipboardImage() }
 
     // MARK: Windows
 

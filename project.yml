@@ -20,6 +20,8 @@ targets:
     platform: macOS
     sources:
       - path: Sources
+        excludes:
+          - "**/*.md"
       - path: Resources
         optional: true
     settings:

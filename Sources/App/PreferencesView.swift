@@ -101,25 +101,27 @@ private struct RecordingPrefs: View {
 }
 
 private struct ShortcutsPrefs: View {
-    @ObservedObject var store = ShortcutStore.shared
+    @State private var tick = 0
     var body: some View {
         VStack {
-            List(ShortcutAction.allCases) { a in
+            List(CaptureAction.allCases, id: \.self) { a in
                 HStack {
                     Text(a.title)
                     Spacer()
-                    ShortcutRecorder(combo: Binding(get: { store.combo(for: a) }, set: { store.set($0, for: a) }))
+                    ShortcutRecorder(combo: Binding(
+                        get: { _ = tick; return HotkeyManager.shared.bindings[a] },
+                        set: { HotkeyManager.shared.register(a, binding: $0); tick += 1 }))
                         .frame(width: 140, height: 24)
                 }
             }
-            HStack { Spacer(); Button("Reset to Defaults") { store.resetToDefaults() } }.padding(.horizontal)
+            HStack { Spacer(); Button("Reset to Defaults") { HotkeyManager.shared.resetToDefaults(); tick += 1 } }.padding(.horizontal)
         }.padding(.vertical, 12)
     }
 }
 
 /// Click-to-record shortcut field.
 struct ShortcutRecorder: NSViewRepresentable {
-    @Binding var combo: KeyCombo?
+    @Binding var combo: HotkeyBinding?
 
     func makeNSView(context: Context) -> RecorderButton {
         let b = RecorderButton(); b.onChange = { combo = $0 }; return b
@@ -130,8 +132,8 @@ struct ShortcutRecorder: NSViewRepresentable {
     }
 
     final class RecorderButton: NSButton {
-        var combo: KeyCombo?
-        var onChange: ((KeyCombo?) -> Void)?
+        var combo: HotkeyBinding?
+        var onChange: ((HotkeyBinding?) -> Void)?
         private var recording = false
 
         override init(frame: NSRect) {
@@ -148,9 +150,9 @@ struct ShortcutRecorder: NSViewRepresentable {
             guard recording else { super.keyDown(with: event); return }
             if event.keyCode == UInt16(kVK_Escape) { recording = false; refreshTitle(); return }
             if event.keyCode == UInt16(kVK_Delete) { recording = false; combo = nil; onChange?(nil); refreshTitle(); return }
-            let mods = KeyCombo.carbonModifiers(from: event.modifierFlags)
-            guard mods != 0 else { return }
-            let c = KeyCombo(keyCode: UInt32(event.keyCode), modifiers: mods)
+            let mods = event.modifierFlags.intersection([.command, .shift, .option, .control])
+            guard !mods.isEmpty else { return }
+            let c = HotkeyBinding(event: event)
             recording = false; combo = c; onChange?(c); refreshTitle()
         }
         override func performKeyEquivalent(with event: NSEvent) -> Bool {

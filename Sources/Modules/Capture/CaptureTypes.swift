@@ -72,11 +72,11 @@ public enum CapturePermissions {
 }
 
 extension NSScreen {
-    var displayID: CGDirectDisplayID {
+    public var displayID: CGDirectDisplayID {
         (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value ?? CGMainDisplayID()
     }
     /// Screen under the mouse cursor, falling back to main.
-    static var underMouse: NSScreen {
+    public static var underMouse: NSScreen {
         let p = NSEvent.mouseLocation
         return screens.first { $0.frame.contains(p) } ?? main ?? screens[0]
     }

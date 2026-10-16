@@ -28,16 +28,3 @@ enum FileOutput {
     }
 }
 
-enum DesktopIcons {
-    static func setHidden(_ hidden: Bool) {
-        let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/usr/bin/defaults")
-        p.arguments = ["write", "com.apple.finder", "CreateDesktop", "-bool", hidden ? "false" : "true"]
-        try? p.run(); p.waitUntilExit()
-        let k = Process()
-        k.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
-        k.arguments = ["Finder"]
-        try? k.run()
-        AppSettings.shared.hideDesktopIcons = hidden
-    }
-}
