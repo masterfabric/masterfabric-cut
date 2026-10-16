@@ -2,15 +2,14 @@ import SwiftUI
 
 struct AboutView: View {
     private var version: String {
-        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0"
         let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "Version \(v) (\(b))"
     }
 
     var body: some View {
         VStack(spacing: 10) {
-            Image(systemName: "scissors.circle.fill").resizable().frame(width: 72, height: 72)
-                .foregroundStyle(.tint)
+            Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 84, height: 84)
             Text("MasterFabric Cut").font(.title.bold())
             Text(version).foregroundStyle(.secondary)
             Text("Screenshots, screen recording and Recording Studio for macOS.")

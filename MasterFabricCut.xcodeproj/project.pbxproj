@@ -11,6 +11,7 @@
 		014D0635683801230040E1BB /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08572107B71C763F78837FE /* AboutView.swift */; };
 		025ABA434F26ADBDBA92CAD2 /* SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB93722A200A68E7A05644A4 /* SelectionOverlay.swift */; };
 		08F8A934A5B08FB454C9ADC0 /* RecordingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD7B4F89CAAEF02EB5BEB40 /* RecordingEngine.swift */; };
+		09311D8BBADF16CB404E26E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDEAE7B348CF0C67889DACC6 /* Assets.xcassets */; };
 		10431BBE11AA1AD3BA066977 /* AnnotationRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9450B017CC9F2B61DA8A2FFA /* AnnotationRenderer.swift */; };
 		1647D2501B35E8339486219A /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */; };
 		181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B876257EBE2D24F70D3CF21 /* CaptureTypes.swift */; };
@@ -95,6 +96,7 @@
 		E2B12F70C05BAE0184C45125 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E5176E90DE22ECB1A830FD5D /* RecordingStudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingStudio.swift; sourceTree = "<group>"; };
 		EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
+		EDEAE7B348CF0C67889DACC6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EE7E11C18D4E8D21D3C2F9A1 /* MasterFabricCutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterFabricCutApp.swift; sourceTree = "<group>"; };
 		F0115329FC94BECC020DD1A7 /* ScrollingCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingCapture.swift; sourceTree = "<group>"; };
 		F14589E5AF1B1F75632D720E /* InputOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputOverlay.swift; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 		FA4715C31A34737A077D4A90 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EDEAE7B348CF0C67889DACC6 /* Assets.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 			buildConfigurationList = 27AC443C2B47AD65EFAC0183 /* Build configuration list for PBXNativeTarget "MasterFabricCut" */;
 			buildPhases = (
 				445A351713F3C8BC6B2AB1F2 /* Sources */,
+				9E0A9C5E6416F30C4FE4A863 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -286,6 +290,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9E0A9C5E6416F30C4FE4A863 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				09311D8BBADF16CB404E26E6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		445A351713F3C8BC6B2AB1F2 /* Sources */ = {
@@ -415,7 +430,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -496,7 +511,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
