@@ -109,7 +109,7 @@ public final class HotkeyManager {
     private var refs: [CaptureAction: EventHotKeyRef] = [:]
     private var ids: [UInt32: CaptureAction] = [:]
     private var handlerInstalled = false
-    private let defaultsKey = "co.masterfabric.cut.hotkeys"
+    private let defaultsKey = "com.masterfabric.cut.hotkeys"
     private let signature: OSType = 0x4D464354 // 'MFCT'
 
     private init() {}

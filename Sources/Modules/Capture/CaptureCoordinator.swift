@@ -20,7 +20,7 @@ public final class CaptureCoordinator {
     public var hideDesktopIconsDuringCapture = false
     public var copyOCRToPasteboard = true
 
-    private let previousAreaKey = "co.masterfabric.cut.previousArea"
+    private let previousAreaKey = "com.masterfabric.cut.previousArea"
     private let overlay = SelectionOverlayController()
     private var scrolling: ScrollingCapture?
     private var busy = false

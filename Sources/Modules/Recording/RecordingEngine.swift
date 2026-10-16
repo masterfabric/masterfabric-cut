@@ -8,7 +8,7 @@ import CoreMedia
 final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
                              AVCaptureAudioDataOutputSampleBufferDelegate, @unchecked Sendable {
 
-    private let queue = DispatchQueue(label: "co.masterfabric.cut.recording.writer")
+    private let queue = DispatchQueue(label: "com.masterfabric.cut.recording.writer")
     private var stream: SCStream?
     private var writer: AVAssetWriter?
     private var videoInput: AVAssetWriterInput?

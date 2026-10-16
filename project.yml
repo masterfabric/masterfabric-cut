@@ -27,7 +27,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: MasterFabric Cut
-        PRODUCT_BUNDLE_IDENTIFIER: co.masterfabric.cut
+        PRODUCT_BUNDLE_IDENTIFIER: com.masterfabric.cut
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Sources/App/Info.plist
         CODE_SIGN_ENTITLEMENTS: Sources/App/MasterFabricCut.entitlements

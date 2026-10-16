@@ -1,4 +1,4 @@
-Build "MasterFabric Cut", a native macOS app written entirely in Swift (SwiftUI + AppKit, ScreenCaptureKit, AVFoundation, Vision). Author: Gürkan Fikret Günak, MasterFabric (masterfabric.co) — in About window, Info.plist copyright, README, LICENSE. Bundle id: co.masterfabric.cut. macOS 14+.
+Build "MasterFabric Cut", a native macOS app written entirely in Swift (SwiftUI + AppKit, ScreenCaptureKit, AVFoundation, Vision). Author: Gürkan Fikret Günak, MasterFabric (masterfabric.co) — in About window, Info.plist copyright, README, LICENSE. Bundle id: com.masterfabric.cut. macOS 14+.
 
 Goal: a 1:1 functional clone of CleanShot X (https://cleanshot.com/), plus a "Recording Studio" mode.
 

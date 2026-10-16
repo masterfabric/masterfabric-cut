@@ -3,7 +3,7 @@
 A native macOS menu bar app (Swift, SwiftUI + AppKit, ScreenCaptureKit, AVFoundation, Vision) that mirrors
 the CleanShot X feature set and adds a **Recording Studio** mode.
 
-Author: **Gürkan Fikret Günak** — [MasterFabric](https://masterfabric.co). Bundle id `co.masterfabric.cut`, macOS 14+. MIT licensed.
+Author: **Gürkan Fikret Günak** — [MasterFabric](https://masterfabric.co). Bundle id `com.masterfabric.cut`, macOS 14+. MIT licensed.
 
 ## Build
 

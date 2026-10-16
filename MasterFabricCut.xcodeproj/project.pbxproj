@@ -325,7 +325,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.masterfabric.cut;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masterfabric.cut;
 				PRODUCT_NAME = "MasterFabric Cut";
 				SDKROOT = macosx;
 			};
@@ -412,7 +412,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.masterfabric.cut;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masterfabric.cut;
 				PRODUCT_NAME = "MasterFabric Cut";
 				SDKROOT = macosx;
 			};
