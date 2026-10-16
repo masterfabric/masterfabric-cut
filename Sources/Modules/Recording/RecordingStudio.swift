@@ -64,7 +64,7 @@ public final class RecordingStudio: ObservableObject {
             self.hud.hide()
             switch result {
             case .success(let r): self.lastResult = r; self.onFinished?(r)
-            case .failure(let e): if case RecordingError.cancelled = e {} else { self.errorMessage = e.localizedDescription }
+            case .failure(let e): self.report(e)
             }
         }
     }
@@ -89,8 +89,19 @@ public final class RecordingStudio: ObservableObject {
             if selectedWindowID == nil || !windows.contains(where: { $0.id == selectedWindowID }) { selectedWindowID = windows.first?.id }
             if selectedDisplayID == nil || !displays.contains(where: { $0.id == selectedDisplayID }) { selectedDisplayID = displays.first?.id }
         } catch {
-            errorMessage = RecordingError.screenPermissionDenied.localizedDescription
+            report(error)
         }
+    }
+
+    /// Friendly error surface: permission problems open the onboarding sheet, the rest become inline text.
+    private func report(_ error: Error) {
+        if ErrorPresenter.isCancellation(error) { return }
+        if ErrorPresenter.isPermission(error) {
+            errorMessage = "Screen Recording access is needed to list windows and record."
+            PermissionOnboarding.shared.show { [weak self] in Task { await self?.refresh() } }
+            return
+        }
+        errorMessage = ErrorPresenter.message(for: error)
     }
 
     // MARK: Session
@@ -126,15 +137,13 @@ public final class RecordingStudio: ObservableObject {
             try await manager.start(cfg)
         } catch {
             bubble.hide(); hud.hide()
-            if case RecordingError.cancelled = error { return }
-            errorMessage = error.localizedDescription
+            report(error)
         }
     }
 
     public func stop() async {
         do { try await manager.stop() } catch {
-            if case RecordingError.cancelled = error { bubble.hide(); hud.hide() }
-            else { errorMessage = error.localizedDescription }
+            if ErrorPresenter.isCancellation(error) { bubble.hide(); hud.hide() } else { report(error) }
         }
     }
 

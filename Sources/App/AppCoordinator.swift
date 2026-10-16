@@ -20,9 +20,10 @@ final class AppCoordinator: ObservableObject {
     private init() {
         capture.onCapture = { [weak self] r in self?.handle(r) }
         capture.onText = { text, _ in AnnotateModule.shared.handleOCRText(text) }
-        capture.onError = { error in
-            guard (error as? CaptureError).map({ if case .cancelled = $0 { return false } else { return true } }) ?? true else { return }
-            let a = NSAlert(); a.messageText = "Capture failed"; a.informativeText = error.localizedDescription; a.runModal()
+        capture.onError = { [weak self] error in
+            ErrorPresenter.present(error, title: "Capture couldn't finish") {
+                if let a = self?.capture.lastAction { self?.perform(a) }
+            }
         }
         recorder.onFinished = { [weak self] result in self?.finished(result) }
         studio.onFinished = { [weak self] r in self?.finished(.success(r)) }
@@ -31,6 +32,7 @@ final class AppCoordinator: ObservableObject {
 
     func start() {
         HotkeyManager.shared.start { [weak self] action in self?.perform(action) }
+        if !CapturePermissions.hasScreenRecording { PermissionOnboarding.shared.show() }
     }
 
     func perform(_ action: CaptureAction) {
@@ -92,7 +94,10 @@ final class AppCoordinator: ObservableObject {
         if recorder.state.isActive { stopRecording(); return }
         let s = AppSettings.shared
         let overlay = SelectionOverlayController()
-        guard CapturePermissions.hasScreenRecording else { CapturePermissions.requestScreenRecording(); return }
+        guard CapturePermissions.hasScreenRecording else {
+            PermissionOnboarding.shared.show { [weak self] in Task { await self?.startRecording(format: format) } }
+            return
+        }
         guard case .rect(let rect)? = await overlay.run(mode: .area, windowCandidates: [], snapshots: [:]) else { return }
         guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(rect) }) ?? NSScreen.main else { return }
         let local = CGRect(x: rect.minX - screen.frame.minX,
@@ -107,7 +112,9 @@ final class AppCoordinator: ObservableObject {
         cfg.showClicks = s.showClicks
         cfg.showKeystrokes = s.showKeystrokes
         cfg.countdown = 3
-        do { try await recorder.start(cfg) } catch { alert(error) }
+        do { try await recorder.start(cfg) } catch {
+            ErrorPresenter.present(error, title: "Recording couldn't start") { [weak self] in Task { await self?.startRecording(format: format) } }
+        }
     }
 
     private func finished(_ result: Result<RecordingResult, Error>) {
@@ -117,13 +124,8 @@ final class AppCoordinator: ObservableObject {
             if r.format == .mp4 { TrimEditorWindowController.present(url: r.url, onExported: { _ in }) }
             NSWorkspace.shared.activateFileViewerSelecting([r.url])
         case .failure(let e):
-            if case RecordingError.cancelled = e { return }
-            alert(e)
+            ErrorPresenter.present(e, title: "Recording couldn't be saved")
         }
-    }
-
-    private func alert(_ error: Error) {
-        let a = NSAlert(); a.messageText = "Recording failed"; a.informativeText = error.localizedDescription; a.runModal()
     }
 
     // MARK: Studio

@@ -65,7 +65,7 @@ final class TrimModel: ObservableObject {
                 done(dest)
             } catch {
                 exportProgress = nil
-                errorMessage = error.localizedDescription
+                errorMessage = ErrorPresenter.message(for: error)
             }
         }
     }

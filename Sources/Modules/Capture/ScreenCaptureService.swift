@@ -16,7 +16,12 @@ public final class ScreenCaptureService {
 
     private func shareable() async throws -> SCShareableContent {
         guard CapturePermissions.hasScreenRecording else { throw CaptureError.permissionDenied }
-        return try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
+        do {
+            return try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
+        } catch {
+            if ErrorPresenter.isPermission(error) { throw CaptureError.permissionDenied }
+            throw error
+        }
     }
 
     private var primaryHeight: CGFloat { NSScreen.screens.first?.frame.height ?? 0 }

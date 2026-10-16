@@ -200,7 +200,7 @@ final class AnnotationEditorWindowController: NSWindowController, NSWindowDelega
             try data.write(to: url, options: .atomic)
             onSaved?(url)
         } catch {
-            NSAlert(error: error).runModal()
+            ErrorPresenter.present(error, title: "Couldn't save the image")
         }
     }
 }

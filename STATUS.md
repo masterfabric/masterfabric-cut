@@ -3,7 +3,7 @@
 Build: `xcodegen generate && xcodebuild -project MasterFabricCut.xcodeproj -scheme MasterFabricCut -configuration Debug -derivedDataPath build build` — **succeeds** (Xcode 26.4, macOS 14 target). The app launches as a menu bar item.
 
 ## Implemented (compiles; wired in `AppCoordinator`)
-- Menu bar app (LSUIElement), configurable global hotkeys (Carbon), Preferences (General, Shortcuts, Output, Format, Quick Access, Recording), About window with author credit, Info.plist copyright/usage strings, entitlements.
+- Menu bar app (LSUIElement; custom SwiftUI dropdown panel, see below), configurable global hotkeys (Carbon), Preferences (General, Shortcuts, Output, Format, Quick Access, Recording), About window with author credit, Info.plist copyright/usage strings, entitlements.
 - Capture: area/window/fullscreen/previous area, crosshair + magnifier + dimensions, self-timer, scrolling capture, OCR (Vision), hide desktop icons.
 - Annotate: editor (arrows, shapes, text, highlighter, blur/pixelate, steps, crop, background/padding, spotlight), Quick Access overlay (copy/save/annotate/pin/drag/close), pinned screenshots, history.
 - Recording: area recording to MP4/GIF with mic + system audio, click/keystroke overlays, pause/resume (menu bar), trim editor opens after MP4 recording; Recording Studio (window/display + webcam bubble, layouts, mic, countdown, export).
@@ -29,3 +29,15 @@ Build: `xcodegen generate && xcodebuild -project MasterFabricCut.xcodeproj -sche
 
 ## UI polish
 - Tooltips on menu bar items, annotate toolbar/sidebar, Recording Studio, trim editor and every Preferences control; hover states on toolbar buttons; SF Symbols on editor actions.
+
+## Capture errors & permissions (fix round)
+Unified log for the app showed no app-level errors (only system AppIntents/XPC noise); the user-visible failures were code-path ones:
+- **Screen Recording not granted → raw "Screen Recording permission is required…" alert** (area/window/fullscreen/scrolling/OCR), repeated every attempt, and `CGRequestScreenCaptureAccess` was fired on every hotkey. Same raw text in Recording Studio (`refresh()` swallowed any error into the permission string) and recording start.
+- `SCShareableContent` throwing `SCStreamError.userDeclined` (-3801) surfaced as a raw NSError.
+- Raw `localizedDescription` / `NSAlert(error:)` leaked from Studio, Trim editor, annotation Save.
+Fixes: `Sources/Shared/PermissionOnboarding.swift` — `ErrorPresenter` (maps every error to friendly copy, logs the raw one, ignores cancellation) and a `PermissionOnboarding` window (3 steps, opens the Screen Recording pane, calls `CGRequestScreenCaptureAccess` once on button press, polls for the grant, auto-retries the last capture/recording, "Restart App" fallback). Shown at launch when access is missing. SCK -3801 is mapped to `permissionDenied`.
+- **Signing / TCC:** no code-signing identity exists on this machine (`security find-identity -v -p codesigning` → 0), so debug builds are ad-hoc signed and macOS drops the Screen Recording grant after every rebuild. Workarounds: create a free "Apple Development" certificate in Xcode (Settings › Accounts) and set `CODE_SIGN_IDENTITY`/`DEVELOPMENT_TEAM` in `project.yml`, or after a rebuild run `tccutil reset ScreenCapture co.masterfabric.cut` and re-grant via the onboarding window.
+- Not verified end-to-end in this sandbox: actual capture after grant (needs the permission + UI input). Build + launch verified.
+
+## Menu bar dropdown redesign
+`Sources/App/MenuBarPanel.swift`: borderless rounded (r=22) material panel under the status item replacing `NSMenu`: header (app name, REC badge), sections Capture / Record / Tools / History, tinted SF Symbol tiles, title + gray description, right-aligned shortcut hints, recent-captures thumbnail row (opens the file), hover highlight, Preferences/About/Quit footer, Esc/outside-click dismiss, live Stop/Pause rows while recording.

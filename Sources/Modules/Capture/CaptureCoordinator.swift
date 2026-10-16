@@ -24,6 +24,8 @@ public final class CaptureCoordinator {
     private let overlay = SelectionOverlayController()
     private var scrolling: ScrollingCapture?
     private var busy = false
+    /// Most recent action, so the shell can retry it after Screen Recording is granted.
+    public private(set) var lastAction: CaptureAction?
 
     public init() {}
 
@@ -34,6 +36,7 @@ public final class CaptureCoordinator {
 
     /// Entry point for menu items and hotkeys. Non-capture actions are ignored (handled by the shell).
     public func perform(_ action: CaptureAction) {
+        lastAction = action
         switch action {
         case .captureArea: Task { await captureArea() }
         case .capturePreviousArea: Task { await capturePreviousArea() }
@@ -116,10 +119,7 @@ public final class CaptureCoordinator {
     // MARK: Helpers
 
     private func select(initial: SelectionOverlayController.Mode) async throws -> SelectionOutcome? {
-        if !CapturePermissions.hasScreenRecording {
-            CapturePermissions.requestScreenRecording()
-            throw CaptureError.permissionDenied
-        }
+        if !CapturePermissions.hasScreenRecording { throw CaptureError.permissionDenied }
         let windows = (try? await service.listWindows()) ?? []
         var snaps: [CGDirectDisplayID: CGImage] = [:]
         for s in NSScreen.screens { snaps[s.displayID] = try? await service.captureRect(s.frame).image }
