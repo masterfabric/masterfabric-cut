@@ -76,7 +76,7 @@ final class QuickAccessOverlayController {
     private var entries: [Entry] = []
 
     /// Card size; the panel is larger by `pad` on each side so the soft shadow isn't clipped.
-    private let cardWidth: CGFloat = 232
+    private let cardWidth: CGFloat = 320
     private let pad: CGFloat = 24
     private let margin: CGFloat = 14
     private let spacing: CGFloat = 10
@@ -154,7 +154,7 @@ final class QuickAccessOverlayController {
 
     private func cardSize(for image: NSImage) -> NSSize {
         let aspect = image.size.width > 0 ? image.size.height / image.size.width : 0.6
-        let h = min(max(cardWidth * aspect, 96), 190)
+        let h = min(max(cardWidth * aspect, 140), 280)
         return NSSize(width: cardWidth, height: h)
     }
 
@@ -269,7 +269,7 @@ struct QuickAccessItemView: View {
     @State private var hovering = false
     @State private var hint: String?
 
-    private let radius: CGFloat = 20
+    private let radius: CGFloat = 26
 
     var body: some View {
         ZStack {
@@ -286,13 +286,13 @@ struct QuickAccessItemView: View {
 
             if let flash = item.flash {
                 Label(flash, systemImage: flash == "Save failed" ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 14).padding(.vertical, 8)
+                    .padding(.horizontal, 20).padding(.vertical, 11)
                     .background(.ultraThinMaterial, in: Capsule())
                     .transition(.scale(scale: 0.8).combined(with: .opacity))
             } else if hovering {
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     pill("Copy", "doc.on.doc", "Copy to clipboard", actions.copy)
                     pill("Save", "square.and.arrow.down", "Save to disk", actions.save)
                 }
@@ -301,11 +301,11 @@ struct QuickAccessItemView: View {
                 corner("pin.fill", .topTrailing, "Pin to screen as a floating window", actions.pin)
                 corner("pencil.tip.crop.circle", .bottomLeading, "Annotate in the editor", actions.annotate)
                 Text(hint ?? "Drag to drop the image anywhere")
-                    .font(.system(size: 10.5, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                    .padding(.bottom, 8).padding(.horizontal, 40)
+                    .padding(.bottom, 12).padding(.horizontal, 56)
                     .allowsHitTesting(false)
             }
         }
@@ -314,7 +314,7 @@ struct QuickAccessItemView: View {
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous)
             .strokeBorder(Color.white.opacity(0.28), lineWidth: 0.75))
-        .shadow(color: .black.opacity(0.28), radius: 14, y: 6)
+        .shadow(color: .black.opacity(0.28), radius: 20, y: 8)
         .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
         .scaleEffect(hovering ? 1.025 : 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.75), value: hovering)
@@ -342,7 +342,7 @@ struct QuickAccessItemView: View {
             return NSItemProvider(object: item.image)
         } preview: {
             Image(nsImage: item.image).resizable().aspectRatio(contentMode: .fit)
-                .frame(width: 150).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .frame(width: 220).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .contextMenu {
             Button { actions.copy() } label: { Label("Copy", systemImage: "doc.on.doc") }
@@ -361,7 +361,7 @@ struct QuickAccessItemView: View {
     private func corner(_ symbol: String, _ alignment: Alignment, _ help: String,
                         _ action: @escaping () -> Void) -> some View {
         QuickAccessRoundButton(symbol: symbol, help: help, action: action) { hint = $0 }
-            .padding(9)
+            .padding(13)
             .frame(width: cardSize.width, height: cardSize.height, alignment: alignment)
     }
 }
@@ -378,8 +378,8 @@ private struct QuickAccessPill: View {
         Button(action: action) {
             Label(title, systemImage: symbol)
                 .labelStyle(.titleAndIcon)
-                .font(.system(size: 12.5, weight: .semibold))
-                .frame(width: 92, height: 28)
+                .font(.system(size: 17, weight: .semibold))
+                .frame(width: 132, height: 40)
                 .foregroundColor(.black.opacity(0.85))
                 .background(Capsule(style: .continuous).fill(Color.white.opacity(over ? 1 : 0.88)))
                 .shadow(color: .black.opacity(0.2), radius: over ? 6 : 3, y: 1)
@@ -402,8 +402,8 @@ private struct QuickAccessRoundButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 11, weight: .bold))
-                .frame(width: 24, height: 24)
+                .font(.system(size: 17, weight: .bold))
+                .frame(width: 38, height: 38)
                 .foregroundColor(.black.opacity(0.8))
                 .background(Circle().fill(Color.white.opacity(over ? 1 : 0.88)))
                 .shadow(color: .black.opacity(0.2), radius: over ? 5 : 2, y: 1)

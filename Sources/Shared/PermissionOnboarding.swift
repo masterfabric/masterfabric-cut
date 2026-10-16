@@ -41,7 +41,7 @@ enum ErrorPresenter {
     /// Permission problems open the onboarding sheet (and run `retry` once granted); everything else is a friendly alert.
     @MainActor static func present(_ error: Error, title: String, retry: (() -> Void)? = nil) {
         if isCancellation(error) { return }
-        if isPermission(error) { PermissionOnboarding.shared.show(onGranted: retry); return }
+        if isPermission(error) { PermissionManager.shared.showDenied(.screen, onGranted: retry); return }
         let a = NSAlert()
         a.alertStyle = .informational
         a.messageText = title
@@ -52,27 +52,27 @@ enum ErrorPresenter {
     }
 }
 
-/// Friendly "how to grant Screen Recording" window that polls for the grant and then retries the action.
+/// The one friendly sheet shown when a permission is already denied: Open System Settings + Restart app.
 @MainActor
-final class PermissionOnboarding {
-    static let shared = PermissionOnboarding()
+final class PermissionSheet {
+    static let shared = PermissionSheet()
     private var window: NSWindow?
     private var onGranted: (() -> Void)?
 
-    func show(onGranted: (() -> Void)? = nil) {
+    func show(_ p: Permission, onGranted: (() -> Void)? = nil) {
         self.onGranted = onGranted
-        if CapturePermissions.hasScreenRecording { finish(); return }
-        if window == nil {
-            let w = NSWindow(contentViewController: NSHostingController(rootView: PermissionOnboardingView(
-                onGranted: { [weak self] in self?.finish() },
-                onClose: { [weak self] in self?.window?.close() })))
-            w.isReleasedWhenClosed = false
-            w.title = "Allow Screen Recording"
-            w.styleMask = [.titled, .closable]
-            window = w
-        }
+        if PermissionManager.shared.isGranted(p) { finish(); return }
+        window?.close()
+        let w = NSWindow(contentViewController: NSHostingController(rootView: PermissionSheetView(
+            permission: p,
+            onGranted: { [weak self] in self?.finish() },
+            onClose: { [weak self] in self?.window?.close() })))
+        w.isReleasedWhenClosed = false
+        w.title = "Allow \(p.title)"
+        w.styleMask = [.titled, .closable]
+        window = w
         NSApp.activate(ignoringOtherApps: true)
-        window?.center(); window?.makeKeyAndOrderFront(nil)
+        w.center(); w.makeKeyAndOrderFront(nil)
     }
 
     private func finish() {
@@ -82,56 +82,41 @@ final class PermissionOnboarding {
     }
 }
 
-private struct PermissionOnboardingView: View {
+private struct PermissionSheetView: View {
+    let permission: Permission
     let onGranted: () -> Void
     let onClose: () -> Void
-    @State private var granted = CapturePermissions.hasScreenRecording
-    @State private var requested = false
+    @State private var granted = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 18) {
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color.accentColor.gradient).frame(width: 64, height: 64)
-                Image(systemName: granted ? "checkmark" : "rectangle.dashed.badge.record")
+                Image(systemName: granted ? "checkmark" : "lock.open")
                     .font(.system(size: 28, weight: .semibold)).foregroundStyle(.white)
             }
-            Text("Allow Screen Recording").font(.title2.bold())
-            Text("MasterFabric Cut needs permission to see your screen so it can take screenshots and record video. Nothing leaves your Mac.")
+            Text("\(permission.title) is turned off").font(.title2.bold())
+            Text("MasterFabric Cut needs \(permission.title) access for this. Nothing leaves your Mac.")
                 .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 10) {
-                step(1, "Click **Open System Settings** below.")
-                step(2, "Turn on **MasterFabric Cut** under Privacy & Security › Screen & System Audio Recording.")
-                step(3, "Click **Restart MasterFabric Cut** here (or **Quit & Reopen** if macOS asks), then try again.")
-                Text("Unsigned development builds lose this permission on every rebuild and must be re-granted.")
-                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                step(1, "Click **Open System Settings** and turn on **MasterFabric Cut**.")
+                step(2, "Click **Restart App** (or **Quit & Reopen** if macOS asks), then try again.")
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading)
             .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            HStack(spacing: 6) {
-                Circle().fill(granted ? Color.green : Color.orange).frame(width: 8, height: 8)
-                Text(granted ? "Access granted" : "Waiting for permission…").font(.callout).foregroundStyle(.secondary)
-            }
             HStack {
                 Button("Not Now", action: onClose)
                 Spacer()
-                if requested {
-                    Button("Restart MasterFabric Cut") { AppRelauncher.relaunch() }
-                        .help("macOS only applies a new Screen Recording grant after the app is relaunched")
-                        .keyboardShortcut(.defaultAction)
-                }
-                Button(requested ? "Open System Settings Again" : "Open System Settings") {
-                    if !requested { _ = CapturePermissions.requestScreenRecording() }
-                    requested = true
-                    NSWorkspace.shared.open(CapturePermissions.screenRecordingSettingsURL)
-                }.keyboardShortcut(requested ? nil : .defaultAction)
+                Button("Restart App") { AppRelauncher.relaunch() }
+                    .help("macOS applies a new Screen Recording grant only after the app is relaunched")
+                Button("Open System Settings") { NSWorkspace.shared.open(permission.settingsURL) }
+                    .keyboardShortcut(.defaultAction)
             }
         }
         .padding(24).frame(width: 460)
         .onReceive(timer) { _ in
-            Task {
-                if await CapturePermissions.probeScreenRecording() { granted = true; onGranted() }
-            }
+            if PermissionManager.shared.isGranted(permission) { granted = true; onGranted() }
         }
     }
 

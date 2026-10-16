@@ -1,5 +1,6 @@
 import AppKit
 import AVFoundation
+import SQLite3
 
 enum CaptureHistoryKind: String, Codable, CaseIterable, Identifiable {
     case screenshot, recording, gif, ocr
@@ -41,7 +42,8 @@ final class CaptureHistoryStore: ObservableObject {
     let directory: URL
     private var itemsDirectory: URL { directory.appendingPathComponent("Items", isDirectory: true) }
     private var thumbsDirectory: URL { directory.appendingPathComponent("Thumbnails", isDirectory: true) }
-    private var indexURL: URL { directory.appendingPathComponent("index.json") }
+    private var legacyIndexURL: URL { directory.appendingPathComponent("index.json") }
+    private let db = Database.shared
     private let thumbCache = NSCache<NSString, NSImage>()
 
     init(directory: URL? = nil) {
@@ -151,14 +153,45 @@ final class CaptureHistoryStore: ObservableObject {
     }
 
     private func load() {
-        guard let data = try? Data(contentsOf: indexURL),
-              let decoded = try? JSONDecoder().decode([CaptureHistoryItem].self, from: data) else { return }
-        items = decoded.filter { $0.kind == .ocr || FileManager.default.fileExists(atPath: $0.filePath) }
+        importLegacyIndexIfNeeded()
+        var loaded: [CaptureHistoryItem] = []
+        db.run("SELECT id, date, kind, file_path, thumbnail_path, width, height, text FROM history ORDER BY date DESC") { s in
+            guard let id = Database.text(s, 0).flatMap(UUID.init(uuidString:)),
+                  let kind = Database.text(s, 2).flatMap(CaptureHistoryKind.init(rawValue:)) else { return }
+            loaded.append(CaptureHistoryItem(
+                id: id, date: Date(timeIntervalSince1970: sqlite3_column_double(s, 1)), kind: kind,
+                filePath: Database.text(s, 3) ?? "",
+                thumbnailFileName: Database.text(s, 4).map { ($0 as NSString).lastPathComponent },
+                pixelWidth: Int(sqlite3_column_int(s, 5)), pixelHeight: Int(sqlite3_column_int(s, 6)),
+                text: Database.text(s, 7)))
+        }
+        items = loaded.filter { $0.kind == .ocr || FileManager.default.fileExists(atPath: $0.filePath) }
+        let gone = loaded.filter { l in !items.contains { $0.id == l.id } }
+        gone.forEach { db.run("DELETE FROM history WHERE id = ?1", [.text($0.id.uuidString)]) }
+    }
+
+    /// One-time import of the old `index.json` into SQLite; the JSON is renamed afterwards.
+    private func importLegacyIndexIfNeeded() {
+        guard let data = try? Data(contentsOf: legacyIndexURL),
+              let old = try? JSONDecoder().decode([CaptureHistoryItem].self, from: data) else { return }
+        db.transaction { old.forEach(upsert) }
+        try? FileManager.default.moveItem(at: legacyIndexURL, to: directory.appendingPathComponent("index.json.migrated"))
+    }
+
+    private func upsert(_ i: CaptureHistoryItem) {
+        db.run("""
+            INSERT OR REPLACE INTO history(id, date, kind, file_path, thumbnail_path, width, height, text)
+            VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+            """, [.text(i.id.uuidString), .double(i.date.timeIntervalSince1970), .text(i.kind.rawValue), .text(i.filePath),
+                  i.thumbnailFileName.map { .text(thumbsDirectory.appendingPathComponent($0).path) } ?? .null,
+                  .int(Int64(i.pixelWidth)), .int(Int64(i.pixelHeight)), i.text.map { .text($0) } ?? .null])
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(items) else { return }
-        try? data.write(to: indexURL, options: .atomic)
+        db.transaction {
+            db.run("DELETE FROM history")
+            items.forEach(upsert)
+        }
     }
 
     private func writeThumbnail(_ cg: CGImage, id: UUID) -> String? {

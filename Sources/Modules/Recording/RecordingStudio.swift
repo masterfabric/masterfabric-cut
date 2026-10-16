@@ -136,7 +136,7 @@ public final class RecordingStudio: ObservableObject {
 
     /// One low-res snapshot of the chosen window/display (own windows excluded) for the setup preview.
     public func capturePreview() async {
-        guard studioOpen, !manager.state.isActive, CapturePermissions.hasScreenRecording, let content else { return }
+        guard studioOpen, !manager.state.isActive, PermissionManager.shared.isGranted(.screen), let content else { return }
         let filter: SCContentFilter
         let size: CGSize
         switch sourceKind {
@@ -189,7 +189,7 @@ public final class RecordingStudio: ObservableObject {
         if ErrorPresenter.isCancellation(error) { return }
         if ErrorPresenter.isPermission(error) {
             errorMessage = "Screen Recording access is needed to list windows and record."
-            PermissionOnboarding.shared.show { [weak self] in Task { await self?.refresh() } }
+            PermissionManager.shared.showDenied(.screen) { [weak self] in Task { await self?.refresh() } }
             return
         }
         errorMessage = ErrorPresenter.message(for: error)

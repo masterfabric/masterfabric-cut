@@ -70,42 +70,26 @@ enum PermissionKind: CaseIterable, Identifiable {
         }
     }
     var required: Bool { self == .screen }
-    var settingsURL: URL? {
-        let pane: String
+    private var permission: Permission {
         switch self {
-        case .screen: pane = "Privacy_ScreenCapture"
-        case .camera: pane = "Privacy_Camera"
-        case .microphone: pane = "Privacy_Microphone"
-        case .accessibility: pane = "Privacy_Accessibility"
-        }
-        return URL(string: "x-apple.systempreferences:com.apple.preference.security?\(pane)")
-    }
-
-    var state: PermissionState {
-        func av(_ t: AVMediaType) -> PermissionState {
-            switch AVCaptureDevice.authorizationStatus(for: t) {
-            case .authorized: return .granted
-            case .notDetermined: return .notDetermined
-            default: return .denied
-            }
-        }
-        switch self {
-        case .screen: return CapturePermissions.hasScreenRecording ? .granted : .notDetermined
-        case .camera: return av(.video)
-        case .microphone: return av(.audio)
-        case .accessibility: return CapturePermissions.hasAccessibility ? .granted : .notDetermined
+        case .screen: return .screen
+        case .camera: return .camera
+        case .microphone: return .microphone
+        case .accessibility: return .accessibility
         }
     }
 
-    func request() {
-        switch self {
-        case .screen: _ = CapturePermissions.requestScreenRecording()
-        case .camera: AVCaptureDevice.requestAccess(for: .video) { _ in }
-        case .microphone: AVCaptureDevice.requestAccess(for: .audio) { _ in }
-        case .accessibility: CapturePermissions.requestAccessibility()
+    @MainActor var state: PermissionState {
+        switch PermissionManager.shared.status(permission) {
+        case .granted: return .granted
+        case .notDetermined: return .notDetermined
+        case .denied: return .denied
         }
     }
-    func openSettings() { if let u = settingsURL { NSWorkspace.shared.open(u) } }
+
+    /// Explicit Grant click: one system prompt, otherwise the denied sheet.
+    @MainActor func request() { Task { _ = await PermissionManager.shared.ensure(permission) } }
+    func openSettings() { NSWorkspace.shared.open(permission.settingsURL) }
 }
 
 // MARK: - View

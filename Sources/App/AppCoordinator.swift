@@ -32,7 +32,6 @@ final class AppCoordinator: ObservableObject {
 
     func start() {
         HotkeyManager.shared.start { [weak self] action in self?.perform(action) }
-        if AppSettings.shared.onboardingCompleted && !CapturePermissions.hasScreenRecording { PermissionOnboarding.shared.show() }
     }
 
     func perform(_ action: CaptureAction) {
@@ -94,10 +93,7 @@ final class AppCoordinator: ObservableObject {
         if recorder.state.isActive { stopRecording(); return }
         let s = AppSettings.shared
         let overlay = SelectionOverlayController()
-        guard await CapturePermissions.probeScreenRecording() else {
-            PermissionOnboarding.shared.show { [weak self] in Task { await self?.startRecording(format: format) } }
-            return
-        }
+        guard await PermissionManager.shared.ensure(.screen, onGranted: { [weak self] in Task { await self?.startRecording(format: format) } }) else { return }
         guard case .rect(let rect)? = await overlay.run(mode: .area, windowCandidates: [], snapshots: [:]) else { return }
         guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(rect) }) ?? NSScreen.main else { return }
         let local = CGRect(x: rect.minX - screen.frame.minX,

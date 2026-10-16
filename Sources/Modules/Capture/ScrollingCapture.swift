@@ -21,10 +21,7 @@ public final class ScrollingCapture {
     public func stop() { cancelled = true }
 
     public func capture(rect: CGRect) async throws -> CaptureResult {
-        guard CapturePermissions.hasAccessibility else {
-            CapturePermissions.requestAccessibility()
-            throw CaptureError.accessibilityRequired
-        }
+        guard await PermissionManager.shared.ensure(.accessibility) else { throw CaptureError.cancelled }
         cancelled = false
         installEscMonitor()
         defer { monitors.forEach(NSEvent.removeMonitor); monitors.removeAll() }

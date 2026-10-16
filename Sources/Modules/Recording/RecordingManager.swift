@@ -27,9 +27,6 @@ public final class RecordingManager: ObservableObject {
         }
     }
 
-    public static func hasScreenPermission() -> Bool { CGPreflightScreenCaptureAccess() }
-    public static func requestScreenPermission() { _ = CGRequestScreenCaptureAccess() }
-
     public static func microphones() -> [AVCaptureDevice] {
         AVCaptureDevice.DiscoverySession(deviceTypes: [.microphone, .external],
                                          mediaType: .audio, position: .unspecified).devices
@@ -40,12 +37,9 @@ public final class RecordingManager: ObservableObject {
     /// Runs the optional countdown, then starts recording.
     public func start(_ config: RecordingConfig) async throws {
         guard state == .idle else { throw RecordingError.invalidState }
-        guard await CapturePermissions.probeScreenRecording() else {
-            CapturePermissions.requestScreenRecording()
-            throw RecordingError.screenPermissionDenied
-        }
+        guard await PermissionManager.shared.ensure(.screen) else { throw RecordingError.cancelled }
         if config.microphone && config.format == .mp4 {
-            guard await AVCaptureDevice.requestAccess(for: .audio) else { throw RecordingError.microphonePermissionDenied }
+            guard await PermissionManager.shared.ensure(.microphone) else { throw RecordingError.cancelled }
         }
         self.config = config
         cancelRequested = false

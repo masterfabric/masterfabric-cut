@@ -144,7 +144,7 @@ public final class HotkeyManager {
 
     public func resetToDefaults() {
         for a in CaptureAction.allCases { register(a, binding: a.defaultBinding, persist: false) }
-        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        AppStateStore.shared.removeObject(forKey: defaultsKey)
     }
 
     public func unregisterAll() {
@@ -171,11 +171,11 @@ public final class HotkeyManager {
     private func save() {
         let enc = Dictionary(uniqueKeysWithValues: bindings.map { ($0.key.rawValue, $0.value) })
         // Explicitly cleared actions are stored as absent; combine with a marker of known actions.
-        if let data = try? JSONEncoder().encode(enc) { UserDefaults.standard.set(data, forKey: defaultsKey) }
+        if let data = try? JSONEncoder().encode(enc) { AppStateStore.shared.set(data, forKey: defaultsKey) }
     }
 
     private func loadStored() -> [CaptureAction: HotkeyBinding] {
-        guard let data = UserDefaults.standard.data(forKey: defaultsKey),
+        guard let data = AppStateStore.shared.data(forKey: defaultsKey),
               let dict = try? JSONDecoder().decode([String: HotkeyBinding].self, from: data) else { return [:] }
         return Dictionary(uniqueKeysWithValues: dict.compactMap { k, v in CaptureAction(rawValue: k).map { ($0, v) } })
     }

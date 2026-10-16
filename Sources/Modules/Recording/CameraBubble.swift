@@ -76,7 +76,7 @@ public final class CameraBubbleController {
     }
 
     public static func requestAccess() async -> Bool {
-        await AVCaptureDevice.requestAccess(for: .video)
+        await PermissionManager.shared.ensure(.camera)
     }
 
     private static func input(for cameraID: String?) throws -> AVCaptureDeviceInput {

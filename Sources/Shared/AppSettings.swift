@@ -24,10 +24,10 @@ enum OverlayCorner: String, CaseIterable, Identifiable {
     }
 }
 
-/// Central, UserDefaults-backed preferences shared across modules.
+/// Central, SQLite-backed (AppStateStore) preferences shared across modules.
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
-    private let d = UserDefaults.standard
+    private let d = AppStateStore.shared
 
     private init() {
         d.register(defaults: [

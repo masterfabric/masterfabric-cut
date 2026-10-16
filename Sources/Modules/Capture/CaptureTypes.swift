@@ -62,29 +62,6 @@ public struct WindowInfo {
     public let appName: String?
 }
 
-public enum CapturePermissions {
-    public static var hasScreenRecording: Bool { CGPreflightScreenCaptureAccess() }
-    private static var didRequest = false
-    /// Triggers the system prompt at most once per launch (macOS ignores repeats and re-prompting is noisy).
-    @discardableResult public static func requestScreenRecording() -> Bool {
-        if CGPreflightScreenCaptureAccess() { return true }
-        if didRequest { return false }
-        didRequest = true
-        return CGRequestScreenCaptureAccess()
-    }
-    /// `CGPreflightScreenCaptureAccess` is cached per process and can lag behind System Settings, so also ask ScreenCaptureKit.
-    public static func probeScreenRecording() async -> Bool {
-        if CGPreflightScreenCaptureAccess() { return true }
-        return (try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)) != nil
-    }
-    public static let screenRecordingSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!
-    public static var hasAccessibility: Bool { AXIsProcessTrusted() }
-    public static func requestAccessibility() {
-        let opts = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
-        _ = AXIsProcessTrustedWithOptions(opts)
-    }
-}
-
 extension NSScreen {
     public var displayID: CGDirectDisplayID {
         (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value ?? CGMainDisplayID()

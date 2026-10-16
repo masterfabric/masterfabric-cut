@@ -30,8 +30,8 @@ public final class CaptureCoordinator {
     public init() {}
 
     public var previousArea: CGRect? {
-        get { UserDefaults.standard.string(forKey: previousAreaKey).map(NSRectFromString).flatMap { $0.isEmpty ? nil : $0 } }
-        set { UserDefaults.standard.set(newValue.map(NSStringFromRect), forKey: previousAreaKey) }
+        get { AppStateStore.shared.string(forKey: previousAreaKey).map(NSRectFromString).flatMap { $0.isEmpty ? nil : $0 } }
+        set { AppStateStore.shared.set(newValue.map(NSStringFromRect), forKey: previousAreaKey) }
     }
 
     /// Entry point for menu items and hotkeys. Non-capture actions are ignored (handled by the shell).
@@ -119,7 +119,7 @@ public final class CaptureCoordinator {
     // MARK: Helpers
 
     private func select(initial: SelectionOverlayController.Mode) async throws -> SelectionOutcome? {
-        if await !CapturePermissions.probeScreenRecording() { throw CaptureError.permissionDenied }
+        guard await PermissionManager.shared.ensure(.screen) else { throw CaptureError.cancelled }
         let windows = (try? await service.listWindows()) ?? []
         var snaps: [CGDirectDisplayID: CGImage] = [:]
         for s in NSScreen.screens { snaps[s.displayID] = try? await service.captureRect(s.frame).image }
