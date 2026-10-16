@@ -68,6 +68,12 @@ public final class RecordingStudio: ObservableObject {
     private var studioOpen = false
 
     public init() {
+        let prefs = AppSettings.shared
+        countdown = prefs.studioCountdown
+        mirrorCamera = prefs.studioMirror
+        bubbleShape = CameraBubbleShape(rawValue: prefs.studioShape) ?? .circle
+        showClicks = prefs.showClicks
+        showKeystrokes = prefs.showKeystrokes
         manager.onFinished = { [weak self] result in
             guard let self else { return }
             self.bubble.chromeEnabled = true

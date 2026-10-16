@@ -54,7 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func showPreferences() {
         if prefsWindow == nil {
             let w = NSWindow(contentViewController: NSHostingController(rootView: PreferencesView()))
-            w.isReleasedWhenClosed = false; w.title = "MasterFabric Cut Preferences"; w.styleMask = [.titled, .closable]
+            w.isReleasedWhenClosed = false; w.title = "Settings"; w.styleMask = [.titled, .closable, .fullSizeContentView]; w.titlebarAppearsTransparent = true
             prefsWindow = w
         }
         present(prefsWindow!)

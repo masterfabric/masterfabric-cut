@@ -40,7 +40,7 @@ final class AppSettings: ObservableObject {
             "overlayAutoCloseSeconds": 6, "overlayCloseAfterAction": true,
             "recordFPS": 30, "gifFPS": 15, "recordMic": false, "recordSystemAudio": true,
             "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
-            "historyLimit": 200, "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
+            "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
         ])
     }
@@ -83,6 +83,9 @@ final class AppSettings: ObservableObject {
         get { d.string(forKey: "launcherOrigin").map { NSPointFromString($0) } }
         set { d.set(newValue.map { NSStringFromPoint($0) }, forKey: "launcherOrigin") }
     }
+    var studioCountdown: Int { get { d.integer(forKey: "studioCountdown") } set { set(newValue, "studioCountdown") } }
+    var studioMirror: Bool { get { d.bool(forKey: "studioMirror") } set { set(newValue, "studioMirror") } }
+    var studioShape: String { get { d.string(forKey: "studioShape") ?? "circle" } set { set(newValue, "studioShape") } }
     var historyLimit: Int { get { d.integer(forKey: "historyLimit") } set { set(newValue, "historyLimit") } }
     var filenameTemplate: String { get { d.string(forKey: "filenameTemplate") ?? "" } set { set(newValue, "filenameTemplate") } }
     var saveDirectory: URL {
