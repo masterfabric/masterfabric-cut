@@ -7,6 +7,7 @@ struct CaptureHistoryView: View {
     @State private var query = ""
     @State private var hovered: UUID?
     @State private var confirmClear = false
+    @State private var durations: [UUID: Double] = [:]
 
     private var filtered: [CaptureHistoryItem] {
         let q = query.trimmingCharacters(in: .whitespaces).lowercased()
@@ -103,9 +104,27 @@ struct CaptureHistoryView: View {
                     Image(systemName: item.kind == .gif ? "photo.stack" : "film")
                         .font(.largeTitle).foregroundStyle(.secondary)
                 }
+                if isHover, item.kind == .gif, let url = item.fileURL {
+                    AnimatedImageView(url: url).padding(6).background(.quaternary)
+                }
+                if !isHover { playBadge(item) }
                 if isHover {
                     Color.black.opacity(0.4)
                     actions(item)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if item.kind == .recording, let secs = durations[item.id] {
+                    Text(MediaDuration.format(secs))
+                        .font(.caption2.weight(.semibold).monospacedDigit())
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .padding(8)
+                }
+            }
+            .task(id: item.id) {
+                if item.kind == .recording, let url = item.fileURL, durations[item.id] == nil {
+                    MediaDuration.video(at: url) { durations[item.id] = $0 }
                 }
             }
             .frame(maxWidth: .infinity)
@@ -151,6 +170,18 @@ struct CaptureHistoryView: View {
         }
     }
 
+    @ViewBuilder
+    private func playBadge(_ item: CaptureHistoryItem) -> some View {
+        if item.kind == .gif || item.kind == .recording {
+            Image(systemName: "play.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .frame(width: 36, height: 36)
+                .background(.ultraThinMaterial, in: Circle())
+                .overlay(Circle().strokeBorder(Color.primary.opacity(0.1)))
+                .help(item.kind == .gif ? "Hover to preview, double-click to play" : "Double-click to play")
+        }
+    }
+
     private func title(for item: CaptureHistoryItem) -> String {
         if let name = item.fileURL?.lastPathComponent { return name }
         let text = (item.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -185,7 +216,12 @@ struct CaptureHistoryView: View {
     }
 
     private func open(_ item: CaptureHistoryItem) {
-        if let url = item.fileURL { NSWorkspace.shared.open(url) }
+        guard let url = item.fileURL else { return }
+        if item.kind == .gif || item.kind == .recording {
+            MediaPlayerWindowController.show(item: item, store: store)
+        } else {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func copy(_ item: CaptureHistoryItem) {

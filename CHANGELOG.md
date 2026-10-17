@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Capture History media player: GIF cards animate on hover and show a play badge, recordings show a play badge and duration. Double-click or Open launches a soft material player window: GIFs get play/pause, loop toggle, a frame scrubber and frame/size info; videos use the standard AVKit controls. Both have Copy, Save As…, Reveal in Finder and Delete.
 - Annotation editor "Window Frame" row of live thumbnail swatches (your screenshot inside each style, with hover tooltips): macOS Light, macOS Dark, Safari-style browser with address bar, Minimal rounded frame, frosted Glass on a mesh gradient, and Terminal. Each style sets a matching backdrop, and every one has adjustable padding, corner radius, shadow size, background color/gradient and optional window title text.
 - Custom backdrop colors: color pickers with a gradient toggle next to the preset chips.
 

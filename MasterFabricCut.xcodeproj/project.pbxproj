@@ -28,6 +28,7 @@
 		6BE6A1439ED551A615D54C0C /* PinnedScreenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03240C4AFC522F55DD7FAD5F /* PinnedScreenshot.swift */; };
 		70060C7E58A5C7F58B6D98CE /* CaptureHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */; };
 		7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D98BB2F5B464F9FCCCC098E /* Utilities.swift */; };
+		82A7FBF7A2D3FD68B3FB06D1 /* MediaPlayerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F18557D8A650720B0C3054 /* MediaPlayerWindow.swift */; };
 		9479135CA2A9E4BA86F9D095 /* AnnotateModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D89A24DA62DA5C1954F9856 /* AnnotateModule.swift */; };
 		97ECDB35302CA7F6609B7E9C /* MenuBarPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E447B058FC3C51ED70AA17 /* MenuBarPanel.swift */; };
 		9CF878D3E76A288D0EF4BC4F /* InputOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14589E5AF1B1F75632D720E /* InputOverlay.swift */; };
@@ -73,6 +74,7 @@
 		788710BA2AA4F14638FF7665 /* QuickAccessOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAccessOverlay.swift; sourceTree = "<group>"; };
 		79E447B058FC3C51ED70AA17 /* MenuBarPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPanel.swift; sourceTree = "<group>"; };
 		7FEAE5F855EADF92EE64AC69 /* AnnotateImageUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateImageUtil.swift; sourceTree = "<group>"; };
+		83F18557D8A650720B0C3054 /* MediaPlayerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerWindow.swift; sourceTree = "<group>"; };
 		84B76B7FFD296E6B7C48B0C7 /* AnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationModel.swift; sourceTree = "<group>"; };
 		8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditor.swift; sourceTree = "<group>"; };
 		91AE35F95A125BDEE695CB1F /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 				9450B017CC9F2B61DA8A2FFA /* AnnotationRenderer.swift */,
 				7029F65721D27AF4C64362C3 /* CaptureHistory.swift */,
 				C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */,
+				83F18557D8A650720B0C3054 /* MediaPlayerWindow.swift */,
 				03240C4AFC522F55DD7FAD5F /* PinnedScreenshot.swift */,
 				788710BA2AA4F14638FF7665 /* QuickAccessOverlay.swift */,
 			);
@@ -332,6 +335,7 @@
 				D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */,
 				AA4AE1F72FE49C5422503638 /* MasterFabricCutApp.swift in Sources */,
 				40CC4A8454EA69010C34D069 /* MediaExporter.swift in Sources */,
+				82A7FBF7A2D3FD68B3FB06D1 /* MediaPlayerWindow.swift in Sources */,
 				97ECDB35302CA7F6609B7E9C /* MenuBarPanel.swift in Sources */,
 				CE5D4FCFD94616ED81EC1732 /* OCRService.swift in Sources */,
 				52A8E834F91D84E59C52FF49 /* OnboardingWindow.swift in Sources */,
