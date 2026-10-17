@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Applying a background style distorted the layout: the preview shadow ignored the canvas scale and flip, so it differed from the exported/copied image. Shadows, backdrops and frames now render through one code path, so preview and output match.
 - Annotation hit-testing and overlays stay aligned with the image after style, padding or frame changes.
+- Annotation editor: choosing a window frame/background style no longer strips the toolbar, tool palette and inspector backgrounds (chrome now keeps explicit system materials; the canvas is clipped), and switching between styles, including back to None, resets cleanly, re-centers and cross-fades.
 
 ## [0.1.1] - 2026-10-17
 

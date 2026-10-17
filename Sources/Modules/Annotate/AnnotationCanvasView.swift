@@ -14,14 +14,45 @@ final class AnnotationCanvasNSView: NSView {
 
     init(document: AnnotationDocument) {
         self.document = document
+        lastFrame = document.background.frame
         super.init(frame: .zero)
+        // Layer-backed + clipped so canvas drawing can never bleed over the editor chrome.
+        wantsLayer = true
+        clipsToBounds = true
+        layerContentsRedrawPolicy = .duringViewResize
         cancellable = document.objectWillChange
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
+                self.styleMayHaveChanged()
                 self.needsDisplay = true
                 self.window?.invalidateCursorRects(for: self)
             }
+    }
+
+    private var lastFrame: WindowFrame
+
+    /// objectWillChange fires before the value lands; hop once more so we observe the new style.
+    private func styleMayHaveChanged() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let frame = self.document.background.frame
+            self.needsDisplay = true
+            guard frame != self.lastFrame else { return }
+            self.lastFrame = frame
+            // Drop in-flight gestures tied to the old layout and cross-fade into the new composition.
+            self.draft = nil; self.cropDraft = nil; self.dragLast = nil
+            let fade = CATransition()
+            fade.type = .fade
+            fade.duration = 0.25
+            fade.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            self.layer?.add(fade, forKey: "styleChange")
+        }
+    }
+
+    override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+        needsDisplay = true
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

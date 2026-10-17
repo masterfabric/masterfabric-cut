@@ -17,15 +17,24 @@ struct AnnotationEditorView: View {
     ]
 
     var body: some View {
+        // The chrome (toolbar, sidebar) owns explicit system materials so it never depends on what the
+        // canvas draws. Background/frame styles only ever affect the clipped canvas below.
         VStack(spacing: 0) {
             toolbar
+                .background(.bar)
+                .zIndex(1)
             Divider()
             HStack(spacing: 0) {
                 AnnotationCanvasView(document: document)
+                    .clipped()
                 Divider()
-                sidebar.frame(width: 230)
+                sidebar
+                    .frame(width: 230)
+                    .background(.regularMaterial)
+                    .zIndex(1)
             }
         }
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     // MARK: Toolbar
@@ -224,6 +233,9 @@ final class AnnotationEditorWindowController: NSWindowController, NSWindowDelega
         window.title = sourceURL?.lastPathComponent ?? "Annotate"
         window.minSize = NSSize(width: 760, height: 480)
         window.isReleasedWhenClosed = false
+        // Keep the standard opaque window chrome regardless of the canvas style.
+        window.isOpaque = true
+        window.backgroundColor = .windowBackgroundColor
         super.init(window: window)
         window.delegate = self
 

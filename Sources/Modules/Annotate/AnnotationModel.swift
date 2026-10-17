@@ -270,6 +270,8 @@ final class AnnotationDocument: ObservableObject {
 
     /// Applies a window frame style together with its default backdrop, padding, radius and shadow.
     func applyFrame(_ frame: WindowFrame) {
+        guard frame != background.frame else { return }
+        // Replace wholesale so no stale colours, mesh flag or title leak from the previous style.
         background = frame.defaults
     }
 
