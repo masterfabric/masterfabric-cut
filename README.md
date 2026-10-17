@@ -10,7 +10,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-AppKit-0A84FF?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
 [![Release](https://img.shields.io/github/v/release/masterfabric/masterfabric-cut?label=release&color=34C759)](https://github.com/masterfabric/masterfabric-cut/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL%20v3.0-blue.svg)](LICENSE)
 [![Built with Grok Bot](https://img.shields.io/badge/Built%20with-Grok%20Bot-111111)](#built-with-grok-bot)
 
 [**⬇️ Download DMG**](https://github.com/masterfabric/masterfabric-cut/releases/latest) ·
@@ -200,4 +200,6 @@ Developed with **Grok Bot** and **Claude Code**.
 
 ## License
 
-Released under the [MIT License](LICENSE). Copyright © 2026 Gürkan Fikret Günak, MasterFabric.
+Released under the [GNU Affero General Public License v3.0](LICENSE). Copyright © 2026 Gürkan Fikret Günak, MasterFabric ([masterfabric.co](https://masterfabric.co)).
+
+See also [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
