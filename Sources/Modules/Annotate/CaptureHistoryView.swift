@@ -21,55 +21,60 @@ struct CaptureHistoryView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            toolbar
+            header
             Divider()
-            ZStack {
+            Group {
                 if filtered.isEmpty {
                     emptyState
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 180, maximum: 260), spacing: 16)], spacing: 16) {
-                            ForEach(filtered) { item in cell(item) }
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 20, alignment: .top)], spacing: 20) {
+                            ForEach(filtered) { item in card(item) }
                         }
-                        .padding(16)
+                        .padding(20)
                     }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 560, idealWidth: 780, minHeight: 360, idealHeight: 540)
-        .background(.regularMaterial)
+        .frame(minWidth: 860, minHeight: 560)
+        .background(Color(nsColor: .windowBackgroundColor))
         .confirmationDialog("Delete all capture history?", isPresented: $confirmClear) {
             Button("Delete All", role: .destructive) { store.clear() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Files saved by MasterFabric Cut in its history folder are removed. This can't be undone.")
         }
     }
 
-    private var toolbar: some View {
-        HStack(spacing: 10) {
-            Picker("", selection: $filter) {
+    private var header: some View {
+        HStack(spacing: 12) {
+            Picker("Filter", selection: $filter) {
                 Text("All").tag(CaptureHistoryKind?.none)
                 ForEach(CaptureHistoryKind.allCases) { Text($0.title).tag(CaptureHistoryKind?.some($0)) }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
-            .frame(width: 320)
-            Spacer(minLength: 8)
+            .fixedSize()
+            Spacer(minLength: 12)
             HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
                 TextField("Search", text: $query).textFieldStyle(.plain)
                 if !query.isEmpty {
                     Button { query = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }
                         .buttonStyle(.plain)
+                        .help("Clear search")
                 }
             }
             .padding(.horizontal, 10).padding(.vertical, 6)
-            .frame(width: 180)
-            .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.07)))
+            .frame(minWidth: 120, idealWidth: 220, maxWidth: 220)
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.07)))
             Button("Clear All…") { confirmClear = true }
+                .fixedSize()
                 .disabled(store.items.isEmpty)
                 .help("Delete every item in the capture history")
         }
-        .padding(.horizontal, 16).padding(.vertical, 10)
+        .padding(.horizontal, 20).padding(.vertical, 12)
     }
 
     private var emptyState: some View {
@@ -77,60 +82,84 @@ struct CaptureHistoryView: View {
             Image(systemName: store.items.isEmpty ? "photo.on.rectangle.angled" : "magnifyingglass")
                 .font(.system(size: 44, weight: .light)).foregroundStyle(.secondary)
             Text(store.items.isEmpty ? "No captures yet" : "No matching captures").font(.headline)
-            Text(store.items.isEmpty ? "Screenshots, recordings and copied text will appear here."
+            Text(store.items.isEmpty ? "Screenshots, recordings, GIFs and copied text will appear here."
                                      : "Try a different search or filter.")
                 .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
         }
         .padding(32)
     }
 
-    private func cell(_ item: CaptureHistoryItem) -> some View {
+    private func card(_ item: CaptureHistoryItem) -> some View {
         let isHover = hovered == item.id
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 0) {
             ZStack {
-                Rectangle().fill(Color.primary.opacity(0.08))
+                Rectangle().fill(.quaternary)
                 if let thumb = store.thumbnail(for: item) {
-                    Image(nsImage: thumb).resizable().aspectRatio(contentMode: .fill)
+                    Image(nsImage: thumb).resizable().aspectRatio(contentMode: .fit).padding(6)
                 } else if item.kind == .ocr {
-                    Text(item.text ?? "").font(.caption).lineLimit(6).padding(10)
+                    Text(item.text ?? "").font(.caption).lineLimit(7).padding(10)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 } else {
-                    Image(systemName: "film").font(.largeTitle).foregroundStyle(.secondary)
+                    Image(systemName: item.kind == .gif ? "photo.stack" : "film")
+                        .font(.largeTitle).foregroundStyle(.secondary)
                 }
                 if isHover {
-                    Color.black.opacity(0.35)
+                    Color.black.opacity(0.4)
                     actions(item)
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 124)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .shadow(color: .black.opacity(isHover ? 0.2 : 0.08), radius: isHover ? 8 : 3, y: 2)
-            HStack(spacing: 4) {
-                Text(item.date.formatted(date: .abbreviated, time: .shortened)).lineLimit(1)
-                Spacer(minLength: 4)
-                if item.kind != .screenshot { Text(item.kind.title).foregroundStyle(.secondary) }
+            .frame(height: 140)
+            .clipped()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title(for: item)).font(.callout.weight(.medium)).lineLimit(1).truncationMode(.middle)
+                HStack(spacing: 6) {
+                    Text(item.date, format: .relative(presentation: .named)).lineLimit(1)
+                    Spacer(minLength: 4)
+                    Text(item.kind.badge)
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Capsule().fill(Color.accentColor.opacity(0.18)))
+                        .foregroundStyle(Color.accentColor)
+                }
+                .font(.caption).foregroundStyle(.secondary)
             }
-            .font(.caption2)
-            .padding(.horizontal, 2)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .contentShape(Rectangle())
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Color.primary.opacity(0.1)))
+        .shadow(color: .black.opacity(isHover ? 0.2 : 0.06), radius: isHover ? 8 : 3, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .onHover { hovered = $0 ? item.id : (hovered == item.id ? nil : hovered) }
         .animation(.easeOut(duration: 0.12), value: isHover)
         .onTapGesture(count: 2) { open(item) }
+        .onDrag { dragProvider(for: item) }
         .contextMenu {
-            Button("Open") { open(item) }
+            Button("Open") { open(item) }.disabled(item.fileURL == nil)
             Button("Copy") { copy(item) }
             if item.kind == .screenshot {
                 Button("Annotate") { annotate(item) }
                 Button("Pin to Screen") { pin(item) }
             }
             if let url = item.fileURL {
-                Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+                Button("Reveal in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
             }
             Divider()
             Button("Delete", role: .destructive) { store.remove(item) }
         }
+    }
+
+    private func title(for item: CaptureHistoryItem) -> String {
+        if let name = item.fileURL?.lastPathComponent { return name }
+        let text = (item.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? "Text capture" : String(text.prefix(40))
+    }
+
+    private func dragProvider(for item: CaptureHistoryItem) -> NSItemProvider {
+        if let url = item.fileURL, let p = NSItemProvider(contentsOf: url) { return p }
+        return NSItemProvider(object: (item.text ?? "") as NSString)
     }
 
     private func actions(_ item: CaptureHistoryItem) -> some View {
@@ -140,14 +169,15 @@ struct CaptureHistoryView: View {
             if let url = item.fileURL {
                 actionButton("folder", "Reveal in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
             }
+            if item.kind == .screenshot { actionButton("pin", "Pin to Screen") { pin(item) } }
             actionButton("trash", "Delete") { store.remove(item) }
         }
     }
 
     private func actionButton(_ symbol: String, _ help: String, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: symbol).font(.system(size: 13, weight: .semibold))
-                .frame(width: 30, height: 30)
+            Image(systemName: symbol).font(.system(size: 12, weight: .semibold))
+                .frame(width: 28, height: 28)
                 .background(.ultraThinMaterial, in: Circle())
         }
         .buttonStyle(.plain)
@@ -183,18 +213,18 @@ final class CaptureHistoryWindowController: NSWindowController {
     static let shared = CaptureHistoryWindowController()
 
     private init() {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 760, height: 520),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 960, height: 640),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered, defer: false)
         window.title = "Capture History"
         window.isReleasedWhenClosed = false
-                let host = NSHostingView(rootView: CaptureHistoryView(store: .shared))
-        // Keep SwiftUI from resizing the window to its content.
+        let host = NSHostingView(rootView: CaptureHistoryView(store: .shared))
+        // The window owns its size; SwiftUI must not resize it to the content.
         host.sizingOptions = []
         window.contentView = host
-        window.setContentSize(NSSize(width: 780, height: 540))
-        window.contentMinSize = NSSize(width: 560, height: 360)
-        window.setFrameAutosaveName("CaptureHistoryWindow")
+        window.contentMinSize = NSSize(width: 860, height: 560)
+        window.setContentSize(NSSize(width: 960, height: 640))
+        window.setFrameAutosaveName("CaptureHistoryWindow.v2")
         window.center()
         super.init(window: window)
     }

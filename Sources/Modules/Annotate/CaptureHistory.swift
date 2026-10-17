@@ -15,6 +15,15 @@ enum CaptureHistoryKind: String, Codable, CaseIterable, Identifiable {
         case .ocr: return "Text"
         }
     }
+
+    var badge: String {
+        switch self {
+        case .screenshot: return "Screenshot"
+        case .recording: return "Recording"
+        case .gif: return "GIF"
+        case .ocr: return "Text"
+        }
+    }
 }
 
 struct CaptureHistoryItem: Identifiable, Codable, Hashable {
