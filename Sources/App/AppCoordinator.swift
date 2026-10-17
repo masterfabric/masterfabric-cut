@@ -108,6 +108,8 @@ final class AppCoordinator: ObservableObject {
         cfg.showClicks = s.showClicks
         cfg.showKeystrokes = s.showKeystrokes
         cfg.countdown = 3
+        cfg.dimOutside = s.recordDimEnabled
+        cfg.dimOpacity = s.recordDimOpacity
         do { try await recorder.start(cfg) } catch {
             ErrorPresenter.present(error, title: "Recording couldn't start") { [weak self] in Task { await self?.startRecording(format: format) } }
         }

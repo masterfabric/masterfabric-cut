@@ -197,6 +197,19 @@ private struct RecordingPane: View {
                 flag(s, "Record microphone", "Add your microphone to screen recordings.", \.recordMic)
                 flag(s, "Record system audio", "Add the Mac's sound output to screen recordings.", \.recordSystemAudio)
             }
+            Section("Focus") {
+                flag(s, "Dim outside recorded area", "While recording an area or window, darken everything outside it. The dim never appears in the video.", \.recordDimEnabled)
+                if s.recordDimEnabled {
+                    Option(hint: "How dark the area outside the recording is.") {
+                        HStack {
+                            Text("Dim strength")
+                            Slider(value: Binding(get: { s.recordDimOpacity }, set: { s.recordDimOpacity = $0 }), in: 0.2...0.8)
+                                .help("How dark the area outside the recording is")
+                            Text("\(Int(s.recordDimOpacity * 100))%").monospacedDigit().foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
             Section("Overlays") {
                 flag(s, "Show mouse clicks", "Highlight clicks in the recording.", \.showClicks)
                 flag(s, "Show keystrokes", "Display pressed keys in the recording.", \.showKeystrokes)

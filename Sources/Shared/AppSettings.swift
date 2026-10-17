@@ -39,7 +39,7 @@ final class AppSettings: ObservableObject {
             "overlayEnabled": true, "overlayCorner": OverlayCorner.bottomLeft.rawValue,
             "overlayAutoCloseSeconds": 6, "overlayCloseAfterAction": true,
             "recordFPS": 30, "gifFPS": 15, "recordMic": false, "recordSystemAudio": true,
-            "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
+            "recordDimEnabled": true, "recordDimOpacity": 0.45, "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
             "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
         ])
@@ -74,6 +74,8 @@ final class AppSettings: ObservableObject {
     var gifFPS: Int { get { d.integer(forKey: "gifFPS") } set { set(newValue, "gifFPS") } }
     var recordMic: Bool { get { d.bool(forKey: "recordMic") } set { set(newValue, "recordMic") } }
     var recordSystemAudio: Bool { get { d.bool(forKey: "recordSystemAudio") } set { set(newValue, "recordSystemAudio") } }
+    var recordDimEnabled: Bool { get { d.bool(forKey: "recordDimEnabled") } set { set(newValue, "recordDimEnabled") } }
+    var recordDimOpacity: Double { get { d.double(forKey: "recordDimOpacity") } set { set(newValue, "recordDimOpacity") } }
     var showClicks: Bool { get { d.bool(forKey: "showClicks") } set { set(newValue, "showClicks") } }
     var showKeystrokes: Bool { get { d.bool(forKey: "showKeystrokes") } set { set(newValue, "showKeystrokes") } }
     var hideDesktopIcons: Bool { get { d.bool(forKey: "hideDesktopIcons") } set { set(newValue, "hideDesktopIcons") } }

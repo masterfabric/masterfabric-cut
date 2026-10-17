@@ -45,6 +45,9 @@ public struct RecordingConfig {
     public var includedWindowIDs: [CGWindowID] = []
     /// Windows to hide from the recording (e.g. your own HUD) for display/area targets.
     public var excludedWindowIDs: [CGWindowID] = []
+    /// Dim everything outside the recorded frame (area/window targets only) while recording.
+    public var dimOutside: Bool = false
+    public var dimOpacity: Double = 0.45
     /// Final file location. nil = ~/Movies/MasterFabric Cut/Recording <date>.<ext>
     public var outputURL: URL? = nil
 

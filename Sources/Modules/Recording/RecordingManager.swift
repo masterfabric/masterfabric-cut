@@ -1,6 +1,8 @@
 import Foundation
 import AVFoundation
 import CoreGraphics
+import AppKit
+import ScreenCaptureKit
 
 /// High-level recording controller. Create one and keep it alive; observe `state` / `elapsed` from SwiftUI.
 @MainActor
@@ -11,6 +13,7 @@ public final class RecordingManager: ObservableObject {
     public var onFinished: ((Result<RecordingResult, Error>) -> Void)?
 
     private let engine = RecordingEngine()
+    private let chrome = RecordingChrome()
     private var config: RecordingConfig?
     private var startedAt = Date()
     private var pausedAt: Date?
@@ -58,15 +61,22 @@ public final class RecordingManager: ObservableObject {
             try? await Task.sleep(nanoseconds: 150_000_000) // let WindowServer register the panels
         }
 
+        var cfg = config
+        if let geo = await chromeGeometry(for: config.target) {
+            chrome.show(manager: self, screen: geo.screen, focus: config.dimOutside ? geo.focus : nil, dimOpacity: config.dimOpacity)
+            cfg.excludedWindowIDs += chrome.windowIDs
+            try? await Task.sleep(nanoseconds: 150_000_000)
+        }
+
         let tempOrFinal = config.format == .gif
             ? RecordingPaths.tempURL(ext: "mp4")
             : (config.outputURL ?? RecordingPaths.defaultOutputURL(ext: "mp4"))
         do {
-            var cfg = config
             if cfg.format == .gif { cfg.systemAudio = false; cfg.microphone = false }
             try await engine.start(config: cfg, outputURL: tempOrFinal, extraIncludedWindowIDs: extra)
         } catch {
             overlays.stop()
+            chrome.hide()
             state = .idle
             throw error
         }
@@ -105,6 +115,7 @@ public final class RecordingManager: ObservableObject {
         state = .finishing
         ticker?.cancel()
         InputOverlayController.shared.stop()
+        chrome.hide()
         do {
             let duration = try await engine.stop()
             let raw = engine.outputURL!
@@ -135,11 +146,41 @@ public final class RecordingManager: ObservableObject {
         guard state.isActive else { return }
         ticker?.cancel()
         InputOverlayController.shared.stop()
+        chrome.hide()
         engine.cancel()
         state = .idle
     }
 
+    /// Discards the current take and immediately starts a new one with the same settings.
+    public func restart() {
+        guard state.isActive, let config else { return }
+        cancel()
+        Task { try? await start(config) }
+    }
+
     // MARK: Private
+
+    /// Screen being recorded and the recorded frame in Cocoa coordinates (nil focus = whole screen).
+    private func chromeGeometry(for target: RecordingTarget) async -> (screen: NSScreen, focus: CGRect?)? {
+        switch target {
+        case .display(let id):
+            return RecordingStudio.screen(for: id).map { ($0, nil) }
+        case .area(let id, let rect):
+            guard let s = RecordingStudio.screen(for: id) else { return nil }
+            let f = s.frame
+            return (s, CGRect(x: f.minX + rect.minX, y: f.maxY - rect.maxY, width: rect.width, height: rect.height))
+        case .window(let wid):
+            guard let content = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true),
+                  let w = content.windows.first(where: { $0.windowID == wid }) else { return nil }
+            let primaryH = NSScreen.screens.first?.frame.height ?? 0
+            let r = CGRect(x: w.frame.minX, y: primaryH - w.frame.maxY, width: w.frame.width, height: w.frame.height)
+            let best = NSScreen.screens.max {
+                $0.frame.intersection(r).width * $0.frame.intersection(r).height
+                    < $1.frame.intersection(r).width * $1.frame.intersection(r).height
+            }
+            return best.map { ($0, r) }
+        }
+    }
 
     private func tick() {
         guard state == .recording else { return }

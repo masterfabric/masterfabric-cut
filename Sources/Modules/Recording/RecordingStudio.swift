@@ -63,7 +63,6 @@ public final class RecordingStudio: ObservableObject {
 
     /// Called when a recording finishes (e.g. open the trim editor / Quick Access).
     public var onFinished: ((RecordingResult) -> Void)?
-    public let hud = RecordingHUDController()
     private var content: SCShareableContent?
     private var studioOpen = false
 
@@ -78,7 +77,6 @@ public final class RecordingStudio: ObservableObject {
             guard let self else { return }
             self.bubble.chromeEnabled = true
             self.bubble.hide()
-            self.hud.hide()
             Task { await self.syncBubble() }
             switch result {
             case .success(let r): self.lastResult = r; self.onFinished?(r)
@@ -214,7 +212,8 @@ public final class RecordingStudio: ObservableObject {
         cfg.showClicks = showClicks
         cfg.showKeystrokes = showKeystrokes
         cfg.countdown = countdown
-        cfg.excludedWindowIDs = hud.windowID.map { [$0] } ?? []
+        cfg.dimOutside = sourceKind == .window && AppSettings.shared.recordDimEnabled
+            cfg.dimOpacity = AppSettings.shared.recordDimOpacity
 
         do {
             if showKeystrokes && !InputOverlayController.hasInputMonitoringAccess {
@@ -228,22 +227,22 @@ public final class RecordingStudio: ObservableObject {
                 cfg.includedWindowIDs = [id]
                 try? await Task.sleep(nanoseconds: 200_000_000)
             }
-            hud.show(manager: manager)
-            cfg.excludedWindowIDs = hud.windowID.map { [$0] } ?? []
+            cfg.dimOutside = sourceKind == .window && AppSettings.shared.recordDimEnabled
+            cfg.dimOpacity = AppSettings.shared.recordDimOpacity
             try await manager.start(cfg)
         } catch {
-            bubble.chromeEnabled = true; hud.hide()
+            bubble.chromeEnabled = true
             report(error)
         }
     }
 
     public func stop() async {
         do { try await manager.stop() } catch {
-            if ErrorPresenter.isCancellation(error) { bubble.chromeEnabled = true; hud.hide() } else { report(error) }
+            if ErrorPresenter.isCancellation(error) { bubble.chromeEnabled = true } else { report(error) }
         }
     }
 
-    public func cancel() { manager.cancel(); bubble.chromeEnabled = true; hud.hide(); Task { await syncBubble() } }
+    public func cancel() { manager.cancel(); bubble.chromeEnabled = true; Task { await syncBubble() } }
 
     // MARK: Geometry
 
@@ -275,66 +274,6 @@ public final class RecordingStudio: ObservableObject {
 
     static func name(of id: CGDirectDisplayID) -> String {
         screen(for: id)?.localizedName ?? "Display \(id)"
-    }
-}
-
-// MARK: - HUD (excluded from capture)
-
-/// Small floating Pause/Stop control with timer. Hidden from screen capture.
-@MainActor
-public final class RecordingHUDController {
-    private var panel: NSPanel?
-    public var windowID: CGWindowID? { panel.map { CGWindowID($0.windowNumber) } }
-
-    public init() {}
-
-    public func show(manager: RecordingManager) {
-        hide()
-        let p = NSPanel(contentRect: CGRect(x: 0, y: 0, width: 240, height: 48),
-                        styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        p.isOpaque = false
-        p.backgroundColor = .clear
-        p.hasShadow = true
-        p.level = .statusBar
-        p.sharingType = .none
-        p.isMovableByWindowBackground = true
-        p.isReleasedWhenClosed = false
-        p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        p.contentView = NSHostingView(rootView: RecordingControlsView(manager: manager))
-        if let s = NSScreen.main {
-            p.setFrameOrigin(CGPoint(x: s.visibleFrame.midX - 120, y: s.visibleFrame.maxY - 70))
-        }
-        p.orderFrontRegardless()
-        panel = p
-    }
-
-    public func hide() { panel?.orderOut(nil); panel = nil }
-}
-
-/// Timer + pause/resume + stop. Usable standalone (e.g. in the menu bar popover).
-public struct RecordingControlsView: View {
-    @ObservedObject var manager: RecordingManager
-    public init(manager: RecordingManager) { self.manager = manager }
-
-    public var body: some View {
-        HStack(spacing: 12) {
-            Circle().fill(manager.state == .paused ? Color.orange : Color.red).frame(width: 10, height: 10)
-            Text(time(manager.elapsed)).font(.system(.body, design: .monospaced)).foregroundStyle(.white)
-            Spacer()
-            Button { manager.togglePause() } label: {
-                Image(systemName: manager.state == .paused ? "play.fill" : "pause.fill")
-            }.buttonStyle(.plain).foregroundStyle(.white).help(manager.state == .paused ? "Resume recording" : "Pause recording")
-            Button { Task { try? await manager.stop() } } label: {
-                Image(systemName: "stop.fill")
-            }.buttonStyle(.plain).foregroundStyle(.red).help("Stop recording")
-        }
-        .padding(.horizontal, 16)
-        .frame(width: 240, height: 48)
-        .background(Capsule().fill(Color.black.opacity(0.85)))
-    }
-
-    private func time(_ t: TimeInterval) -> String {
-        String(format: "%02d:%02d", Int(t) / 60, Int(t) % 60)
     }
 }
 

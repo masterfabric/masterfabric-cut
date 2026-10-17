@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Screen recording focus dim: while recording an area or window, everything outside the recorded frame is darkened with a subtle border around it. Adjustable strength and an on/off toggle in Settings › Recording (default on); no dim for full-screen recording. The overlay is click-through, on all Spaces, and excluded from the capture.
+- Recording controls pill (red dot, mm:ss timer, Pause/Resume, Stop, Restart, Cancel with tooltips) now appears for every recording, centered directly below the notch on notched displays or below the menu bar otherwise, on the screen being recorded, and is excluded from the video.
 - Capture History media player: GIF cards animate on hover and show a play badge, recordings show a play badge and duration. Double-click or Open launches a soft material player window: GIFs get play/pause, loop toggle, a frame scrubber and frame/size info; videos use the standard AVKit controls. Both have Copy, Save As…, Reveal in Finder and Delete.
 - Annotation editor "Window Frame" row of live thumbnail swatches (your screenshot inside each style, with hover tooltips): macOS Light, macOS Dark, Safari-style browser with address bar, Minimal rounded frame, frosted Glass on a mesh gradient, and Terminal. Each style sets a matching backdrop, and every one has adjustable padding, corner radius, shadow size, background color/gradient and optional window title text.
 - Custom backdrop colors: color pickers with a gradient toggle next to the preset chips.
 
 ### Fixed
+- Pausing a recording now shifts later video and audio by the exact time paused (host clock), so there is no frozen gap and audio resumes immediately even when the screen is static.
 - Applying a background style distorted the layout: the preview shadow ignored the canvas scale and flip, so it differed from the exported/copied image. Shadows, backdrops and frames now render through one code path, so preview and output match.
 - Annotation hit-testing and overlays stay aligned with the image after style, padding or frame changes.
 - Annotation editor: choosing a window frame/background style no longer strips the toolbar, tool palette and inspector backgrounds (chrome now keeps explicit system materials; the canvas is clipped), and switching between styles, including back to None, resets cleanly, re-centers and cross-fades.

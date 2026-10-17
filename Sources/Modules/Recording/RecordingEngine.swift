@@ -18,10 +18,8 @@ final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
 
     private var firstPTS: CMTime?
     private var pausedTotal = CMTime.zero
-    private var lastVideoPTS = CMTime.invalid
+    private var pauseStart = CMTime.invalid
     private var paused = false
-    private var resumePending = false
-    private var frameInterval = CMTime(value: 1, timescale: 30)
 
     var onError: ((Error) -> Void)?
     private(set) var outputURL: URL?
@@ -91,10 +89,8 @@ final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
             self.micInput = mIn
             self.firstPTS = nil
             self.pausedTotal = .zero
-            self.lastVideoPTS = .invalid
+            self.pauseStart = .invalid
             self.paused = false
-            self.resumePending = false
-            self.frameInterval = sc.minimumFrameInterval
             self.outputURL = url
         }
 
@@ -127,13 +123,24 @@ final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
 
     // MARK: Pause / resume
 
-    func pause() { queue.async { self.paused = true } }
+    /// Pausing stops appending samples. On resume the host-clock time spent paused is added to `pausedTotal`,
+    /// so every later sample (video and audio share the host clock) is shifted back and the file has no gap.
+    func pause() {
+        queue.async {
+            guard !self.paused else { return }
+            self.paused = true
+            self.pauseStart = CMClockGetTime(CMClockGetHostTimeClock())
+        }
+    }
 
     func resume() {
         queue.async {
             guard self.paused else { return }
             self.paused = false
-            self.resumePending = true
+            if self.firstPTS != nil, self.pauseStart.isValid {
+                self.pausedTotal = self.pausedTotal + (CMClockGetTime(CMClockGetHostTimeClock()) - self.pauseStart)
+            }
+            self.pauseStart = .invalid
         }
     }
 
@@ -155,8 +162,8 @@ final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
                     return
                 }
                 let end: CMTime
-                if self.paused || self.resumePending {
-                    end = self.lastVideoPTS - first - self.pausedTotal
+                if self.paused, self.pauseStart.isValid {
+                    end = self.pauseStart - first - self.pausedTotal
                 } else {
                     end = CMClockGetTime(CMClockGetHostTimeClock()) - first - self.pausedTotal
                 }
@@ -214,18 +221,13 @@ final class RecordingEngine: NSObject, SCStreamOutput, SCStreamDelegate,
         let pts = CMSampleBufferGetPresentationTimeStamp(sb)
         if paused { return }
         if firstPTS == nil { firstPTS = pts }
-        if resumePending {
-            let gap = pts - lastVideoPTS
-            pausedTotal = pausedTotal + max(gap - frameInterval, .zero)
-            resumePending = false
-        }
         guard input.isReadyForMoreMediaData,
               let out = Self.retimed(sb, by: firstPTS! + pausedTotal) else { return }
-        if input.append(out) { lastVideoPTS = pts }
+        input.append(out)
     }
 
     private func handleAudio(_ sb: CMSampleBuffer, input: AVAssetWriterInput?) {
-        guard let input, let first = firstPTS, !paused, !resumePending,
+        guard let input, let first = firstPTS, !paused,
               CMSampleBufferDataIsReady(sb),
               let writer, writer.status == .writing, input.isReadyForMoreMediaData else { return }
         let pts = CMSampleBufferGetPresentationTimeStamp(sb)

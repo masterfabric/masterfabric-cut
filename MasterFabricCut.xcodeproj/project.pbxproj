@@ -47,6 +47,7 @@
 		D2BD8CEA7CD94D30CD3B3B96 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC2115EDAC0D7F97F16CC4D /* Database.swift */; };
 		D6C72D451362A6A41CE7EB62 /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12BB86B3877CA1639C5B1BD /* AnnotationCanvasView.swift */; };
 		D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */; };
+		DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */; };
 		E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */; };
 		EDC71C3388E49783C81428F0 /* AnnotateImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEAE5F855EADF92EE64AC69 /* AnnotateImageUtil.swift */; };
 		F1087621F17DB226DD1940B9 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */; };
@@ -59,6 +60,7 @@
 		043E7F8661A50B9D25F1643E /* DesktopIconsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopIconsManager.swift; sourceTree = "<group>"; };
 		07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
 		11E02231860198CFF6E7D8DA /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingChrome.swift; sourceTree = "<group>"; };
 		2D234706B4558C75A4E68A22 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		39A12783D66B8F60FC69DA42 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterFabricCut.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,6 +115,7 @@
 				E04B118D169E19E1DFF839CE /* Countdown.swift */,
 				F14589E5AF1B1F75632D720E /* InputOverlay.swift */,
 				AEE82991EF2BA6DDA507A032 /* MediaExporter.swift */,
+				267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */,
 				4CD7B4F89CAAEF02EB5BEB40 /* RecordingEngine.swift */,
 				ACF6C6755FB5F20F8F5B70B5 /* RecordingManager.swift */,
 				E5176E90DE22ECB1A830FD5D /* RecordingStudio.swift */,
@@ -344,6 +347,7 @@
 				6BE6A1439ED551A615D54C0C /* PinnedScreenshot.swift in Sources */,
 				60E25DE6461E91BA3F8F5D27 /* PreferencesView.swift in Sources */,
 				65B7BFB4AA31BBC6DCDF7F2F /* QuickAccessOverlay.swift in Sources */,
+				DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */,
 				08F8A934A5B08FB454C9ADC0 /* RecordingEngine.swift in Sources */,
 				A96F9422939CB112A25967BB /* RecordingManager.swift in Sources */,
 				00B5B0622AC95FBFE20A1801 /* RecordingStudio.swift in Sources */,
