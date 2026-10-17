@@ -91,11 +91,9 @@ private struct PermissionSheetView: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color.accentColor.gradient).frame(width: 64, height: 64)
-                Image(systemName: granted ? "checkmark" : "lock.open")
-                    .font(.system(size: 28, weight: .semibold)).foregroundStyle(.white)
-            }
+            BrandHeader(iconSize: 44, font: .headline)
+            Image(systemName: granted ? "checkmark.circle.fill" : "lock.open.fill")
+                .font(.system(size: 26, weight: .semibold)).foregroundStyle(granted ? .green : Color.accentColor)
             Text("\(permission.title) is turned off").font(.title2.bold())
             Text("MasterFabric Cut needs \(permission.title) access for this. Nothing leaves your Mac.")
                 .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)

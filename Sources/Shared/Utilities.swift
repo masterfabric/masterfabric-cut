@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import UniformTypeIdentifiers
 
 extension NSImage {
@@ -28,3 +29,61 @@ enum FileOutput {
     }
 }
 
+
+// MARK: - Brand
+
+/// Full-color MasterFabric app icon, shown next to the product name in UI.
+struct BrandIcon: View {
+    var size: CGFloat = 24
+    var body: some View {
+        Image(nsImage: NSApp.applicationIconImage ?? NSImage())
+            .resizable().interpolation(.high)
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
+    }
+}
+
+/// App icon + "MasterFabric Cut" wordmark.
+struct BrandHeader: View {
+    var iconSize: CGFloat = 24
+    var font: Font = .system(size: 14, weight: .semibold)
+    var body: some View {
+        HStack(spacing: 8) {
+            BrandIcon(size: iconSize)
+            Text("MasterFabric Cut").font(font)
+        }
+    }
+}
+
+/// Monochrome template image for the menu bar; draws a red dot while recording.
+enum MenuBarIcon {
+    static func image(recording: Bool) -> NSImage {
+        guard let base = NSImage(named: "MenuBarIcon") else {
+            return NSImage(systemSymbolName: "scissors", accessibilityDescription: "MasterFabric Cut") ?? NSImage()
+        }
+        let h: CGFloat = 18, w = h * 192 / 152
+        let size = NSSize(width: w, height: h)
+        guard recording else {
+            let img = NSImage(size: size, flipped: false) { rect in base.draw(in: rect); return true }
+            img.isTemplate = true
+            img.accessibilityDescription = "MasterFabric Cut"
+            return img
+        }
+        // Template images are tinted as a whole, so the recording variant is non-template with a red dot.
+        let out = NSImage(size: size, flipped: false) { rect in
+            // Tint the mark for the current menu bar appearance, then add the red dot.
+            let mark = NSImage(size: size, flipped: false) { r in
+                base.draw(in: r)
+                NSColor.labelColor.set(); r.fill(using: .sourceIn); return true
+            }
+            mark.draw(in: rect)
+            let d: CGFloat = 7
+            let dot = NSRect(x: rect.maxX - d, y: rect.maxY - d, width: d, height: d)
+            NSColor.systemRed.setFill(); NSBezierPath(ovalIn: dot).fill()
+            return true
+        }
+        out.isTemplate = false
+        out.accessibilityDescription = "MasterFabric Cut (recording)"
+        return out
+    }
+}

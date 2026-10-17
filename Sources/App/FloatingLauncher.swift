@@ -176,8 +176,7 @@ private struct LauncherButton: View {
     var body: some View {
         ZStack {
             Circle().fill(.regularMaterial)
-            Circle().fill(Color.accentColor.gradient).padding(4)
-            Image(systemName: "scissors").font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+            BrandIcon(size: size - 8)
         }
         .frame(width: size, height: size)
         .overlay(Circle().strokeBorder(.white.opacity(0.3), lineWidth: 0.5))
@@ -222,9 +221,11 @@ private struct ActionPalette: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: "scissors").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white)
-                    .frame(width: 24, height: 24).background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.accentColor.gradient))
-                Text("What would you like to do?").font(.system(size: 13, weight: .semibold))
+                BrandIcon(size: 24)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("MasterFabric Cut").font(.system(size: 13, weight: .semibold))
+                    Text("What would you like to do?").font(.system(size: 10)).foregroundStyle(.secondary)
+                }
                 Spacer()
                 Text("esc").font(.system(size: 10, weight: .medium, design: .rounded)).foregroundStyle(.secondary)
                     .padding(.horizontal, 6).padding(.vertical, 2).background(.quaternary, in: Capsule())

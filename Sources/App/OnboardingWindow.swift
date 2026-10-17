@@ -154,7 +154,7 @@ private struct OnboardingView: View {
     private var welcome: some View {
         VStack(spacing: 16) {
             Spacer()
-            Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 112, height: 112)
+            BrandIcon(size: 112)
                 .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
             Text("Welcome to").font(.title3).foregroundStyle(.secondary).padding(.top, 8)
             Text("MasterFabric Cut").font(.system(size: 38, weight: .bold, design: .rounded))

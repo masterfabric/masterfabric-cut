@@ -21,7 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func setupStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(systemSymbolName: "scissors", accessibilityDescription: "MasterFabric Cut")
+        item.button?.image = MenuBarIcon.image(recording: false)
         item.button?.target = self
         item.button?.action = #selector(togglePanel)
         statusItem = item
@@ -30,8 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func rebuildMenu() {
         // The dropdown is a custom SwiftUI panel (MenuBarPanel.swift); it observes state itself.
-        statusItem?.button?.image = NSImage(systemSymbolName: AppCoordinator.shared.recorder.state.isActive ? "record.circle.fill" : "scissors",
-                                            accessibilityDescription: "MasterFabric Cut")
+        statusItem?.button?.image = MenuBarIcon.image(recording: AppCoordinator.shared.recorder.state.isActive)
     }
 
     @objc private func togglePanel() {

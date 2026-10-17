@@ -50,10 +50,14 @@ struct PreferencesView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: .constant(.all)) {
+            VStack(spacing: 0) {
+            BrandHeader(iconSize: 22, font: .system(size: 13, weight: .semibold))
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 14).padding(.top, 10).padding(.bottom, 4)
             List(PrefsPane.allCases, selection: $pane) { p in
                 Label { Text(p.title) } icon: { IconTile(symbol: p.symbol, color: p.color) }
                     .tag(p)
                     .help(p.title)
+            }
             }
             .navigationSplitViewColumnWidth(190)
             .toolbar(removing: .sidebarToggle)
@@ -395,9 +399,7 @@ private struct AboutPane: View {
         VStack(spacing: 8) {
             Spacer()
             Group {
-                if let icon = NSApp.applicationIconImage {
-                    Image(nsImage: icon).resizable().frame(width: 96, height: 96)
-                }
+                BrandIcon(size: 96)
             }
             Text("MasterFabric Cut").font(.title.bold())
             Text(version).foregroundStyle(.secondary)

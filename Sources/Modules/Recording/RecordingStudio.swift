@@ -346,6 +346,7 @@ public struct RecordingStudioView: View {
 
     public var body: some View {
         Form {
+            Section { BrandHeader(iconSize: 28, font: .headline) }
             Section("Preview") {
                 StudioPreview(studio: studio)
                     .help("Exactly what will be recorded, with the camera in its current spot")

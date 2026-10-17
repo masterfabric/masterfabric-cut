@@ -9,7 +9,7 @@ struct AboutView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 84, height: 84)
+            BrandIcon(size: 84)
             Text("MasterFabric Cut").font(.title.bold())
             Text(version).foregroundStyle(.secondary)
             Text("Screenshots, screen recording and Recording Studio for macOS.")

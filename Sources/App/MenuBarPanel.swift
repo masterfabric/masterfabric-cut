@@ -140,11 +140,7 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.accentColor.gradient).frame(width: 26, height: 26)
-                Image(systemName: "scissors").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white)
-            }
-            Text("MasterFabric Cut").font(.system(size: 14, weight: .semibold))
+            BrandHeader(iconSize: 26)
             Spacer()
             if recorder.state.isActive {
                 Label("REC", systemImage: "circle.fill").font(.caption2.bold()).foregroundStyle(.red)
