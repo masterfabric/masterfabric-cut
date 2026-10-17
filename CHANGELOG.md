@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Menu bar status item now uses a monochrome template image of the MasterFabric logo mark (adapts to light/dark menu bars) with a red dot while recording.
+- Menu bar status item keeps the scissors SF Symbol as a template image (adapts to light/dark menu bars) with a red dot while recording.
 - The full-color app icon now appears next to the "MasterFabric Cut" name in the menu bar panel, onboarding, Settings sidebar and About, launcher button and palette, Quick Access cards, Recording Studio and permission sheets.
 
 ## [0.1.0] - 2026-10-17

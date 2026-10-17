@@ -55,29 +55,23 @@ struct BrandHeader: View {
     }
 }
 
-/// Monochrome template image for the menu bar; draws a red dot while recording.
+/// Scissors SF Symbol template image for the menu bar; draws a red dot while recording.
 enum MenuBarIcon {
     static func image(recording: Bool) -> NSImage {
-        guard let base = NSImage(named: "MenuBarIcon") else {
-            return NSImage(systemSymbolName: "scissors", accessibilityDescription: "MasterFabric Cut") ?? NSImage()
-        }
-        let h: CGFloat = 18, w = h * 192 / 152
-        let size = NSSize(width: w, height: h)
+        let base = NSImage(systemSymbolName: "scissors", accessibilityDescription: "MasterFabric Cut") ?? NSImage()
         guard recording else {
-            let img = NSImage(size: size, flipped: false) { rect in base.draw(in: rect); return true }
-            img.isTemplate = true
-            img.accessibilityDescription = "MasterFabric Cut"
-            return img
+            base.isTemplate = true
+            return base
         }
         // Template images are tinted as a whole, so the recording variant is non-template with a red dot.
+        let size = base.size
         let out = NSImage(size: size, flipped: false) { rect in
-            // Tint the mark for the current menu bar appearance, then add the red dot.
             let mark = NSImage(size: size, flipped: false) { r in
                 base.draw(in: r)
                 NSColor.labelColor.set(); r.fill(using: .sourceIn); return true
             }
             mark.draw(in: rect)
-            let d: CGFloat = 7
+            let d: CGFloat = 6
             let dot = NSRect(x: rect.maxX - d, y: rect.maxY - d, width: d, height: d)
             NSColor.systemRed.setFill(); NSBezierPath(ovalIn: dot).fill()
             return true
