@@ -50,8 +50,8 @@ final class AnnotationCanvasNSView: NSView {
         let (scale, offset) = layoutInfo()
         let scene = document.scene
         let cx = (v.x - offset.x) / scale, cy = (v.y - offset.y) / scale
-        return CGPoint(x: cx - scene.padding + scene.cropRect.minX,
-                       y: cy - scene.padding + scene.cropRect.minY)
+        return CGPoint(x: cx - scene.contentOrigin.x + scene.cropRect.minX,
+                       y: cy - scene.contentOrigin.y + scene.cropRect.minY)
     }
 
     // MARK: Drawing
@@ -71,7 +71,7 @@ final class AnnotationCanvasNSView: NSView {
         AnnotationRenderer.draw(scene: scene, in: ctx)
 
         // Editing overlays live in image space.
-        ctx.translateBy(x: scene.padding - scene.cropRect.minX, y: scene.padding - scene.cropRect.minY)
+        ctx.translateBy(x: scene.contentOrigin.x - scene.cropRect.minX, y: scene.contentOrigin.y - scene.cropRect.minY)
         let hairline = 1 / scale
 
         if let id = document.selectedID, let a = scene.annotations.first(where: { $0.id == id }) {

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Annotation editor "Window Frame" row of live thumbnail swatches (your screenshot inside each style, with hover tooltips): macOS Light, macOS Dark, Safari-style browser with address bar, Minimal rounded frame, frosted Glass on a mesh gradient, and Terminal. Each style sets a matching backdrop, and every one has adjustable padding, corner radius, shadow size, background color/gradient and optional window title text.
+- Custom backdrop colors: color pickers with a gradient toggle next to the preset chips.
+
+### Fixed
+- Applying a background style distorted the layout: the preview shadow ignored the canvas scale and flip, so it differed from the exported/copied image. Shadows, backdrops and frames now render through one code path, so preview and output match.
+- Annotation hit-testing and overlays stay aligned with the image after style, padding or frame changes.
+
 ## [0.1.1] - 2026-10-17
 
 ### Changed

@@ -98,28 +98,111 @@ enum BackgroundPreset: String, CaseIterable, Identifiable {
 
     /// One colour = solid, two or more = diagonal gradient.
     var colors: [NSColor] {
-        func c(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat) -> NSColor {
-            NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: 1)
-        }
         switch self {
         case .none: return []
-        case .white: return [c(255, 255, 255)]
-        case .black: return [c(18, 18, 20)]
-        case .graphite: return [c(72, 76, 86), c(30, 32, 38)]
-        case .ocean: return [c(58, 123, 213), c(0, 210, 255)]
-        case .sunset: return [c(255, 94, 98), c(255, 195, 113)]
-        case .forest: return [c(17, 153, 142), c(56, 239, 125)]
-        case .lavender: return [c(142, 45, 226), c(74, 0, 224)]
+        case .white: return [.rgb(255, 255, 255)]
+        case .black: return [.rgb(18, 18, 20)]
+        case .graphite: return [.rgb(72, 76, 86), .rgb(30, 32, 38)]
+        case .ocean: return [.rgb(58, 123, 213), .rgb(0, 210, 255)]
+        case .sunset: return [.rgb(255, 94, 98), .rgb(255, 195, 113)]
+        case .forest: return [.rgb(17, 153, 142), .rgb(56, 239, 125)]
+        case .lavender: return [.rgb(142, 45, 226), .rgb(74, 0, 224)]
         }
     }
 }
 
+extension NSColor {
+    static func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> NSColor {
+        NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: a)
+    }
+}
+
+/// macOS-like window chrome placed around the screenshot.
+enum WindowFrame: String, CaseIterable, Identifiable {
+    case none, macLight, macDark, safari, minimal, glass, terminal
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .none: return "None"
+        case .macLight: return "Light"
+        case .macDark: return "Dark"
+        case .safari: return "Browser"
+        case .minimal: return "Minimal"
+        case .glass: return "Glass"
+        case .terminal: return "Terminal"
+        }
+    }
+
+    var tooltip: String {
+        switch self {
+        case .none: return "No window: the screenshot on its own backdrop"
+        case .macLight: return "macOS light window with traffic lights on a gradient wallpaper"
+        case .macDark: return "macOS dark window on a dark gradient"
+        case .safari: return "Safari-style browser window with an address bar on a pastel gradient"
+        case .minimal: return "Minimal rounded frame with a large soft shadow on a solid color"
+        case .glass: return "Frosted glass window on a vibrant mesh gradient"
+        case .terminal: return "Terminal-style dark window"
+        }
+    }
+
+    /// Title bar height in units.
+    var titleBarHeight: CGFloat {
+        switch self {
+        case .none, .minimal: return 0
+        case .macLight, .macDark, .glass: return 34
+        case .safari: return 52
+        case .terminal: return 30
+        }
+    }
+
+    /// Border between the window edge and the screenshot, in units.
+    var inset: CGFloat { self == .glass ? 10 : 0 }
+
+    /// Settings applied when the style is chosen.
+    var defaults: BackgroundSettings {
+        var s = BackgroundSettings()
+        s.frame = self
+        switch self {
+        case .none:
+            s.padding = 0; s.cornerRadius = 0
+        case .macLight:
+            s.colors = [.rgb(120, 119, 255), .rgb(255, 128, 190)]
+            s.padding = 60; s.cornerRadius = 12; s.shadowAmount = 0.6; s.title = "Untitled"
+        case .macDark:
+            s.colors = [.rgb(52, 52, 96), .rgb(12, 12, 24)]
+            s.padding = 60; s.cornerRadius = 12; s.shadowAmount = 0.7; s.title = "Untitled"
+        case .safari:
+            s.colors = [.rgb(253, 203, 241), .rgb(166, 193, 238)]
+            s.padding = 60; s.cornerRadius = 12; s.shadowAmount = 0.5; s.title = "masterfabric.co"
+        case .minimal:
+            s.colors = [.rgb(232, 236, 244)]
+            s.padding = 80; s.cornerRadius = 16; s.shadowAmount = 1.0
+        case .glass:
+            s.colors = [.rgb(255, 64, 129), .rgb(124, 77, 255), .rgb(0, 200, 255), .rgb(255, 171, 64)]
+            s.mesh = true
+            s.padding = 70; s.cornerRadius = 18; s.shadowAmount = 0.5; s.title = "Glass"
+        case .terminal:
+            s.colors = [.rgb(44, 44, 58), .rgb(14, 14, 20)]
+            s.padding = 60; s.cornerRadius = 10; s.shadowAmount = 0.7; s.title = "zsh — 80×24"
+        }
+        return s
+    }
+}
+
 struct BackgroundSettings {
-    var preset: BackgroundPreset = .none
-    /// Padding around the image, in units.
+    var frame: WindowFrame = .none
+    /// One colour = solid, two = diagonal gradient, more (with `mesh`) = mesh gradient. Empty = transparent.
+    var colors: [NSColor] = []
+    var mesh = false
+    /// Padding around the window/image, in units.
     var padding: CGFloat = 0
     var cornerRadius: CGFloat = 0
     var shadow: Bool = true
+    /// 0...1 strength/size of the shadow.
+    var shadowAmount: CGFloat = 0.5
+    var title = ""
 }
 
 /// Immutable description of what to render.
@@ -132,8 +215,17 @@ struct AnnotationScene {
     var unit: CGFloat
 
     var padding: CGFloat { background.padding * unit }
+    var titleBar: CGFloat { background.frame.titleBarHeight * unit }
+    var inset: CGFloat { background.frame.inset * unit }
+    /// The window (or bare image) including chrome, excluding padding.
+    var windowSize: CGSize {
+        CGSize(width: cropRect.width + 2 * inset, height: cropRect.height + titleBar + 2 * inset)
+    }
+    var windowRect: CGRect { CGRect(origin: CGPoint(x: padding, y: padding), size: windowSize) }
+    /// Where the cropped screenshot's top-left lands in the output.
+    var contentOrigin: CGPoint { CGPoint(x: padding + inset, y: padding + titleBar + inset) }
     var outputSize: CGSize {
-        CGSize(width: cropRect.width + 2 * padding, height: cropRect.height + 2 * padding)
+        CGSize(width: windowSize.width + 2 * padding, height: windowSize.height + 2 * padding)
     }
 }
 
@@ -174,6 +266,37 @@ final class AnnotationDocument: ObservableObject {
     var scene: AnnotationScene {
         AnnotationScene(base: baseImage, annotations: annotations, cropRect: cropRect,
                         background: background, unit: unit)
+    }
+
+    /// Applies a window frame style together with its default backdrop, padding, radius and shadow.
+    func applyFrame(_ frame: WindowFrame) {
+        background = frame.defaults
+    }
+
+    private var thumbnailCache: [String: NSImage] = [:]
+
+    /// Small live preview of the current crop inside `frame` (annotations omitted), cached per crop.
+    func frameThumbnail(_ frame: WindowFrame) -> NSImage? {
+        let key = "\(frame.rawValue)|\(cropRect)"
+        if let hit = thumbnailCache[key] { return hit }
+        guard let cropped = baseImage.cropping(to: cropRect) else { return nil }
+        let targetW = 320.0
+        let k = min(1, targetW / CGFloat(cropped.width))
+        let w = max(1, Int(CGFloat(cropped.width) * k)), h = max(1, Int(CGFloat(cropped.height) * k))
+        guard let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else { return nil }
+        ctx.interpolationQuality = .high
+        ctx.draw(cropped, in: CGRect(x: 0, y: 0, width: w, height: h))
+        guard let small = ctx.makeImage() else { return nil }
+        let scene = AnnotationScene(base: small, annotations: [],
+                                    cropRect: CGRect(x: 0, y: 0, width: w, height: h),
+                                    background: frame.defaults, unit: unit * k)
+        guard let out = AnnotationRenderer.render(scene: scene) else { return nil }
+        let img = NSImage(cgImage: out, size: NSSize(width: out.width, height: out.height))
+        thumbnailCache[key] = img
+        return img
     }
 
     var nextStepNumber: Int {

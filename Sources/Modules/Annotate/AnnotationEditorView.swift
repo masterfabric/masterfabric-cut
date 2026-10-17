@@ -66,6 +66,36 @@ struct AnnotationEditorView: View {
         Binding(get: { Color(nsColor: document.color) }, set: { document.setColor(NSColor($0)) })
     }
 
+    private func colorBinding(_ i: Int) -> Binding<Color> {
+        Binding(get: {
+            let cs = document.background.colors
+            return Color(nsColor: i < cs.count ? cs[i] : (cs.first ?? .white))
+        }, set: { new in
+            var cs = document.background.colors
+            if cs.isEmpty { cs = [NSColor(new)] }
+            while cs.count <= i { cs.append(cs.last ?? NSColor(new)) }
+            cs[i] = NSColor(new)
+            document.background.colors = cs
+        })
+    }
+
+    private var gradientBinding: Binding<Bool> {
+        Binding(get: { document.background.colors.count > 1 }, set: { on in
+            var bg = document.background
+            if on {
+                if let c = bg.colors.first, bg.colors.count == 1 {
+                    bg.colors = [c, c.blended(withFraction: 0.5, of: .systemPurple) ?? c]
+                } else if bg.colors.isEmpty {
+                    bg.colors = [.rgb(120, 119, 255), .rgb(255, 128, 190)]
+                }
+            } else {
+                bg.colors = Array(bg.colors.prefix(1))
+                bg.mesh = false
+            }
+            document.background = bg
+        })
+    }
+
     private var sidebar: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
@@ -95,13 +125,45 @@ struct AnnotationEditorView: View {
                         .help("Restore the full image after cropping")
                 }
 
+                section("Window Frame") {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(WindowFrame.allCases) { frame in
+                                FrameSwatch(document: document, frame: frame,
+                                            selected: document.background.frame == frame)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                    if document.background.frame != .none {
+                        TextField("Window title", text: $document.background.title)
+                            .textFieldStyle(.roundedBorder)
+                            .help("Text shown in the window's title bar or address bar")
+                    }
+                }
+
                 section("Background") {
-                    Picker("Style", selection: $document.background.preset) {
-                        ForEach(BackgroundPreset.allCases) { Text($0.title).tag($0) }
-                    }.help("Choose a backdrop to place behind the screenshot")
+                    HStack(spacing: 6) {
+                        ForEach(BackgroundPreset.allCases) { preset in
+                            PresetSwatch(preset: preset) {
+                                document.background.colors = preset.colors
+                                document.background.mesh = false
+                            }
+                        }
+                    }
+                    ColorPicker("Color", selection: colorBinding(0))
+                        .help("Backdrop color (first gradient stop)")
+                    Toggle("Gradient", isOn: gradientBinding)
+                        .help("Blend into a second color")
+                    if document.background.colors.count > 1 {
+                        ColorPicker("Color 2", selection: colorBinding(1)).help("Second gradient color")
+                    }
                     slider("Padding", value: $document.background.padding, range: 0...200)
                     slider("Corners", value: $document.background.cornerRadius, range: 0...60)
                     Toggle("Shadow", isOn: $document.background.shadow).help("Add a soft drop shadow behind the image")
+                    if document.background.shadow {
+                        slider("Shadow size", value: $document.background.shadowAmount, range: 0...1)
+                    }
                 }
             }
             .padding(12)
@@ -225,5 +287,62 @@ struct ToolbarToggleButton: View {
         .onHover { hovering = $0 }
         .help(help)
         .animation(.easeOut(duration: 0.12), value: hovering)
+    }
+}
+
+/// Live thumbnail of the user's screenshot inside a window frame style.
+struct FrameSwatch: View {
+    @ObservedObject var document: AnnotationDocument
+    let frame: WindowFrame
+    let selected: Bool
+    @State private var hovering = false
+
+    var body: some View {
+        Button { document.applyFrame(frame) } label: {
+            VStack(spacing: 4) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.06))
+                    if let img = document.frameThumbnail(frame) {
+                        Image(nsImage: img).resizable().aspectRatio(contentMode: .fit).padding(3)
+                    }
+                }
+                .frame(width: 92, height: 64)
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(selected ? Color.accentColor : Color.primary.opacity(hovering ? 0.25 : 0.1),
+                            lineWidth: selected ? 2 : 1))
+                .scaleEffect(hovering ? 1.03 : 1)
+                Text(frame.title).font(.caption2).foregroundStyle(selected ? Color.accentColor : .secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .animation(.easeOut(duration: 0.12), value: hovering)
+        .help(frame.tooltip)
+    }
+}
+
+/// Round backdrop preset chip.
+struct PresetSwatch: View {
+    let preset: BackgroundPreset
+    let action: () -> Void
+
+    var body: some View {
+        let cs = preset.colors.map { Color(nsColor: $0) }
+        Button(action: action) {
+            Group {
+                if cs.isEmpty {
+                    Circle().fill(Color.clear)
+                        .overlay(Image(systemName: "slash.circle").font(.system(size: 14)).foregroundStyle(.secondary))
+                } else {
+                    Circle().fill(LinearGradient(colors: cs.count == 1 ? [cs[0], cs[0]] : cs,
+                                                 startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
+            }
+            .frame(width: 18, height: 18)
+            .overlay(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .help("\(preset.title) backdrop")
     }
 }

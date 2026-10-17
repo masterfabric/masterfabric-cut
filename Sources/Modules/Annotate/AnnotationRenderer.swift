@@ -21,32 +21,43 @@ enum AnnotationRenderer {
 
     /// `ctx` must already be flipped so that (0,0) is the top-left of the output.
     static func draw(scene: AnnotationScene, in ctx: CGContext) {
-        let size = scene.outputSize
-        let pad = scene.padding
-        let crop = scene.cropRect
+        let bg = scene.background
+        let unit = scene.unit
+        let win = scene.windowRect
+        let radius = max(0, min(bg.cornerRadius * unit, min(win.width, win.height) / 2))
+        let winPath = CGPath(roundedRect: win, cornerWidth: radius, cornerHeight: radius, transform: nil)
 
-        drawBackground(scene.background, size: size, in: ctx)
+        drawBackground(bg, size: scene.outputSize, in: ctx)
 
-        let content = CGRect(x: pad, y: pad, width: crop.width, height: crop.height)
-        let radius = min(scene.background.cornerRadius * scene.unit, min(content.width, content.height) / 2)
-        let path = CGPath(roundedRect: content, cornerWidth: radius, cornerHeight: radius, transform: nil)
-
-        if scene.background.shadow && pad > 0 {
-            ctx.saveGState()
-            ctx.setShadow(offset: CGSize(width: 0, height: -pad * 0.18), blur: pad * 0.4,
-                          color: CGColor(gray: 0, alpha: 0.45))
-            ctx.setFillColor(CGColor(gray: 0, alpha: 1))
-            ctx.addPath(path)
-            ctx.fillPath()
-            ctx.restoreGState()
+        if bg.shadow && scene.padding > 0 {
+            drawShadow(around: win, radius: radius, amount: bg.shadowAmount, unit: unit, in: ctx)
         }
 
+        // Window body + chrome.
         ctx.saveGState()
-        ctx.addPath(path)
+        ctx.addPath(winPath)
         ctx.clip()
-        ctx.translateBy(x: content.minX - crop.minX, y: content.minY - crop.minY)
+        drawChrome(frame: bg.frame, title: bg.title, window: win, titleBar: scene.titleBar, unit: unit, in: ctx)
+        ctx.restoreGState()
+
+        // Screenshot content.
+        let origin = scene.contentOrigin
+        let content = CGRect(origin: origin, size: scene.cropRect.size)
+        ctx.saveGState()
+        if bg.frame == .none || bg.frame == .minimal {
+            ctx.addPath(winPath)
+        } else if bg.frame == .glass {
+            let r = max(0, radius - scene.inset)
+            ctx.addPath(CGPath(roundedRect: content, cornerWidth: r, cornerHeight: r, transform: nil))
+        } else {
+            ctx.addRect(content.intersection(win))
+        }
+        ctx.clip()
+        ctx.translateBy(x: content.minX - scene.cropRect.minX, y: content.minY - scene.cropRect.minY)
         drawContent(scene: scene, in: ctx)
         ctx.restoreGState()
+
+        if bg.frame == .glass { drawGlassRim(window: win, radius: radius, unit: unit, in: ctx) }
     }
 
     /// Draws base image + annotations in image-pixel space.
@@ -89,16 +100,181 @@ enum AnnotationRenderer {
     // MARK: Background
 
     private static func drawBackground(_ bg: BackgroundSettings, size: CGSize, in ctx: CGContext) {
-        let colors = bg.preset.colors
-        guard !colors.isEmpty else { return }
+        let colors = bg.colors
+        guard !colors.isEmpty, let space = CGColorSpace(name: CGColorSpace.sRGB) else { return }
         let full = CGRect(origin: .zero, size: size)
         if colors.count == 1 {
             ctx.setFillColor(colors[0].cgColor)
             ctx.fill(full)
-        } else if let space = CGColorSpace(name: CGColorSpace.sRGB),
-                  let g = CGGradient(colorsSpace: space, colors: colors.map(\.cgColor) as CFArray, locations: nil) {
-            ctx.drawLinearGradient(g, start: .zero, end: CGPoint(x: size.width, y: size.height), options: [])
+            return
         }
+        if let g = CGGradient(colorsSpace: space, colors: colors.map(\.cgColor) as CFArray, locations: nil) {
+            ctx.drawLinearGradient(g, start: .zero, end: CGPoint(x: size.width, y: size.height),
+                                   options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+        }
+        guard bg.mesh else { return }
+        // Mesh: soft radial blobs, one per colour.
+        let spots: [CGPoint] = [CGPoint(x: 0.12, y: 0.15), CGPoint(x: 0.88, y: 0.2),
+                                CGPoint(x: 0.75, y: 0.92), CGPoint(x: 0.1, y: 0.85), CGPoint(x: 0.5, y: 0.5)]
+        let reach = max(size.width, size.height) * 0.75
+        ctx.saveGState()
+        ctx.clip(to: full)
+        for (i, c) in colors.enumerated() {
+            let center = CGPoint(x: spots[i % spots.count].x * size.width, y: spots[i % spots.count].y * size.height)
+            let clear = c.withAlphaComponent(0).cgColor
+            if let g = CGGradient(colorsSpace: space, colors: [c.cgColor, clear] as CFArray, locations: [0, 1]) {
+                ctx.drawRadialGradient(g, startCenter: center, startRadius: 0, endCenter: center,
+                                       endRadius: reach, options: [])
+            }
+        }
+        ctx.restoreGState()
+    }
+
+    /// Soft shadow built from stacked translucent rounded rects. Unlike `CGContext.setShadow`, the result is
+    /// expressed in user space, so the live preview (scaled, flipped) and exported output match exactly.
+    private static func drawShadow(around rect: CGRect, radius: CGFloat, amount: CGFloat, unit: CGFloat,
+                                   in ctx: CGContext) {
+        let amt = min(max(amount, 0), 1)
+        guard amt > 0 else { return }
+        let blur = (16 + 56 * amt) * unit
+        let dy = blur * 0.32
+        let peak = 0.16 + 0.38 * amt
+        let steps = 28
+        let layerAlpha = 1 - pow(1 - peak, 1 / CGFloat(steps))
+        ctx.saveGState()
+        // Keep the shadow out from under the (possibly translucent) window.
+        let clipPath = CGMutablePath()
+        clipPath.addRect(rect.insetBy(dx: -blur * 3, dy: -blur * 3).offsetBy(dx: 0, dy: dy))
+        clipPath.addPath(CGPath(roundedRect: rect, cornerWidth: radius, cornerHeight: radius, transform: nil))
+        ctx.addPath(clipPath)
+        ctx.clip(using: .evenOdd)
+        ctx.setFillColor(CGColor(gray: 0, alpha: layerAlpha))
+        for k in 0..<steps {
+            let t = CGFloat(k) / CGFloat(steps)
+            let grow = blur * (1 - t) * 0.9 - blur * 0.35
+            let r = rect.offsetBy(dx: 0, dy: dy).insetBy(dx: -grow, dy: -grow)
+            guard r.width > 0, r.height > 0 else { continue }
+            let rad = max(0, min(radius + grow, min(r.width, r.height) / 2))
+            ctx.addPath(CGPath(roundedRect: r, cornerWidth: rad, cornerHeight: rad, transform: nil))
+            ctx.fillPath()
+        }
+        ctx.restoreGState()
+    }
+
+    // MARK: Window chrome
+
+    private static func drawChrome(frame: WindowFrame, title: String, window w: CGRect, titleBar: CGFloat,
+                                   unit u: CGFloat, in ctx: CGContext) {
+        let bar = CGRect(x: w.minX, y: w.minY, width: w.width, height: titleBar)
+        switch frame {
+        case .none:
+            return
+        case .minimal:
+            ctx.setFillColor(CGColor(gray: 1, alpha: 1)); ctx.fill(w)
+        case .macLight:
+            ctx.setFillColor(NSColor.rgb(246, 246, 247).cgColor); ctx.fill(w)
+            divider(bar, color: CGColor(gray: 0, alpha: 0.12), unit: u, in: ctx)
+            trafficLights(in: bar, unit: u, ctx: ctx)
+            centeredTitle(title, in: bar, color: NSColor(white: 0.25, alpha: 1), unit: u, mono: false, ctx: ctx)
+        case .macDark:
+            ctx.setFillColor(NSColor.rgb(30, 30, 33).cgColor); ctx.fill(w)
+            ctx.setFillColor(NSColor.rgb(44, 44, 48).cgColor); ctx.fill(bar)
+            divider(bar, color: CGColor(gray: 0, alpha: 0.5), unit: u, in: ctx)
+            trafficLights(in: bar, unit: u, ctx: ctx)
+            centeredTitle(title, in: bar, color: NSColor(white: 0.85, alpha: 1), unit: u, mono: false, ctx: ctx)
+        case .terminal:
+            ctx.setFillColor(NSColor.rgb(18, 18, 20).cgColor); ctx.fill(w)
+            ctx.setFillColor(NSColor.rgb(52, 52, 56).cgColor); ctx.fill(bar)
+            divider(bar, color: CGColor(gray: 0, alpha: 0.6), unit: u, in: ctx)
+            trafficLights(in: bar, unit: u, ctx: ctx)
+            centeredTitle(title, in: bar, color: NSColor(white: 0.72, alpha: 1), unit: u, mono: true, ctx: ctx)
+        case .safari:
+            ctx.setFillColor(NSColor.rgb(250, 250, 251).cgColor); ctx.fill(w)
+            ctx.setFillColor(NSColor.rgb(236, 236, 238).cgColor); ctx.fill(bar)
+            divider(bar, color: CGColor(gray: 0, alpha: 0.14), unit: u, in: ctx)
+            trafficLights(in: bar, unit: u, ctx: ctx)
+            // Back / forward chevrons.
+            ctx.saveGState()
+            ctx.setStrokeColor(CGColor(gray: 0.45, alpha: 1))
+            ctx.setLineWidth(1.8 * u); ctx.setLineCap(.round); ctx.setLineJoin(.round)
+            let cy = bar.midY
+            for (i, dir) in [CGFloat(-1), 1].enumerated() {
+                let x = bar.minX + (96 + CGFloat(i) * 26) * u
+                ctx.move(to: CGPoint(x: x - dir * 3.5 * u, y: cy - 6 * u))
+                ctx.addLine(to: CGPoint(x: x + dir * 3.5 * u, y: cy))
+                ctx.addLine(to: CGPoint(x: x - dir * 3.5 * u, y: cy + 6 * u))
+                ctx.strokePath()
+            }
+            ctx.restoreGState()
+            // Address bar.
+            let barW = min(w.width * 0.5, 460 * u)
+            let field = CGRect(x: bar.midX - barW / 2, y: bar.midY - 14 * u, width: barW, height: 28 * u)
+            if field.minX > bar.minX + 150 * u {
+                ctx.setFillColor(CGColor(gray: 0, alpha: 0.07))
+                ctx.addPath(CGPath(roundedRect: field, cornerWidth: 8 * u, cornerHeight: 8 * u, transform: nil))
+                ctx.fillPath()
+                centeredTitle(title, in: field, color: NSColor(white: 0.3, alpha: 1), unit: u, mono: false, ctx: ctx)
+            }
+        case .glass:
+            ctx.setFillColor(CGColor(gray: 1, alpha: 0.26)); ctx.fill(w)
+            let sheen = [CGColor(gray: 1, alpha: 0.32), CGColor(gray: 1, alpha: 0.04)] as CFArray
+            if let space = CGColorSpace(name: CGColorSpace.sRGB),
+               let g = CGGradient(colorsSpace: space, colors: sheen, locations: [0, 1]) {
+                ctx.drawLinearGradient(g, start: CGPoint(x: w.minX, y: w.minY),
+                                       end: CGPoint(x: w.maxX, y: w.maxY), options: [])
+            }
+            trafficLights(in: bar, unit: u, ctx: ctx)
+            centeredTitle(title, in: bar, color: NSColor(white: 1, alpha: 0.92), unit: u, mono: false, ctx: ctx)
+        }
+    }
+
+    private static func drawGlassRim(window w: CGRect, radius: CGFloat, unit u: CGFloat, in ctx: CGContext) {
+        ctx.saveGState()
+        ctx.setStrokeColor(CGColor(gray: 1, alpha: 0.55))
+        ctx.setLineWidth(1.2 * u)
+        let r = w.insetBy(dx: 0.6 * u, dy: 0.6 * u)
+        ctx.addPath(CGPath(roundedRect: r, cornerWidth: max(0, radius - 0.6 * u),
+                           cornerHeight: max(0, radius - 0.6 * u), transform: nil))
+        ctx.strokePath()
+        ctx.restoreGState()
+    }
+
+    private static func divider(_ bar: CGRect, color: CGColor, unit u: CGFloat, in ctx: CGContext) {
+        ctx.setFillColor(color)
+        ctx.fill(CGRect(x: bar.minX, y: bar.maxY - max(1, u), width: bar.width, height: max(1, u)))
+    }
+
+    private static func trafficLights(in bar: CGRect, unit u: CGFloat, ctx: CGContext) {
+        let colors = [NSColor.rgb(255, 95, 86), .rgb(255, 189, 46), .rgb(39, 201, 63)]
+        let d = 12 * u
+        for (i, c) in colors.enumerated() {
+            let r = CGRect(x: bar.minX + 14 * u + CGFloat(i) * 20 * u, y: bar.midY - d / 2, width: d, height: d)
+            ctx.setFillColor(c.cgColor)
+            ctx.fillEllipse(in: r)
+            ctx.setStrokeColor(CGColor(gray: 0, alpha: 0.14))
+            ctx.setLineWidth(max(0.5, 0.75 * u))
+            ctx.strokeEllipse(in: r.insetBy(dx: 0.4 * u, dy: 0.4 * u))
+        }
+    }
+
+    private static func centeredTitle(_ text: String, in rect: CGRect, color: NSColor, unit u: CGFloat,
+                                      mono: Bool, ctx: CGContext) {
+        let t = text.trimmingCharacters(in: .whitespaces)
+        guard !t.isEmpty else { return }
+        let size = 13 * u
+        let font = mono ? NSFont.monospacedSystemFont(ofSize: size, weight: .regular)
+                        : NSFont.systemFont(ofSize: size, weight: .medium)
+        let para = NSMutableParagraphStyle()
+        para.alignment = .center
+        para.lineBreakMode = .byTruncatingTail
+        let str = NSAttributedString(string: t, attributes: [
+            .font: font, .foregroundColor: color, .paragraphStyle: para
+        ])
+        let h = str.size().height
+        let inset = 110 * u
+        let box = CGRect(x: rect.minX + inset, y: rect.midY - h / 2, width: max(0, rect.width - 2 * inset), height: h)
+        guard box.width > 10 * u else { return }
+        withFlippedGraphics(ctx) { str.draw(in: box) }
     }
 
     // MARK: Annotations
