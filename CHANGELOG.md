@@ -6,9 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-17
+
 ### Changed
+- Capture History window rebuilt: minimum size 860x560 and resizable, header with a native segmented filter (All, Screenshots, Recordings, GIFs, Text), search and a "Clear All…" button with confirmation.
+- History grid uses adaptive 200pt cards with 12pt rounded corners, aspect-fit thumbnails, filename, relative date and a type badge; hover overlay with Open, Copy, Reveal in Finder, Pin and Delete (with tooltips), double-click to open, context menu and drag-out to other apps.
 - Menu bar status item keeps the scissors SF Symbol as a template image (adapts to light/dark menu bars) with a red dot while recording.
-- The full-color app icon now appears next to the "MasterFabric Cut" name in the menu bar panel, onboarding, Settings sidebar and About, launcher button and palette, Quick Access cards, Recording Studio and permission sheets.
+- The full-color MasterFabric app icon now appears next to the "MasterFabric Cut" name in the menu bar panel, onboarding, Settings sidebar and About, launcher button and palette, Quick Access cards, Recording Studio and permission sheets.
+
+### Fixed
+- Capture History window content was clipped on the left edge (filter, thumbnails and dates cut off) with a large empty area.
 
 ## [0.1.0] - 2026-10-17
 
