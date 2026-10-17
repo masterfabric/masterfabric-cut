@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-17
+
 ### Added
 - Screen recording focus dim: while recording an area or window, everything outside the recorded frame is darkened with a subtle border around it. Adjustable strength and an on/off toggle in Settings › Recording (default on); no dim for full-screen recording. The overlay is click-through, on all Spaces, and excluded from the capture.
 - Recording controls pill (red dot, mm:ss timer, Pause/Resume, Stop, Restart, Cancel with tooltips) now appears for every recording, centered directly below the notch on notched displays or below the menu bar otherwise, on the screen being recorded, and is excluded from the video.
