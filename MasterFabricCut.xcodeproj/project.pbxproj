@@ -18,10 +18,12 @@
 		26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */; };
 		3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D234706B4558C75A4E68A22 /* AppCoordinator.swift */; };
 		31DB092AD5C0AF9D4C3FBD37 /* ScreenRuler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */; };
+		37FF86EA3C47B5F12C174115 /* QuickNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */; };
 		3995BFA8CE90A088F62F00B9 /* CameraBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94346B508A92EBCE6A53A68F /* CameraBubble.swift */; };
 		40492FBAC9570E67C0763CE6 /* TrimEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */; };
 		40CC4A8454EA69010C34D069 /* MediaExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE82991EF2BA6DDA507A032 /* MediaExporter.swift */; };
 		41AC8460AF41BC1D92274926 /* CaptureCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62112020DD89689FF5C71FC5 /* CaptureCoordinator.swift */; };
+		4D09D51F8E4CDB3D2517BA4C /* CountdownTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13C0A649D082B32B6E7E12C /* CountdownTimer.swift */; };
 		52A8E834F91D84E59C52FF49 /* OnboardingWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A396238D248321E27B0D13 /* OnboardingWindow.swift */; };
 		580923E7422095CC4231E5F8 /* RecordingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEB59709CC8FDF7CDA1832E /* RecordingTypes.swift */; };
 		60E25DE6461E91BA3F8F5D27 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E02231860198CFF6E7D8DA /* PreferencesView.swift */; };
@@ -51,6 +53,7 @@
 		D2BD8CEA7CD94D30CD3B3B96 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC2115EDAC0D7F97F16CC4D /* Database.swift */; };
 		D6C72D451362A6A41CE7EB62 /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12BB86B3877CA1639C5B1BD /* AnnotationCanvasView.swift */; };
 		D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */; };
+		D977E04768141E5436B0B2A1 /* KeepAwake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01B2446C623BD4B95FAE5A29 /* KeepAwake.swift */; };
 		DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */; };
 		E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */; };
 		EB7FBEE2920D9EB3CA6DD161 /* ClipboardHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E47799AD431797FABFFD79 /* ClipboardHistory.swift */; };
@@ -63,6 +66,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01B2446C623BD4B95FAE5A29 /* KeepAwake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepAwake.swift; sourceTree = "<group>"; };
 		043E7F8661A50B9D25F1643E /* DesktopIconsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopIconsManager.swift; sourceTree = "<group>"; };
 		07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
 		11E02231860198CFF6E7D8DA /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 		84B76B7FFD296E6B7C48B0C7 /* AnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationModel.swift; sourceTree = "<group>"; };
 		8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditor.swift; sourceTree = "<group>"; };
 		91AE35F95A125BDEE695CB1F /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickNotes.swift; sourceTree = "<group>"; };
 		94346B508A92EBCE6A53A68F /* CameraBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBubble.swift; sourceTree = "<group>"; };
 		9450B017CC9F2B61DA8A2FFA /* AnnotationRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationRenderer.swift; sourceTree = "<group>"; };
 		A08572107B71C763F78837FE /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -102,6 +107,7 @@
 		BB93722A200A68E7A05644A4 /* SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlay.swift; sourceTree = "<group>"; };
 		BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPicker.swift; sourceTree = "<group>"; };
 		BEAE84EA539771CCFE876FEF /* AnnotationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationEditorView.swift; sourceTree = "<group>"; };
+		C13C0A649D082B32B6E7E12C /* CountdownTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownTimer.swift; sourceTree = "<group>"; };
 		C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureHistoryView.swift; sourceTree = "<group>"; };
 		CED1ABB3407B935266E1A71A /* PermissionOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionOnboarding.swift; sourceTree = "<group>"; };
 		D5A396238D248321E27B0D13 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
@@ -186,9 +192,12 @@
 			children = (
 				48E47799AD431797FABFFD79 /* ClipboardHistory.swift */,
 				BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */,
+				C13C0A649D082B32B6E7E12C /* CountdownTimer.swift */,
+				01B2446C623BD4B95FAE5A29 /* KeepAwake.swift */,
 				D65041912FBFDF50E42959A7 /* OCRTranslate.swift */,
 				E1AFF95CF61B8A0A5AD352B1 /* PinOverlay.swift */,
 				27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */,
+				93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */,
 				F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */,
 				3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */,
 			);
@@ -361,11 +370,13 @@
 				EB7FBEE2920D9EB3CA6DD161 /* ClipboardHistory.swift in Sources */,
 				F664D2529C15C4F6CF1426D6 /* ColorPicker.swift in Sources */,
 				CAF5FA2261B8339C101E3807 /* Countdown.swift in Sources */,
+				4D09D51F8E4CDB3D2517BA4C /* CountdownTimer.swift in Sources */,
 				D2BD8CEA7CD94D30CD3B3B96 /* Database.swift in Sources */,
 				A858560B9987DDD5FE6F5804 /* DesktopIconsManager.swift in Sources */,
 				F79F4C92391671D0A17CB9E8 /* FloatingLauncher.swift in Sources */,
 				6700243880768238DD274119 /* HotkeyManager.swift in Sources */,
 				9CF878D3E76A288D0EF4BC4F /* InputOverlay.swift in Sources */,
+				D977E04768141E5436B0B2A1 /* KeepAwake.swift in Sources */,
 				D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */,
 				AA4AE1F72FE49C5422503638 /* MasterFabricCutApp.swift in Sources */,
 				40CC4A8454EA69010C34D069 /* MediaExporter.swift in Sources */,
@@ -381,6 +392,7 @@
 				26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */,
 				65B7BFB4AA31BBC6DCDF7F2F /* QuickAccessOverlay.swift in Sources */,
 				6C2248A8B1EBBA2FC3204074 /* QuickHelpButton.swift in Sources */,
+				37FF86EA3C47B5F12C174115 /* QuickNotes.swift in Sources */,
 				DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */,
 				08F8A934A5B08FB454C9ADC0 /* RecordingEngine.swift in Sources */,
 				A96F9422939CB112A25967BB /* RecordingManager.swift in Sources */,

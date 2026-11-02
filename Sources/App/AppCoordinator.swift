@@ -51,6 +51,9 @@ final class AppCoordinator: ObservableObject {
         case .screenRuler: ScreenRuler.shared.toggle()
         case .ocrTranslate: OCRTranslateTool.shared.captureAndTranslate()
         case .clipboardHistory: ClipboardPicker.shared.toggle()
+        case .quickNote: QuickNotes.shared.newNote()
+        case .countdownTimer: CountdownTimer.shared.toggleWindow()
+        case .keepAwake: KeepAwake.shared.toggle()
         }
     }
 

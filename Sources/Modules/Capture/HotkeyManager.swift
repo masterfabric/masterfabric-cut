@@ -16,6 +16,9 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case screenRuler
     case ocrTranslate
     case clipboardHistory
+    case quickNote
+    case countdownTimer
+    case keepAwake
 
     public var title: String {
         switch self {
@@ -37,6 +40,9 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .screenRuler: return "Screen Ruler"
         case .ocrTranslate: return "OCR Translate"
         case .clipboardHistory: return "Clipboard History"
+        case .quickNote: return "New Quick Note"
+        case .countdownTimer: return "Countdown Timer"
+        case .keepAwake: return "Keep Awake"
         }
     }
 
@@ -62,6 +68,9 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .screenRuler: return nil
         case .ocrTranslate: return nil
         case .clipboardHistory: return .init(keyCode: kVK_ANSI_V, modifiers: m)
+        case .quickNote: return nil
+        case .countdownTimer: return nil
+        case .keepAwake: return .init(keyCode: kVK_ANSI_K, modifiers: m)
         }
     }
 }
