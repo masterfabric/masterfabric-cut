@@ -127,10 +127,10 @@ struct MenuBarView: View {
                     recents
                     action(.openHistory, "Show All History", "Screenshots, recordings and text", "clock.arrow.circlepath", .brown)
                     section("Help")
-                    MenuRow(title: settings.showQuickHelp ? "Hide Quick Help Button" : "Show Quick Help Button",
-                            subtitle: "Floating button with a radial tools menu", symbol: "circle.grid.cross.fill", tint: .indigo,
-                            shortcut: settings.showQuickHelp ? "On" : "Off") {
-                        settings.showQuickHelp.toggle()
+                    MenuRow(title: settings.showFloatingButton ? "Hide Floating Button" : "Show Floating Button",
+                            subtitle: "Click for all actions, hover 2 s for the radial menu", symbol: "circle.grid.cross.fill", tint: .indigo,
+                            shortcut: settings.showFloatingButton ? "On" : "Off") {
+                        settings.showFloatingButton.toggle()
                         QuickHelpButton.shared.refresh()
                     }
                     MenuRow(title: "Welcome & Permissions", subtitle: "Permission status, tips and tricks", symbol: "hand.wave.fill", tint: .blue, shortcut: nil) {

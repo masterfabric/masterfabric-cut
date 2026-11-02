@@ -42,8 +42,13 @@ final class AppSettings: ObservableObject {
             "recordDimEnabled": true, "recordDimOpacity": 0.45, "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
             "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
-            "pinCorner": PinCorner.topRight.rawValue, "showQuickHelp": true, "pinWidth": 360.0, "pinOpacity": 1.0,
+            "pinCorner": PinCorner.topRight.rawValue, "showQuickHelp": true, "showFloatingButton": true, "pinWidth": 360.0, "pinOpacity": 1.0,
         ])
+        // One floating button since 0.1.3: shown if either the old launcher or the Quick Help button was on.
+        if d.string(forKey: "migrated.floatingButton") == nil {
+            d.set(d.bool(forKey: "showLauncher") || d.bool(forKey: "showQuickHelp"), forKey: "showFloatingButton")
+            d.set("1", forKey: "migrated.floatingButton")
+        }
     }
 
     private func set<T>(_ v: T, _ k: String) { objectWillChange.send(); d.set(v, forKey: k) }
@@ -94,6 +99,8 @@ final class AppSettings: ObservableObject {
         get { PinCorner(rawValue: d.string(forKey: "pinCorner") ?? "") ?? .topRight }
         set { set(newValue.rawValue, "pinCorner") }
     }
+    /// The single floating button (click: action palette, 2 s hover: radial menu).
+    var showFloatingButton: Bool { get { d.bool(forKey: "showFloatingButton") } set { set(newValue, "showFloatingButton") } }
     var showQuickHelp: Bool { get { d.bool(forKey: "showQuickHelp") } set { set(newValue, "showQuickHelp") } }
     var quickHelpOrigin: CGPoint? {
         get { d.string(forKey: "quickHelpOrigin").map { NSPointFromString($0) } }

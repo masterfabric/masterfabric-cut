@@ -3,8 +3,9 @@
 import AppKit
 import SwiftUI
 
-/// Floating squircle "Quick Help" button. Hover for 2 s (a ring fills while you wait) or click to open a
-/// semicircular radial menu whose arc points away from the nearest screen edge. Drag to move; it snaps to the
+/// The single floating button (app-icon squircle). Click opens the action palette (every action, like the
+/// old launcher); hover for 2 s (a ring fills while you wait) to open a semicircular radial menu whose arc
+/// points away from the nearest screen edge. Drag to move; it snaps to the
 /// nearest screen edge and remembers its position. Drop an image or PDF on it to pin the file.
 @MainActor
 final class QuickHelpButton {
@@ -26,7 +27,7 @@ final class QuickHelpButton {
     var isMenuOpen: Bool { menuPanel != nil }
 
     func refresh() {
-        if AppSettings.shared.showQuickHelp { show() } else { hide() }
+        if AppSettings.shared.showFloatingButton { show() } else { hide() }
     }
 
     // MARK: Button panel
@@ -49,6 +50,7 @@ final class QuickHelpButton {
     }
 
     private func hide() {
+        FloatingLauncher.shared.closePalette()
         closeMenu(animated: false)
         cancelDwell()
         panel?.orderOut(nil)
@@ -60,16 +62,23 @@ final class QuickHelpButton {
            NSScreen.screens.contains(where: { $0.visibleFrame.insetBy(dx: -4, dy: -4).contains(NSPoint(x: saved.x + size.width / 2, y: saved.y + size.height / 2)) }) {
             return saved
         }
-        // Default: middle of the right edge of the main screen (the launcher lives bottom-right).
+        // Migrate the old launcher's position (its window was 70 pt, this one is 72 pt) and snap it to an edge.
+        if let old = AppSettings.shared.launcherOrigin,
+           NSScreen.screens.contains(where: { $0.visibleFrame.insetBy(dx: -4, dy: -4).contains(NSPoint(x: old.x + 35, y: old.y + 35)) }) {
+            let o = snappedOrigin(for: NSRect(x: old.x + 35 - size.width / 2, y: old.y + 35 - size.height / 2, width: size.width, height: size.height))
+            AppSettings.shared.quickHelpOrigin = o
+            return o
+        }
+        // Default: bottom-right of the main screen.
         let vf = (NSScreen.main ?? NSScreen.screens[0]).visibleFrame
-        return NSPoint(x: vf.maxX - size.width - Self.edgeMargin + Self.inset, y: vf.midY - size.height / 2)
+        return NSPoint(x: vf.maxX - size.width - Self.edgeMargin + Self.inset, y: vf.minY + Self.edgeMargin - Self.inset)
     }
 
     // MARK: Hover dwell
 
     func hoverChanged(_ inside: Bool) {
         if inside {
-            guard !isMenuOpen, dragStartMouse == nil, dwellWork == nil else { return }
+            guard !isMenuOpen, !FloatingLauncher.shared.isPaletteOpen, dragStartMouse == nil, dwellWork == nil else { return }
             model.dwellProgress = 0
             withAnimation(.linear(duration: Self.dwell)) { model.dwellProgress = 1 }
             let work = DispatchWorkItem { [weak self] in
@@ -89,9 +98,18 @@ final class QuickHelpButton {
         withAnimation(.easeOut(duration: 0.2)) { model.dwellProgress = 0 }
     }
 
+    /// Click = the old launcher behaviour: toggle the full action palette.
     func clicked() {
         cancelDwell()
-        isMenuOpen ? closeMenu() : openMenu()
+        if isMenuOpen { closeMenu(); return }
+        guard let p = panel else { return }
+        FloatingLauncher.shared.togglePalette(anchor: p)
+    }
+
+    /// "All Actions" in the radial menu.
+    func openPalette() {
+        guard let p = panel else { return }
+        FloatingLauncher.shared.openPalette(anchor: p)
     }
 
     // MARK: Drag & edge snapping
@@ -101,7 +119,7 @@ final class QuickHelpButton {
         let mouse = NSEvent.mouseLocation
         if dragStartMouse == nil {
             dragStartMouse = mouse; dragStartOrigin = p.frame.origin
-            cancelDwell(); closeMenu()
+            cancelDwell(); closeMenu(); FloatingLauncher.shared.closePalette()
         }
         guard let sm = dragStartMouse, let so = dragStartOrigin else { return }
         p.setFrameOrigin(NSPoint(x: so.x + mouse.x - sm.x, y: so.y + mouse.y - sm.y))
@@ -150,6 +168,7 @@ final class QuickHelpButton {
         .init(id: "record", title: "Record", symbol: "record.circle", tint: .red) { AppCoordinator.shared.perform(.recordScreen) },
         .init(id: "qr", title: "Link to QR", symbol: "qrcode", tint: .teal) { AppCoordinator.shared.perform(.linkToQR) },
         .init(id: "pin", title: "Pin Image / PDF", symbol: "pin.square.fill", tint: .mint) { AppCoordinator.shared.perform(.pinFile) },
+        .init(id: "all", title: "All Actions", symbol: "square.grid.2x2.fill", tint: .indigo) { QuickHelpButton.shared.openPalette() },
         .init(id: "settings", title: "Settings", symbol: "gearshape.fill", tint: .gray) { (NSApp.delegate as? AppDelegate)?.showPreferences() },
     ]
 
@@ -157,6 +176,7 @@ final class QuickHelpButton {
     func openMenu(autoClose: Bool = true) {
         guard menuPanel == nil, let bp = panel else { return }
         cancelDwell()
+        FloatingLauncher.shared.closePalette()
         let center = NSPoint(x: bp.frame.midX, y: bp.frame.midY)
         let screen = NSScreen.screens.first { $0.frame.contains(center) } ?? NSScreen.main ?? NSScreen.screens[0]
         let layout = QuickHelpLayout.make(center: center, visibleFrame: screen.visibleFrame, count: Self.items.count)
@@ -241,9 +261,9 @@ struct QuickHelpItem: Identifiable {
 struct QuickHelpLayout {
     var direction: CGFloat = .pi / 2      // radians, math orientation (y up)
     var span: CGFloat = .pi
-    var radius: CGFloat = 96
+    var radius: CGFloat = 106
     var bubble: CGFloat = 44
-    var count = 6
+    var count = 7
 
     var panelSide: CGFloat { (radius + bubble + 60) * 2 }
 
@@ -263,7 +283,7 @@ struct QuickHelpLayout {
         // Point from the nearest edge(s) towards the screen: quantize the vector to the visible-frame centre to 45°.
         let raw = atan2(vf.midY - center.y, vf.midX - center.x)
         // Prefer straight away from a single nearby edge when the button hugs only one edge.
-        let near: CGFloat = 140
+        let near: CGFloat = 150
         let dl = center.x - vf.minX, dr = vf.maxX - center.x, db = center.y - vf.minY, dt = vf.maxY - center.y
         let hx: CGFloat = dl < near ? 1 : (dr < near ? -1 : 0)
         let hy: CGFloat = db < near ? 1 : (dt < near ? -1 : 0)
@@ -274,7 +294,7 @@ struct QuickHelpLayout {
         }
         if hx != 0 && hy != 0 {
             // Corner: a tighter arc on a larger radius keeps every bubble on screen.
-            l.span = .pi * 0.6; l.radius = 140
+            l.span = .pi * 0.6; l.radius = 168
         }
         return l
     }

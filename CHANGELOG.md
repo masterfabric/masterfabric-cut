@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings › Capture › Scrolling capture speed: Gentle (default), Normal, Fast.
 
 ### Changed
+- One floating button instead of two: the old circular launcher and the Quick Help squircle are merged into a single app-icon squircle. Click opens the action palette (every launcher action, as before), hovering 2 s opens the radial menu (now with an **All Actions** bubble, 7 items), dropping an image/PDF pins it, and it snaps to screen edges and remembers its position (the old launcher position is carried over). Settings › General › Appearance and the menu-bar panel have a single "Show floating button" toggle, on if either old toggle was on.
 - Pinned screenshots (Quick Access, history, editor, launcher "Pin Last") now use the new pin windows with corner snapping, opacity and click-through.
 - Scrolling capture is slower and smoother: each step scrolls 35% of the region as an eased stream of small continuous scroll events (~0.55 s) instead of one 60% jump, then waits until the page stops changing before grabbing the frame, giving cleaner stitches with lazy-loaded content.
 

@@ -131,9 +131,7 @@ private struct GeneralPane: View {
             }
             Section("Appearance") {
                 flag(s, "Show menu bar icon", "Keep the scissors icon in the menu bar.", \.showMenuBarIcon)
-                flag(s, "Show floating launcher button", "A draggable button that opens the action palette from anywhere.", \.showLauncher,
-                     after: { FloatingLauncher.shared.refresh() })
-                flag(s, "Show Quick Help button", "A floating squircle: hover for 2 seconds or click for a radial menu of capture tools. Drag to any screen edge.", \.showQuickHelp,
+                flag(s, "Show floating button", "Click for every action, hover for 2 seconds for a radial menu, drop an image or PDF to pin it. Drag it to any screen edge.", \.showFloatingButton,
                      after: { QuickHelpButton.shared.refresh() })
             }
             Section("Pins") {

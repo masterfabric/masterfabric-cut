@@ -92,12 +92,14 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 - Backgrounds: preset chips, custom colors, gradients, padding, corner radius, shadow size and window title text
 - One render path, so the preview matches the exported/copied image
 
-### Quick Help button
-- Floating squircle with a radial tools menu: hover for 2 s or click; drag it to any screen edge
-- Screenshot Area, Scrolling Capture, Record, Link to QR, Pin Image / PDF and Settings in one arc
+### Floating button
+- One always-on-top app-icon squircle (default bottom-right; drag it to any screen edge, it snaps and remembers its spot)
+- Click: the action palette with every action (capture area/window/fullscreen/scrolling, OCR, Link to QR, record screen/GIF, Studio, pins, History)
+- Hover 2 s (a ring fills): a half-moon radial menu — Screenshot Area, Scrolling Capture, Record, Link to QR, Pin Image / PDF, All Actions, Settings — pointing away from the nearest edge
+- Drop an image or PDF on it to pin the file
 
 ### Pin to screen
-- Pin any screenshot, image file (PNG, JPG, HEIC, GIF…) or PDF as a floating, always-on-top window in a screen corner (`⌃⇧⌘P`, drag a file onto the launcher, or Pin Clipboard)
+- Pin any screenshot, image file (PNG, JPG, HEIC, GIF…) or PDF as a floating, always-on-top window in a screen corner (`⌃⇧⌘P`, drag a file onto the floating button, or Pin Clipboard)
 - Hover for controls: snap to a corner, resize keeping the aspect ratio, opacity, PDF pages, click-through (`⌃⇧⌘U`), close
 - Active pins are listed in the menu-bar panel with Close All
 
@@ -127,7 +129,7 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 ### Onboarding & permissions
 - Welcome flow with live permission status for Screen Recording, Camera, Microphone and Accessibility, plus tips and tricks
 - Friendly permission sheets with deep links to System Settings and a one-click app relaunch
-- Optional floating launcher button with an action palette, and launch at login
+- Optional floating button (action palette + radial menu), and launch at login
 
 ## Tech stack
 
@@ -191,7 +193,7 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 
 | Path | Contents |
 |---|---|
-| `Sources/App` | App entry, menu bar panel, onboarding, floating launcher, Settings, About |
+| `Sources/App` | App entry, menu bar panel, onboarding, floating button, Settings, About |
 | `Sources/Shared` | Settings, permissions, SQLite storage, utilities |
 | `Sources/Modules/Capture` | Area/window/fullscreen capture, scrolling, OCR, timer, hotkeys |
 | `Sources/Modules/Tools` | Link to QR Code generator and presentation mode, image/PDF pin overlay |

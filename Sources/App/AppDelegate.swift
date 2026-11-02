@@ -13,7 +13,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         setupStatusItem()
         AppCoordinator.shared.start()
-        FloatingLauncher.shared.refresh()
         QuickHelpButton.shared.refresh()
         // Already trusted (e.g. after an update with a stable signature): no onboarding, no prompts.
         if !AppSettings.shared.onboardingCompleted, PermissionManager.shared.isGranted(.screen) {
@@ -95,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                         return true
                     }
                     if let tiff = img.tiffRepresentation, let out = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) {
-                        try? out.write(to: URL(fileURLWithPath: dir).appendingPathComponent("quick-help.png"))
+                        try? out.write(to: URL(fileURLWithPath: dir).appendingPathComponent(env["MFC_DEMO_SNAPSHOT_NAME"] ?? "quick-help.png"))
                     }
                 }
             }

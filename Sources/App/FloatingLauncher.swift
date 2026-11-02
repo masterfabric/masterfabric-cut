@@ -3,64 +3,28 @@
 import AppKit
 import SwiftUI
 
-/// Always-on-top draggable button (default: bottom-right) that opens an action palette.
+/// The action palette (every capture/record/pin action as a grid) opened by clicking the floating button.
+/// The button itself lives in `QuickHelpButton`; this type only owns the palette window.
 @MainActor
 final class FloatingLauncher {
     static let shared = FloatingLauncher()
 
-    private static let buttonSize: CGFloat = 54
-    private var buttonPanel: NSPanel?
     private var palette: NSPanel?
+    private weak var anchor: NSWindow?
     private var monitors: [Any] = []
 
-    func refresh() {
-        if AppSettings.shared.showLauncher { showButton() } else { hideButton() }
-    }
+    var isPaletteOpen: Bool { palette != nil }
 
-    // MARK: Button
-
-    private func showButton() {
-        if buttonPanel == nil {
-            let size = Self.buttonSize
-            let p = FloatingPanel(contentRect: NSRect(x: 0, y: 0, width: size + 16, height: size + 16),
-                                  styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-            p.isReleasedWhenClosed = false
-            p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = false
-            p.level = .floating
-            p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
-            p.hidesOnDeactivate = false
-            p.contentView = NSHostingView(rootView: LauncherButton(
-                size: size,
-                onMove: { [weak self] origin in self?.buttonPanel?.setFrameOrigin(origin); self?.movePalette() },
-                onMoveEnd: { [weak self] in AppSettings.shared.launcherOrigin = self?.buttonPanel?.frame.origin },
-                onClick: { [weak self] in self?.togglePalette() }))
-            p.setFrameOrigin(initialOrigin(for: p.frame.size))
-            buttonPanel = p
-        }
-        buttonPanel?.orderFrontRegardless()
-    }
-
-    private func hideButton() {
-        closePalette()
-        buttonPanel?.orderOut(nil)
-        buttonPanel = nil
-    }
-
-    private func initialOrigin(for size: NSSize) -> NSPoint {
-        if let saved = AppSettings.shared.launcherOrigin,
-           NSScreen.screens.contains(where: { $0.visibleFrame.insetBy(dx: -4, dy: -4).contains(NSPoint(x: saved.x + size.width / 2, y: saved.y + size.height / 2)) }) {
-            return saved
-        }
-        let vf = (NSScreen.main ?? NSScreen.screens[0]).visibleFrame
-        return NSPoint(x: vf.maxX - size.width - 12, y: vf.minY + 12)
-    }
+    /// Drops the button window from builds before 0.1.3 (no-op now; kept so callers stay simple).
+    func refresh() {}
 
     // MARK: Palette
 
-    private func togglePalette() { palette == nil ? openPalette() : closePalette() }
+    func togglePalette(anchor: NSWindow) { palette == nil ? openPalette(anchor: anchor) : closePalette() }
 
-    private func openPalette() {
-        guard let bp = buttonPanel else { return }
+    func openPalette(anchor bp: NSWindow) {
+        guard palette == nil else { return }
+        anchor = bp
         let host = NSHostingView(rootView: ActionPalette(dismiss: { [weak self] in self?.closePalette() },
                                                          run: { [weak self] a in self?.run(a) }))
         let size = host.fittingSize
@@ -90,20 +54,27 @@ final class FloatingLauncher {
         monitors = [click, key].compactMap { $0 }
     }
 
-    private func movePalette() { if let bp = buttonPanel { movePalette(for: bp) } }
+    func movePalette() { if let bp = anchor { movePalette(for: bp) } }
 
-    private func movePalette(for bp: NSPanel) {
+    private func movePalette(for bp: NSWindow) {
         guard let p = palette else { return }
-        let b = bp.frame.insetBy(dx: 8, dy: 8)
+        let b = bp.frame.insetBy(dx: QuickHelpButton.inset, dy: QuickHelpButton.inset)
         let vf = (bp.screen ?? NSScreen.main)?.visibleFrame ?? .zero
-        var x = b.maxX - p.frame.width
+        // Open towards the screen: beside the button when it hugs a side edge, otherwise above/below it.
+        var x: CGFloat, y: CGFloat
+        if b.midX > vf.maxX - 120 || b.midX < vf.minX + 120 {
+            x = b.midX > vf.midX ? b.minX - 10 - p.frame.width : b.maxX + 10
+            y = b.midY - p.frame.height / 2
+        } else {
+            x = b.midX - p.frame.width / 2
+            y = b.midY > vf.midY ? b.minY - 10 - p.frame.height : b.maxY + 10
+        }
         x = min(max(x, vf.minX + 8), vf.maxX - p.frame.width - 8)
-        var y = b.maxY + 10
-        if y + p.frame.height > vf.maxY { y = max(b.minY - 10 - p.frame.height, vf.minY + 8) }
+        y = min(max(y, vf.minY + 8), vf.maxY - p.frame.height - 8)
         p.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
-    private func closePalette() {
+    func closePalette() {
         monitors.forEach { NSEvent.removeMonitor($0) }
         monitors = []
         palette?.orderOut(nil)
@@ -158,59 +129,6 @@ struct LauncherAction: Identifiable {
 }
 
 // MARK: - Views
-
-private struct LauncherButton: View {
-    let size: CGFloat
-    let onMove: (NSPoint) -> Void
-    let onMoveEnd: () -> Void
-    let onClick: () -> Void
-    @State private var hovering = false
-    @State private var pressing = false
-    @State private var startOrigin: NSPoint?
-    @State private var startMouse: NSPoint = .zero
-    @State private var moved = false
-    @State private var dropTarget = false
-
-    var body: some View {
-        ZStack {
-            Circle().fill(.regularMaterial)
-            BrandIcon(size: size - 8)
-        }
-        .frame(width: size, height: size)
-        .overlay(Circle().strokeBorder(.white.opacity(0.3), lineWidth: 0.5))
-        .shadow(color: .black.opacity(hovering ? 0.35 : 0.25), radius: hovering ? 14 : 9, y: 4)
-        .scaleEffect(pressing ? 0.92 : (hovering ? 1.08 : 1))
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: hovering)
-        .animation(.spring(response: 0.25, dampingFraction: 0.6), value: pressing)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .contentShape(Circle())
-        .onHover { hovering = $0 }
-        .help("MasterFabric Cut — click for actions, drag to move, drop an image or PDF to pin it")
-        .onDrop(of: PinnedScreenshotController.dropTypes, isTargeted: $dropTarget) { PinnedScreenshotController.shared.handleDrop($0) }
-        .overlay(Circle().strokeBorder(Color.accentColor, lineWidth: dropTarget ? 3 : 0))
-        .gesture(
-            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                .onChanged { _ in
-                    let mouse = NSEvent.mouseLocation
-                    if startOrigin == nil {
-                        startOrigin = NSApp.windows.first(where: { $0.contentView is NSHostingView<LauncherButton> })?.frame.origin
-                        startMouse = mouse; pressing = true
-                    }
-                    guard let o = startOrigin else { return }
-                    let dx = mouse.x - startMouse.x, dy = mouse.y - startMouse.y
-                    if moved || hypot(dx, dy) > 4 {
-                        moved = true; pressing = false
-                        onMove(NSPoint(x: o.x + dx, y: o.y + dy))
-                    }
-                }
-                .onEnded { _ in
-                    pressing = false
-                    if moved { onMoveEnd() } else { onClick() }
-                    startOrigin = nil; moved = false
-                }
-        )
-    }
-}
 
 private struct ActionPalette: View {
     let dismiss: () -> Void
