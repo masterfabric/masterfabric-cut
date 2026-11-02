@@ -19,6 +19,8 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case quickNote
     case countdownTimer
     case keepAwake
+    case imageConverter
+    case textTools
 
     public var title: String {
         switch self {
@@ -43,6 +45,8 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .quickNote: return "New Quick Note"
         case .countdownTimer: return "Countdown Timer"
         case .keepAwake: return "Keep Awake"
+        case .imageConverter: return "Image Converter"
+        case .textTools: return "Text Tools"
         }
     }
 
@@ -71,6 +75,8 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .quickNote: return nil
         case .countdownTimer: return nil
         case .keepAwake: return .init(keyCode: kVK_ANSI_K, modifiers: m)
+        case .imageConverter: return nil
+        case .textTools: return nil
         }
     }
 }

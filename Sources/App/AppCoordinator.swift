@@ -54,6 +54,8 @@ final class AppCoordinator: ObservableObject {
         case .quickNote: QuickNotes.shared.newNote()
         case .countdownTimer: CountdownTimer.shared.toggleWindow()
         case .keepAwake: KeepAwake.shared.toggle()
+        case .imageConverter: ImageConverterTool.show()
+        case .textTools: TextToolsWindow.show()
         }
     }
 

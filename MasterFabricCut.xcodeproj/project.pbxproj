@@ -16,6 +16,7 @@
 		1647D2501B35E8339486219A /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */; };
 		181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B876257EBE2D24F70D3CF21 /* CaptureTypes.swift */; };
 		26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */; };
+		2A89B8CCEF3EA14DAB26562A /* TextTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E04DA1310C11DD9016D73D /* TextTools.swift */; };
 		3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D234706B4558C75A4E68A22 /* AppCoordinator.swift */; };
 		31DB092AD5C0AF9D4C3FBD37 /* ScreenRuler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */; };
 		37FF86EA3C47B5F12C174115 /* QuickNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */; };
@@ -32,6 +33,7 @@
 		6700243880768238DD274119 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A12783D66B8F60FC69DA42 /* HotkeyManager.swift */; };
 		6C2248A8B1EBBA2FC3204074 /* QuickHelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690522720713C3D982B6198E /* QuickHelpButton.swift */; };
 		70060C7E58A5C7F58B6D98CE /* CaptureHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */; };
+		762AC7E77E52A1D963B9D6B5 /* ImageConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85264D95B30F935E6C673C57 /* ImageConverter.swift */; };
 		7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D98BB2F5B464F9FCCCC098E /* Utilities.swift */; };
 		82A7FBF7A2D3FD68B3FB06D1 /* MediaPlayerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F18557D8A650720B0C3054 /* MediaPlayerWindow.swift */; };
 		9479135CA2A9E4BA86F9D095 /* AnnotateModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D89A24DA62DA5C1954F9856 /* AnnotateModule.swift */; };
@@ -92,6 +94,7 @@
 		7FEAE5F855EADF92EE64AC69 /* AnnotateImageUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateImageUtil.swift; sourceTree = "<group>"; };
 		83F18557D8A650720B0C3054 /* MediaPlayerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerWindow.swift; sourceTree = "<group>"; };
 		84B76B7FFD296E6B7C48B0C7 /* AnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationModel.swift; sourceTree = "<group>"; };
+		85264D95B30F935E6C673C57 /* ImageConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConverter.swift; sourceTree = "<group>"; };
 		8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditor.swift; sourceTree = "<group>"; };
 		91AE35F95A125BDEE695CB1F /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickNotes.swift; sourceTree = "<group>"; };
@@ -125,6 +128,7 @@
 		F14589E5AF1B1F75632D720E /* InputOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputOverlay.swift; sourceTree = "<group>"; };
 		F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRuler.swift; sourceTree = "<group>"; };
 		F6150E5C17BF2A866C275743 /* MasterFabricCut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MasterFabricCut.entitlements; sourceTree = "<group>"; };
+		F9E04DA1310C11DD9016D73D /* TextTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTools.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -193,12 +197,14 @@
 				48E47799AD431797FABFFD79 /* ClipboardHistory.swift */,
 				BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */,
 				C13C0A649D082B32B6E7E12C /* CountdownTimer.swift */,
+				85264D95B30F935E6C673C57 /* ImageConverter.swift */,
 				01B2446C623BD4B95FAE5A29 /* KeepAwake.swift */,
 				D65041912FBFDF50E42959A7 /* OCRTranslate.swift */,
 				E1AFF95CF61B8A0A5AD352B1 /* PinOverlay.swift */,
 				27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */,
 				93AD82827DD3FA2DBC6E2B13 /* QuickNotes.swift */,
 				F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */,
+				F9E04DA1310C11DD9016D73D /* TextTools.swift */,
 				3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */,
 			);
 			path = Tools;
@@ -375,6 +381,7 @@
 				A858560B9987DDD5FE6F5804 /* DesktopIconsManager.swift in Sources */,
 				F79F4C92391671D0A17CB9E8 /* FloatingLauncher.swift in Sources */,
 				6700243880768238DD274119 /* HotkeyManager.swift in Sources */,
+				762AC7E77E52A1D963B9D6B5 /* ImageConverter.swift in Sources */,
 				9CF878D3E76A288D0EF4BC4F /* InputOverlay.swift in Sources */,
 				D977E04768141E5436B0B2A1 /* KeepAwake.swift in Sources */,
 				D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */,
@@ -403,6 +410,7 @@
 				C4AA409DB07F01AB825B45B9 /* ScrollingCapture.swift in Sources */,
 				025ABA434F26ADBDBA92CAD2 /* SelectionOverlay.swift in Sources */,
 				FF5DA2211A3B3B8200D147EE /* SelfTimer.swift in Sources */,
+				2A89B8CCEF3EA14DAB26562A /* TextTools.swift in Sources */,
 				FCD0160CC229BC737AD6FA86 /* ToolKit.swift in Sources */,
 				40492FBAC9570E67C0763CE6 /* TrimEditor.swift in Sources */,
 				7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */,
