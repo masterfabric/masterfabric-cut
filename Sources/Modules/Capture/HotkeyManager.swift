@@ -14,6 +14,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     // General tools (0.1.3). Appended last, one per line, in this order: hotkey ids follow case order.
     case colorPicker
     case screenRuler
+    case ocrTranslate
 
     public var title: String {
         switch self {
@@ -33,6 +34,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .togglePinClickThrough: return "Toggle Pin Click-Through"
         case .colorPicker: return "Color Picker"
         case .screenRuler: return "Screen Ruler"
+        case .ocrTranslate: return "OCR Translate"
         }
     }
 
@@ -56,6 +58,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .togglePinClickThrough: return .init(keyCode: kVK_ANSI_U, modifiers: m)
         case .colorPicker: return .init(keyCode: kVK_ANSI_C, modifiers: m)
         case .screenRuler: return nil
+        case .ocrTranslate: return nil
         }
     }
 }

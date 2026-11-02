@@ -35,6 +35,7 @@
 		9479135CA2A9E4BA86F9D095 /* AnnotateModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D89A24DA62DA5C1954F9856 /* AnnotateModule.swift */; };
 		97ECDB35302CA7F6609B7E9C /* MenuBarPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E447B058FC3C51ED70AA17 /* MenuBarPanel.swift */; };
 		9CF878D3E76A288D0EF4BC4F /* InputOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14589E5AF1B1F75632D720E /* InputOverlay.swift */; };
+		A61805E2C0B7F9D7DF596F7B /* OCRTranslate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65041912FBFDF50E42959A7 /* OCRTranslate.swift */; };
 		A6D27A412B1A331ABEB29A1E /* PermissionOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED1ABB3407B935266E1A71A /* PermissionOnboarding.swift */; };
 		A858560B9987DDD5FE6F5804 /* DesktopIconsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043E7F8661A50B9D25F1643E /* DesktopIconsManager.swift */; };
 		A89CFF990FF65BE4484BE2D1 /* CaptureHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7029F65721D27AF4C64362C3 /* CaptureHistory.swift */; };
@@ -102,6 +103,7 @@
 		C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureHistoryView.swift; sourceTree = "<group>"; };
 		CED1ABB3407B935266E1A71A /* PermissionOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionOnboarding.swift; sourceTree = "<group>"; };
 		D5A396238D248321E27B0D13 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
+		D65041912FBFDF50E42959A7 /* OCRTranslate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRTranslate.swift; sourceTree = "<group>"; };
 		DAEB59709CC8FDF7CDA1832E /* RecordingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingTypes.swift; sourceTree = "<group>"; };
 		DFC2115EDAC0D7F97F16CC4D /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		E04B118D169E19E1DFF839CE /* Countdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countdown.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */,
+				D65041912FBFDF50E42959A7 /* OCRTranslate.swift */,
 				E1AFF95CF61B8A0A5AD352B1 /* PinOverlay.swift */,
 				27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */,
 				F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */,
@@ -365,6 +368,7 @@
 				82A7FBF7A2D3FD68B3FB06D1 /* MediaPlayerWindow.swift in Sources */,
 				97ECDB35302CA7F6609B7E9C /* MenuBarPanel.swift in Sources */,
 				CE5D4FCFD94616ED81EC1732 /* OCRService.swift in Sources */,
+				A61805E2C0B7F9D7DF596F7B /* OCRTranslate.swift in Sources */,
 				52A8E834F91D84E59C52FF49 /* OnboardingWindow.swift in Sources */,
 				C775694FD4B207637BD3F55A /* PermissionManager.swift in Sources */,
 				A6D27A412B1A331ABEB29A1E /* PermissionOnboarding.swift in Sources */,

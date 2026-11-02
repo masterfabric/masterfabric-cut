@@ -49,6 +49,7 @@ final class AppCoordinator: ObservableObject {
         case .togglePinClickThrough: PinnedScreenshotController.shared.toggleClickThroughAll()
         case .colorPicker: ColorPickerTool.shared.pick()
         case .screenRuler: ScreenRuler.shared.toggle()
+        case .ocrTranslate: OCRTranslateTool.shared.captureAndTranslate()
         }
     }
 

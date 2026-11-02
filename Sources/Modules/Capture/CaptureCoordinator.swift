@@ -102,6 +102,17 @@ public final class CaptureCoordinator {
         }
     }
 
+    /// Select an area and return its recognized text without copying it or opening the OCR result
+    /// (used by OCR Translate). Cancel/errors behave like Capture Text.
+    public func recognizeTextInArea(languages: [String]? = nil, _ completion: @escaping (String) -> Void) async {
+        await run {
+            guard case .rect(let rect)? = try await self.select(initial: .area) else { return }
+            try await Task.sleep(nanoseconds: 120_000_000)
+            let shot = try await self.service.captureRect(rect)
+            completion(try await OCRService.recognize(in: shot.image, languages: languages))
+        }
+    }
+
     private func selectAndCapture(initial: SelectionOverlayController.Mode) async {
         await run {
             guard let outcome = try await self.select(initial: initial) else { return }
