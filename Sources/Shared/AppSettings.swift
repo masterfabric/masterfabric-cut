@@ -43,6 +43,8 @@ final class AppSettings: ObservableObject {
             "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
             "pinCorner": PinCorner.topRight.rawValue, "showQuickHelp": true, "showFloatingButton": true, "pinWidth": 360.0, "pinOpacity": 1.0,
+            "colorFormat": "hex", "clipboardHistoryEnabled": true, "clipboardPersist": false,
+            "countdownSound": true, "keepAwakeDisplay": true,
         ])
         // One floating button since 0.1.3: shown if either the old launcher or the Quick Help button was on.
         if d.string(forKey: "migrated.floatingButton") == nil {
@@ -101,6 +103,13 @@ final class AppSettings: ObservableObject {
     }
     /// The single floating button (click: action palette, 2 s hover: radial menu).
     var showFloatingButton: Bool { get { d.bool(forKey: "showFloatingButton") } set { set(newValue, "showFloatingButton") } }
+
+    // General tools
+    var colorFormat: String { get { d.string(forKey: "colorFormat") ?? "hex" } set { set(newValue, "colorFormat") } }
+    var clipboardHistoryEnabled: Bool { get { d.bool(forKey: "clipboardHistoryEnabled") } set { set(newValue, "clipboardHistoryEnabled") } }
+    var clipboardPersist: Bool { get { d.bool(forKey: "clipboardPersist") } set { set(newValue, "clipboardPersist") } }
+    var countdownSound: Bool { get { d.bool(forKey: "countdownSound") } set { set(newValue, "countdownSound") } }
+    var keepAwakeDisplay: Bool { get { d.bool(forKey: "keepAwakeDisplay") } set { set(newValue, "keepAwakeDisplay") } }
     var showQuickHelp: Bool { get { d.bool(forKey: "showQuickHelp") } set { set(newValue, "showQuickHelp") } }
     var quickHelpOrigin: CGPoint? {
         get { d.string(forKey: "quickHelpOrigin").map { NSPointFromString($0) } }

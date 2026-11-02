@@ -47,6 +47,8 @@ final class AppCoordinator: ObservableObject {
         case .linkToQR: QRCodeToolWindowController.shared.show()
         case .pinFile: PinnedScreenshotController.shared.pinFromOpenPanel()
         case .togglePinClickThrough: PinnedScreenshotController.shared.toggleClickThroughAll()
+        case .colorPicker: ColorPickerTool.shared.pick()
+        case .screenRuler: ScreenRuler.shared.toggle()
         }
     }
 

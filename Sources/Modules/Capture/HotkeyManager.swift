@@ -11,6 +11,9 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case recordScreen, recordGIF, openStudio, openHistory   // handled by the app shell / Recording module
     case linkToQR                                           // Tools module (appended last: hotkey ids follow case order)
     case pinFile, togglePinClickThrough                     // Pin overlay (appended after linkToQR, keep order)
+    // General tools (0.1.3). Appended last, one per line, in this order: hotkey ids follow case order.
+    case colorPicker
+    case screenRuler
 
     public var title: String {
         switch self {
@@ -28,6 +31,8 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .linkToQR: return "Link to QR Code"
         case .pinFile: return "Pin Image / PDF"
         case .togglePinClickThrough: return "Toggle Pin Click-Through"
+        case .colorPicker: return "Color Picker"
+        case .screenRuler: return "Screen Ruler"
         }
     }
 
@@ -49,6 +54,8 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .linkToQR: return .init(keyCode: kVK_ANSI_L, modifiers: m)
         case .pinFile: return .init(keyCode: kVK_ANSI_P, modifiers: m)
         case .togglePinClickThrough: return .init(keyCode: kVK_ANSI_U, modifiers: m)
+        case .colorPicker: return .init(keyCode: kVK_ANSI_C, modifiers: m)
+        case .screenRuler: return nil
         }
     }
 }

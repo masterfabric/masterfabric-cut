@@ -17,6 +17,7 @@
 		181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B876257EBE2D24F70D3CF21 /* CaptureTypes.swift */; };
 		26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */; };
 		3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D234706B4558C75A4E68A22 /* AppCoordinator.swift */; };
+		31DB092AD5C0AF9D4C3FBD37 /* ScreenRuler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */; };
 		3995BFA8CE90A088F62F00B9 /* CameraBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94346B508A92EBCE6A53A68F /* CameraBubble.swift */; };
 		40492FBAC9570E67C0763CE6 /* TrimEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */; };
 		40CC4A8454EA69010C34D069 /* MediaExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE82991EF2BA6DDA507A032 /* MediaExporter.swift */; };
@@ -53,7 +54,9 @@
 		E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */; };
 		EDC71C3388E49783C81428F0 /* AnnotateImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEAE5F855EADF92EE64AC69 /* AnnotateImageUtil.swift */; };
 		F1087621F17DB226DD1940B9 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */; };
+		F664D2529C15C4F6CF1426D6 /* ColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */; };
 		F79F4C92391671D0A17CB9E8 /* FloatingLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7405A8AF7455BAB0E84B3E8 /* FloatingLauncher.swift */; };
+		FCD0160CC229BC737AD6FA86 /* ToolKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */; };
 		FF5DA2211A3B3B8200D147EE /* SelfTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47648E72EEBAE3B551C14F1 /* SelfTimer.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +68,7 @@
 		27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeTool.swift; sourceTree = "<group>"; };
 		2D234706B4558C75A4E68A22 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		39A12783D66B8F60FC69DA42 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
+		3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolKit.swift; sourceTree = "<group>"; };
 		439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterFabricCut.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CD7B4F89CAAEF02EB5BEB40 /* RecordingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingEngine.swift; sourceTree = "<group>"; };
 		4D89A24DA62DA5C1954F9856 /* AnnotateModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateModule.swift; sourceTree = "<group>"; };
@@ -93,6 +97,7 @@
 		AEE82991EF2BA6DDA507A032 /* MediaExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaExporter.swift; sourceTree = "<group>"; };
 		B12BB86B3877CA1639C5B1BD /* AnnotationCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationCanvasView.swift; sourceTree = "<group>"; };
 		BB93722A200A68E7A05644A4 /* SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlay.swift; sourceTree = "<group>"; };
+		BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPicker.swift; sourceTree = "<group>"; };
 		BEAE84EA539771CCFE876FEF /* AnnotationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationEditorView.swift; sourceTree = "<group>"; };
 		C7BEDC3C1B75C9401FBBA841 /* CaptureHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureHistoryView.swift; sourceTree = "<group>"; };
 		CED1ABB3407B935266E1A71A /* PermissionOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionOnboarding.swift; sourceTree = "<group>"; };
@@ -108,6 +113,7 @@
 		EE7E11C18D4E8D21D3C2F9A1 /* MasterFabricCutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterFabricCutApp.swift; sourceTree = "<group>"; };
 		F0115329FC94BECC020DD1A7 /* ScrollingCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingCapture.swift; sourceTree = "<group>"; };
 		F14589E5AF1B1F75632D720E /* InputOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputOverlay.swift; sourceTree = "<group>"; };
+		F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRuler.swift; sourceTree = "<group>"; };
 		F6150E5C17BF2A866C275743 /* MasterFabricCut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MasterFabricCut.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -174,8 +180,11 @@
 		56181784650F3E333789AFD7 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */,
 				E1AFF95CF61B8A0A5AD352B1 /* PinOverlay.swift */,
 				27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */,
+				F2C47D2BF7741B2DEA377D4F /* ScreenRuler.swift */,
+				3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -343,6 +352,7 @@
 				A89CFF990FF65BE4484BE2D1 /* CaptureHistory.swift in Sources */,
 				70060C7E58A5C7F58B6D98CE /* CaptureHistoryView.swift in Sources */,
 				181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */,
+				F664D2529C15C4F6CF1426D6 /* ColorPicker.swift in Sources */,
 				CAF5FA2261B8339C101E3807 /* Countdown.swift in Sources */,
 				D2BD8CEA7CD94D30CD3B3B96 /* Database.swift in Sources */,
 				A858560B9987DDD5FE6F5804 /* DesktopIconsManager.swift in Sources */,
@@ -369,9 +379,11 @@
 				00B5B0622AC95FBFE20A1801 /* RecordingStudio.swift in Sources */,
 				580923E7422095CC4231E5F8 /* RecordingTypes.swift in Sources */,
 				C78505271F8F06842F91BE15 /* ScreenCaptureService.swift in Sources */,
+				31DB092AD5C0AF9D4C3FBD37 /* ScreenRuler.swift in Sources */,
 				C4AA409DB07F01AB825B45B9 /* ScrollingCapture.swift in Sources */,
 				025ABA434F26ADBDBA92CAD2 /* SelectionOverlay.swift in Sources */,
 				FF5DA2211A3B3B8200D147EE /* SelfTimer.swift in Sources */,
+				FCD0160CC229BC737AD6FA86 /* ToolKit.swift in Sources */,
 				40492FBAC9570E67C0763CE6 /* TrimEditor.swift in Sources */,
 				7E6FC7B42F1907B4F7BF4734 /* Utilities.swift in Sources */,
 			);
