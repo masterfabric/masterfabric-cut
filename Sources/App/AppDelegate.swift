@@ -1,4 +1,5 @@
 import AppKit
+import PDFKit
 import SwiftUI
 
 @MainActor
@@ -34,6 +35,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     tool.model.present()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         snap(NSApp.windows.first { $0.level == .statusBar && $0.styleMask == [.borderless] && $0.frame.width > 400 }, "qr-present.png")
+                    }
+                }
+            }
+        }
+        // MFC_DEMO_PIN=<file>[:<file>…] pins files with the hover chrome shown; with MFC_DEMO_SNAPSHOT_DIR writes pin-1.png, pin-2.png….
+        if let files = env["MFC_DEMO_PIN"] {
+            let pins = files.split(separator: ":").compactMap { PinnedScreenshotController.shared.pin(fileURL: URL(fileURLWithPath: String($0))) }
+            for case let p as PinPanel in pins { p.chrome.hovering = true; (p.contentView as? PinRootView)?.updateChrome(animated: false) }
+            if let dir = env["MFC_DEMO_SNAPSHOT_DIR"] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    for (i, w) in pins.enumerated() {
+                        guard let v = w.contentView, let layer = v.layer else { continue }
+                        // CALayer render (not cacheDisplay) so PDFView's tiled page layers are captured too.
+                        let scale = w.backingScaleFactor, size = v.bounds.size
+                        guard let ctx = CGContext(data: nil, width: Int(size.width * scale), height: Int(size.height * scale), bitsPerComponent: 8, bytesPerRow: 0,
+                                                  space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { continue }
+                        ctx.scaleBy(x: scale, y: scale)
+                        // PDFKit tiles render asynchronously and aren't captured by layer.render: draw the current page first (debug snapshot only).
+                        func findPDF(_ v: NSView) -> PDFView? { (v as? PDFView) ?? v.subviews.lazy.compactMap(findPDF).first }
+                        var hidden: PDFView?
+                        if let pdf = findPDF(v), let page = pdf.currentPage {
+                            let r = pdf.convert(pdf.bounds, to: v)
+                            ctx.setFillColor(.white); ctx.fill(r)
+                            let box = page.bounds(for: .mediaBox), k = min(r.width / box.width, r.height / box.height)
+                            ctx.saveGState()
+                            ctx.translateBy(x: r.minX + (r.width - box.width * k) / 2, y: r.maxY - box.height * k)
+                            ctx.scaleBy(x: k, y: k)
+                            page.draw(with: .mediaBox, to: ctx)
+                            ctx.restoreGState()
+                            pdf.isHidden = true; hidden = pdf
+                        }
+                        layer.render(in: ctx)
+                        hidden?.isHidden = false
+                        guard let cg = ctx.makeImage() else { continue }
+                        try? NSBitmapImageRep(cgImage: cg).representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dir).appendingPathComponent("pin-\(i + 1).png"))
                     }
                 }
             }

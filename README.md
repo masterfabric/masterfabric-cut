@@ -93,8 +93,9 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 - One render path, so the preview matches the exported/copied image
 
 ### Pin to screen
-- Pin any screenshot (or the clipboard image) as a floating, always-on-top window
-- Scale it, and close it from its context menu
+- Pin any screenshot, image file (PNG, JPG, HEIC, GIF…) or PDF as a floating, always-on-top window in a screen corner (`⌃⇧⌘P`, drag a file onto the launcher, or Pin Clipboard)
+- Hover for controls: snap to a corner, resize keeping the aspect ratio, opacity, PDF pages, click-through (`⌃⇧⌘U`), close
+- Active pins are listed in the menu-bar panel with Close All
 
 ### Quick Access overlay
 - Stacked, rounded preview cards after every capture or recording
@@ -174,6 +175,8 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 | Scrolling Capture | `⌃⇧⌘7` |
 | Capture Text (OCR) | `⌃⇧⌘8` |
 | Link to QR Code | `⌃⇧⌘L` |
+| Pin Image / PDF | `⌃⇧⌘P` |
+| Toggle Pin Click-Through | `⌃⇧⌘U` |
 | Toggle Desktop Icons | `⌃⇧⌘H` |
 | Record Screen | `⌃⇧⌘R` |
 | Record GIF | `⌃⇧⌘G` |
@@ -187,7 +190,7 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 | `Sources/App` | App entry, menu bar panel, onboarding, floating launcher, Settings, About |
 | `Sources/Shared` | Settings, permissions, SQLite storage, utilities |
 | `Sources/Modules/Capture` | Area/window/fullscreen capture, scrolling, OCR, timer, hotkeys |
-| `Sources/Modules/Tools` | Link to QR Code generator and presentation mode |
+| `Sources/Modules/Tools` | Link to QR Code generator and presentation mode, image/PDF pin overlay |
 | `Sources/Modules/Annotate` | Editor, Quick Access, pins, history and media player |
 | `Sources/Modules/Recording` | Recording engine, Studio, webcam bubble, controls, trim, export |
 

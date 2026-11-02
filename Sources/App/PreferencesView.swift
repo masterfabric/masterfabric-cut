@@ -134,6 +134,13 @@ private struct GeneralPane: View {
                 flag(s, "Show floating launcher button", "A draggable button that opens the action palette from anywhere.", \.showLauncher,
                      after: { FloatingLauncher.shared.refresh() })
             }
+            Section("Pins") {
+                Option(hint: "Where new image/PDF pins appear. Dragging a pin snaps it to the nearest corner and updates this.") {
+                    Picker("New pins appear in", selection: Binding(get: { s.pinCorner }, set: { s.pinCorner = $0 })) {
+                        ForEach(PinCorner.allCases) { Text($0.displayName).tag($0) }
+                    }
+                }
+            }
             Section("Feedback") {
                 flag(s, "Play sounds", "Play a shutter sound after each capture.", \.playSounds)
             }

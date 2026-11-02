@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Pin Image / PDF (Tools section, launcher, `⌃⇧⌘P`, drag a file onto the launcher, or Pin Clipboard): float any image (PNG, JPG, HEIC, GIF…) or PDF in a screen corner, always on top, on every Space and over full-screen apps. Hover for controls: snap to any of the four corners (or drag; it snaps to the nearest one, hold ⌥ to place freely), resize with the grip keeping the aspect ratio, opacity slider, PDF page navigation with scrolling, click-through and close. Pins stack, are listed in the menu-bar panel (reveal, click-through toggle, close, Close All) and remember the last corner, size and opacity. `⌃⇧⌘U` toggles click-through on all pins.
 - Link to QR Code tool (Tools section, launcher, `⌃⇧⌘L`): paste a link (bare domains get `https://`), generate a crisp Core Image QR code, then Present it full screen — a clean white view with the QR and the link underneath, above full-screen apps on the display under the cursor; Esc, Space, Return or a click closes it. Copy image, Save PNG and Copy link included; a link on the clipboard is prefilled.
 - Settings › Capture › Scrolling capture speed: Gentle (default), Normal, Fast.
 
 ### Changed
+- Pinned screenshots (Quick Access, history, editor, launcher "Pin Last") now use the new pin windows with corner snapping, opacity and click-through.
 - Scrolling capture is slower and smoother: each step scrolls 35% of the region as an eased stream of small continuous scroll events (~0.55 s) instead of one 60% jump, then waits until the page stops changing before grabbing the frame, giving cleaner stitches with lazy-loaded content.
 
 ## [0.1.2] - 2026-10-17

@@ -80,6 +80,7 @@ struct MenuBarView: View {
     let actions: MenuBarActions
     @ObservedObject private var recorder = AppCoordinator.shared.recorder
     @ObservedObject private var history = CaptureHistoryStore.shared
+    @ObservedObject private var pinStore = PinnedScreenshotController.shared
 
     private func hint(_ a: CaptureAction) -> String? { HotkeyManager.shared.bindings[a]?.displayString }
 
@@ -116,9 +117,11 @@ struct MenuBarView: View {
                     }
                     action(.linkToQR, "Link to QR Code", "Turn a link into a QR and present it", "qrcode", .teal)
                     action(.toggleDesktopIcons, "Toggle Desktop Icons", "Hide clutter before you capture", "eye.slash", .gray)
-                    MenuRow(title: "Pin Clipboard Image", subtitle: "Float it above your other windows", symbol: "pin", tint: .mint, shortcut: nil) {
+                    action(.pinFile, "Pin Image / PDF", "Float a file in a screen corner", "pin.square.fill", .mint)
+                    MenuRow(title: "Pin Clipboard", subtitle: "Float the copied image or PDF", symbol: "doc.on.clipboard", tint: .mint, shortcut: nil) {
                         run { actions.pinClipboard() }
                     }
+                    if !pinStore.pins.isEmpty { pinnedList }
                     section("History")
                     recents
                     action(.openHistory, "Show All History", "Screenshots, recordings and text", "clock.arrow.circlepath", .brown)
@@ -180,6 +183,24 @@ struct MenuBarView: View {
                 }
             }
             .padding(.vertical, 4)
+        }
+    }
+
+    private var pinnedList: some View {
+        VStack(spacing: 2) {
+            HStack {
+                Text("PINNED (\(pinStore.pins.count))").font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary)
+                Spacer()
+                if pinStore.anyClickThrough {
+                    Button("Unlock All") { pinStore.toggleClickThroughAll() }
+                        .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Color.accentColor)
+                        .help("Turn click-through off for every pin (\(hint(.togglePinClickThrough) ?? "⌃⇧⌘U"))")
+                }
+                Button("Close All") { pinStore.closeAll() }
+                    .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(.red)
+            }
+            .padding(.horizontal, 8).padding(.top, 10).padding(.bottom, 2)
+            ForEach(pinStore.pins) { pin in PinListRow(pin: pin) }
         }
     }
 
@@ -264,6 +285,42 @@ private struct FooterButton: View {
                 .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(hovering ? Color.primary.opacity(0.09) : .clear))
         }
         .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+    }
+}
+
+/// One active pin in the menu-bar panel: reveal, click-through toggle, close.
+private struct PinListRow: View {
+    let pin: PinInfo
+    @State private var hovering = false
+    private var store: PinnedScreenshotController { .shared }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: pin.symbol).font(.system(size: 11, weight: .semibold)).foregroundStyle(.white)
+                .frame(width: 22, height: 22)
+                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.mint.gradient))
+            Text(pin.title).font(.system(size: 12)).lineLimit(1).truncationMode(.middle)
+            Spacer(minLength: 4)
+            Button { store.setClickThrough(pin.id, !pin.clickThrough) } label: {
+                Image(systemName: pin.clickThrough ? "cursorarrow.slash" : "cursorarrow")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(pin.clickThrough ? Color.white : Color.secondary)
+                    .frame(width: 22, height: 22)
+                    .background(Circle().fill(pin.clickThrough ? Color.orange : Color.primary.opacity(0.07)))
+            }
+            .buttonStyle(.plain)
+            .help(pin.clickThrough ? "Click-through is on — click to make the pin interactive again" : "Make clicks pass through this pin")
+            Button { store.close(pin.id) } label: {
+                Image(systemName: "xmark").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary)
+                    .frame(width: 22, height: 22).background(Circle().fill(Color.primary.opacity(0.07)))
+            }
+            .buttonStyle(.plain).help("Close this pin")
+        }
+        .padding(.horizontal, 8).padding(.vertical, 4)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(hovering ? Color.primary.opacity(0.09) : .clear))
+        .contentShape(Rectangle())
+        .onTapGesture { store.reveal(pin.id) }
         .onHover { hovering = $0 }
     }
 }

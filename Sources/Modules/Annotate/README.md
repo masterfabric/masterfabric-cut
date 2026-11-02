@@ -45,7 +45,7 @@ CaptureHistoryStore.shared.maxItems = 200
 | `AnnotationCanvasView.swift` | Interactive `NSView` + SwiftUI wrapper (draw, select/move, delete, crop, Shift-constrain, undo shortcuts). |
 | `AnnotationEditorView.swift` | Toolbar/sidebar UI and `AnnotationEditorWindowController.open(image:sourceURL:onSaved:)`. |
 | `QuickAccessOverlay.swift` | Floating thumbnail stack: copy, save, annotate, pin, close, drag-out (file drag), auto-close. |
-| `PinnedScreenshot.swift` | Always-on-top pins: scroll/pinch to zoom, double-click = 100%, right-click menu (opacity, copy, save, annotate), Esc closes. |
+| `../Tools/PinOverlay.swift` | Always-on-top image/PDF pins (`PinnedScreenshotController`): corner snapping, hover chrome (opacity, click-through, resize, PDF pages), scroll/pinch to zoom, right-click menu, Esc closes. |
 | `CaptureHistory.swift` / `CaptureHistoryView.swift` | JSON-indexed history in `~/Library/Application Support/MasterFabric Cut/History`, thumbnails, grid window. |
 | `AnnotateImageUtil.swift` | Image encoding, pasteboard, unique file names. |
 

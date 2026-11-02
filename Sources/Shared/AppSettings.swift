@@ -42,6 +42,7 @@ final class AppSettings: ObservableObject {
             "recordDimEnabled": true, "recordDimOpacity": 0.45, "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
             "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
+            "pinCorner": PinCorner.topRight.rawValue, "pinWidth": 360.0, "pinOpacity": 1.0,
         ])
     }
 
@@ -89,6 +90,12 @@ final class AppSettings: ObservableObject {
         get { d.string(forKey: "launcherOrigin").map { NSPointFromString($0) } }
         set { d.set(newValue.map { NSStringFromPoint($0) }, forKey: "launcherOrigin") }
     }
+    var pinCorner: PinCorner {
+        get { PinCorner(rawValue: d.string(forKey: "pinCorner") ?? "") ?? .topRight }
+        set { set(newValue.rawValue, "pinCorner") }
+    }
+    var pinWidth: Double { get { d.double(forKey: "pinWidth") } set { set(newValue, "pinWidth") } }
+    var pinOpacity: Double { get { d.double(forKey: "pinOpacity") } set { set(newValue, "pinOpacity") } }
     var studioCountdown: Int { get { d.integer(forKey: "studioCountdown") } set { set(newValue, "studioCountdown") } }
     var studioMirror: Bool { get { d.bool(forKey: "studioMirror") } set { set(newValue, "studioMirror") } }
     var studioShape: String { get { d.string(forKey: "studioShape") ?? "circle" } set { set(newValue, "studioShape") } }

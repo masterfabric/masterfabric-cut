@@ -45,6 +45,8 @@ final class AppCoordinator: ObservableObject {
         case .openStudio: showStudio()
         case .openHistory: AnnotateModule.shared.showHistory()
         case .linkToQR: QRCodeToolWindowController.shared.show()
+        case .pinFile: PinnedScreenshotController.shared.pinFromOpenPanel()
+        case .togglePinClickThrough: PinnedScreenshotController.shared.toggleClickThroughAll()
         }
     }
 
@@ -56,7 +58,7 @@ final class AppCoordinator: ObservableObject {
     }
 
     func pinClipboardImage() {
-        if let img = NSImage(pasteboard: .general) { AnnotateModule.shared.pin(image: img) }
+        PinnedScreenshotController.shared.pinFromClipboard()
     }
 
     func stopRecording() { Task { _ = try? await recorder.stop() } }

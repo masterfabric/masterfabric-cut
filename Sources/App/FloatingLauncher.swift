@@ -145,16 +145,12 @@ struct LauncherAction: Identifiable {
             cap(.recordScreen, "Record Screen", "Save a region as MP4", "record.circle", .red),
             cap(.recordGIF, "Record GIF", "Save a region as a GIF", "gift", .pink),
             cap(.openStudio, "Recording Studio", "Webcam, mic and layouts", "video.badge.waveform", .orange),
+            cap(.pinFile, "Pin Image / PDF", "Float a file on screen (or drop it here)", "pin.square.fill", .mint),
+            LauncherAction(id: "pinClipboard", title: "Pin Clipboard", subtitle: "Float the copied image or PDF", symbol: "doc.on.clipboard", tint: .mint, shortcut: nil) {
+                PinnedScreenshotController.shared.pinFromClipboard()
+            },
             LauncherAction(id: "pinLast", title: "Pin Last", subtitle: "Float your latest capture", symbol: "pin.fill", tint: .mint, shortcut: nil) {
-                let store = CaptureHistoryStore.shared
-                if let item = store.items.first(where: { $0.kind == .screenshot }),
-                   let url = item.fileURL, let img = NSImage(contentsOf: url) {
-                    AnnotateModule.shared.pin(image: img)
-                } else {
-                    let a = NSAlert(); a.messageText = "Nothing to pin yet"
-                    a.informativeText = "Take a screenshot first, then pin it from here."
-                    NSApp.activate(ignoringOtherApps: true); a.runModal()
-                }
+                PinnedScreenshotController.shared.pinLastCapture()
             },
             cap(.openHistory, "History", "Screenshots, recordings, text", "clock.arrow.circlepath", .brown),
         ]
@@ -173,6 +169,7 @@ private struct LauncherButton: View {
     @State private var startOrigin: NSPoint?
     @State private var startMouse: NSPoint = .zero
     @State private var moved = false
+    @State private var dropTarget = false
 
     var body: some View {
         ZStack {
@@ -188,7 +185,9 @@ private struct LauncherButton: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Circle())
         .onHover { hovering = $0 }
-        .help("MasterFabric Cut — click for actions, drag to move")
+        .help("MasterFabric Cut — click for actions, drag to move, drop an image or PDF to pin it")
+        .onDrop(of: PinnedScreenshotController.dropTypes, isTargeted: $dropTarget) { PinnedScreenshotController.shared.handleDrop($0) }
+        .overlay(Circle().strokeBorder(Color.accentColor, lineWidth: dropTarget ? 3 : 0))
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .global)
                 .onChanged { _ in
