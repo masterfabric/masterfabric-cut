@@ -15,6 +15,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         FloatingLauncher.shared.refresh()
         if !AppSettings.shared.onboardingCompleted { OnboardingWindow.shared.show() }
         AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
+        #if DEBUG
+        // Dev/screenshot hook: MFC_DEMO_QR=<link> opens the QR tool prefilled; MFC_DEMO_QR_PRESENT=1 also presents it.
+        let env = ProcessInfo.processInfo.environment
+        if let link = env["MFC_DEMO_QR"] {
+            let tool = QRCodeToolWindowController.shared
+            tool.model.input = link; tool.model.generate(); tool.show()
+            if env["MFC_DEMO_QR_PRESENT"] == "1" { DispatchQueue.main.asyncAfter(deadline: .now() + 1) { tool.model.present() } }
+            // MFC_DEMO_SNAPSHOT_DIR=<dir>: write PNG snapshots of the tool and presentation windows (no Screen Recording needed).
+            if let dir = env["MFC_DEMO_SNAPSHOT_DIR"] {
+                func snap(_ w: NSWindow?, _ name: String) {
+                    guard let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { return }
+                    v.cacheDisplay(in: v.bounds, to: rep)
+                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dir).appendingPathComponent(name))
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    snap(NSApp.windows.first { $0.title == "Link to QR Code" }, "qr-tool.png")
+                    tool.model.present()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        snap(NSApp.windows.first { $0.level == .statusBar && $0.styleMask == [.borderless] && $0.frame.width > 400 }, "qr-present.png")
+                    }
+                }
+            }
+        }
+        #endif
     }
 
     // MARK: Menu bar

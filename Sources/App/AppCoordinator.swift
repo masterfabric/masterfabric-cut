@@ -44,6 +44,7 @@ final class AppCoordinator: ObservableObject {
         case .recordGIF: Task { await startRecording(format: .gif) }
         case .openStudio: showStudio()
         case .openHistory: AnnotateModule.shared.showHistory()
+        case .linkToQR: QRCodeToolWindowController.shared.show()
         }
     }
 

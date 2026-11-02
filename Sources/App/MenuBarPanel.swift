@@ -114,6 +114,7 @@ struct MenuBarView: View {
                     MenuRow(title: "Self-Timer", subtitle: "Capture an area after a countdown", symbol: "timer", tint: .yellow, shortcut: nil) {
                         run { actions.selfTimer() }
                     }
+                    action(.linkToQR, "Link to QR Code", "Turn a link into a QR and present it", "qrcode", .teal)
                     action(.toggleDesktopIcons, "Toggle Desktop Icons", "Hide clutter before you capture", "eye.slash", .gray)
                     MenuRow(title: "Pin Clipboard Image", subtitle: "Float it above your other windows", symbol: "pin", tint: .mint, shortcut: nil) {
                         run { actions.pinClipboard() }

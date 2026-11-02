@@ -15,6 +15,7 @@
 		10431BBE11AA1AD3BA066977 /* AnnotationRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9450B017CC9F2B61DA8A2FFA /* AnnotationRenderer.swift */; };
 		1647D2501B35E8339486219A /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */; };
 		181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B876257EBE2D24F70D3CF21 /* CaptureTypes.swift */; };
+		26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */; };
 		3163900F0A7D9B9F0291BEFD /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D234706B4558C75A4E68A22 /* AppCoordinator.swift */; };
 		3995BFA8CE90A088F62F00B9 /* CameraBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94346B508A92EBCE6A53A68F /* CameraBubble.swift */; };
 		40492FBAC9570E67C0763CE6 /* TrimEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E707C65B2A66C035FCC55B9 /* TrimEditor.swift */; };
@@ -61,6 +62,7 @@
 		07F497599CF5EAEF76BF2ED5 /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
 		11E02231860198CFF6E7D8DA /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingChrome.swift; sourceTree = "<group>"; };
+		27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeTool.swift; sourceTree = "<group>"; };
 		2D234706B4558C75A4E68A22 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		39A12783D66B8F60FC69DA42 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterFabricCut.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +151,7 @@
 				FBEAC9D1DB579447D0C61E7B /* Annotate */,
 				CADCED78F700BCCA25701E70 /* Capture */,
 				0238145F12C1B0B43139FC9F /* Recording */,
+				56181784650F3E333789AFD7 /* Tools */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -163,6 +166,14 @@
 				AB53CA5CB592EEBEA70B84CA /* Storage */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		56181784650F3E333789AFD7 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				27D9D9370F1D7A4BCCA16369 /* QRCodeTool.swift */,
+			);
+			path = Tools;
 			sourceTree = "<group>";
 		};
 		6BCADBB57C64C47A51DAD70D = {
@@ -346,6 +357,7 @@
 				A6D27A412B1A331ABEB29A1E /* PermissionOnboarding.swift in Sources */,
 				6BE6A1439ED551A615D54C0C /* PinnedScreenshot.swift in Sources */,
 				60E25DE6461E91BA3F8F5D27 /* PreferencesView.swift in Sources */,
+				26473E8F7C66DA777AB7A810 /* QRCodeTool.swift in Sources */,
 				65B7BFB4AA31BBC6DCDF7F2F /* QuickAccessOverlay.swift in Sources */,
 				DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */,
 				08F8A934A5B08FB454C9ADC0 /* RecordingEngine.swift in Sources */,

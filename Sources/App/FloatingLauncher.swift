@@ -141,6 +141,7 @@ struct LauncherAction: Identifiable {
             cap(.captureFullscreen, "Fullscreen", "The whole display", "display", .cyan),
             cap(.captureScrolling, "Scrolling", "Stitch a long page", "arrow.up.and.down.text.horizontal", .purple),
             cap(.captureText, "OCR Text", "Copy text from the screen", "text.viewfinder", .green),
+            cap(.linkToQR, "Link to QR", "Present a link as a QR code", "qrcode", .teal),
             cap(.recordScreen, "Record Screen", "Save a region as MP4", "record.circle", .red),
             cap(.recordGIF, "Record GIF", "Save a region as a GIF", "gift", .pink),
             cap(.openStudio, "Recording Studio", "Webcam, mic and layouts", "video.badge.waveform", .orange),

@@ -9,6 +9,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case captureScrolling, captureText
     case toggleDesktopIcons
     case recordScreen, recordGIF, openStudio, openHistory   // handled by the app shell / Recording module
+    case linkToQR                                           // Tools module (appended last: hotkey ids follow case order)
 
     public var title: String {
         switch self {
@@ -23,6 +24,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .recordGIF: return "Record GIF"
         case .openStudio: return "Recording Studio"
         case .openHistory: return "Capture History"
+        case .linkToQR: return "Link to QR Code"
         }
     }
 
@@ -41,6 +43,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .recordGIF: return .init(keyCode: kVK_ANSI_G, modifiers: m)
         case .openStudio: return .init(keyCode: kVK_ANSI_S, modifiers: m)
         case .openHistory: return .init(keyCode: kVK_ANSI_Y, modifiers: m)
+        case .linkToQR: return .init(keyCode: kVK_ANSI_L, modifiers: m)
         }
     }
 }
