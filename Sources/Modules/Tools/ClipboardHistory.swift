@@ -261,7 +261,7 @@ final class ClipboardPicker {
         p.hasShadow = true
         p.hidesOnDeactivate = false
         p.isReleasedWhenClosed = false
-        p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .moveToActiveSpace]
+        p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         p.contentView = NSHostingView(rootView: ClipboardPickerView(model: model, history: .shared,
                                                                     choose: { [weak self] item, paste in self?.choose(item, paste: paste) },
                                                                     close: { [weak self] in self?.close() }))

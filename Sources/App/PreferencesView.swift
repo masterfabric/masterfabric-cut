@@ -2,7 +2,7 @@ import SwiftUI
 import Carbon.HIToolbox
 
 enum PrefsPane: String, CaseIterable, Identifiable {
-    case general, capture, recording, studio, quickAccess, shortcuts, permissions, storage, about
+    case general, capture, recording, studio, quickAccess, tools, shortcuts, permissions, storage, about
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -11,6 +11,7 @@ enum PrefsPane: String, CaseIterable, Identifiable {
         case .recording: return "Recording"
         case .studio: return "Studio"
         case .quickAccess: return "Quick Access"
+        case .tools: return "Tools"
         case .shortcuts: return "Shortcuts"
         case .permissions: return "Permissions"
         case .storage: return "Storage & History"
@@ -24,6 +25,7 @@ enum PrefsPane: String, CaseIterable, Identifiable {
         case .recording: return "record.circle.fill"
         case .studio: return "video.badge.waveform"
         case .quickAccess: return "rectangle.on.rectangle"
+        case .tools: return "wrench.and.screwdriver.fill"
         case .shortcuts: return "command"
         case .permissions: return "lock.shield.fill"
         case .storage: return "internaldrive.fill"
@@ -37,6 +39,7 @@ enum PrefsPane: String, CaseIterable, Identifiable {
         case .recording: return .red
         case .studio: return .orange
         case .quickAccess: return .purple
+        case .tools: return .pink
         case .shortcuts: return .indigo
         case .permissions: return .green
         case .storage: return .brown
@@ -69,6 +72,7 @@ struct PreferencesView: View {
                 case .recording: RecordingPane()
                 case .studio: StudioPane()
                 case .quickAccess: QuickAccessPane()
+                case .tools: ToolsPane()
                 case .shortcuts: ShortcutsPane()
                 case .permissions: PermissionsPane()
                 case .storage: StoragePane()
@@ -144,6 +148,45 @@ private struct GeneralPane: View {
             Section("Feedback") {
                 flag(s, "Play sounds", "Play a shutter sound after each capture.", \.playSounds)
             }
+        }
+    }
+}
+
+private struct ToolsPane: View {
+    @ObservedObject var s = AppSettings.shared
+    @ObservedObject var clips = ClipboardHistory.shared
+    @State private var confirmClear = false
+    var body: some View {
+        Form {
+            Section("Color Picker") {
+                Option(hint: "The value copied when you click a color. Every format is still shown in the picker result.") {
+                    Picker("Copy as", selection: Binding(get: { ColorFormat(rawValue: s.colorFormat) ?? .hex },
+                                                         set: { s.colorFormat = $0.rawValue })) {
+                        ForEach(ColorFormat.allCases) { Text($0.title).tag($0) }
+                    }.help("Format copied to the clipboard after picking a color")
+                }
+            }
+            Section("Clipboard History") {
+                flag(s, "Keep clipboard history", "Remember the last 50 copied texts and images. Passwords and other concealed items are never recorded.", \.clipboardHistoryEnabled,
+                     after: { ClipboardHistory.shared.applySettings() })
+                flag(s, "Keep history after quitting", "Save the history to disk so it survives a restart. Off keeps it in memory only.", \.clipboardPersist,
+                     after: { ClipboardHistory.shared.applySettings() })
+                Option(hint: "\(clips.items.count) item\(clips.items.count == 1 ? "" : "s") in history.") {
+                    Button("Clear History…") { confirmClear = true }
+                        .disabled(clips.items.isEmpty)
+                        .help("Remove every item from clipboard history")
+                }
+            }
+            Section("Countdown Timer") {
+                flag(s, "Play a sound when time is up", "The timer window flashes either way.", \.countdownSound)
+            }
+            Section("Keep Awake") {
+                flag(s, "Keep the display on too", "On: the screen stays lit. Off: only the Mac stays awake and the display may sleep.", \.keepAwakeDisplay,
+                     after: { KeepAwake.shared.applySettings() })
+            }
+        }
+        .confirmationDialog("Clear clipboard history?", isPresented: $confirmClear) {
+            Button("Clear", role: .destructive) { ClipboardHistory.shared.clear() }
         }
     }
 }

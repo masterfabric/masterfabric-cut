@@ -78,10 +78,19 @@ struct MenuBarActions {
 
 struct MenuBarView: View {
     let actions: MenuBarActions
+
+    /// Tall enough to show the Utilities grid without scrolling on most displays; scrolls on short ones.
+    static var maxHeight: CGFloat {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["MFC_DEMO_TOOL"] == "menu-bar" { return 2000 }
+        #endif
+        return min(max((NSScreen.main?.visibleFrame.height ?? 800) - 60, 420), 780)
+    }
     @ObservedObject private var recorder = AppCoordinator.shared.recorder
     @ObservedObject private var history = CaptureHistoryStore.shared
     @ObservedObject private var pinStore = PinnedScreenshotController.shared
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var awake = KeepAwake.shared
 
     private func hint(_ a: CaptureAction) -> String? { HotkeyManager.shared.bindings[a]?.displayString }
 
@@ -123,6 +132,9 @@ struct MenuBarView: View {
                         run { actions.pinClipboard() }
                     }
                     if !pinStore.pins.isEmpty { pinnedList }
+                    section("Utilities")
+                    utilities
+                    keepAwakeRow
                     section("History")
                     recents
                     action(.openHistory, "Show All History", "Screenshots, recordings and text", "clock.arrow.circlepath", .brown)
@@ -139,7 +151,7 @@ struct MenuBarView: View {
                 }
                 .padding(.horizontal, 8).padding(.bottom, 8)
             }
-            .frame(maxHeight: 560)
+            .frame(maxHeight: Self.maxHeight)
             footer
         }
         .frame(width: 340)
@@ -191,6 +203,63 @@ struct MenuBarView: View {
             }
             .padding(.vertical, 4)
         }
+    }
+
+    /// The general tools as a compact 3×3 grid so the panel stays short.
+    private var utilities: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
+            tile(.colorPicker, "Color Picker", "eyedropper.halffull", .pink)
+            tile(.screenRuler, "Ruler", "ruler", .yellow)
+            tile(.ocrTranslate, "Translate", "character.bubble.fill", .blue)
+            tile(.clipboardHistory, "Clipboard", "list.clipboard.fill", .indigo)
+            tile(.imageConverter, "Convert Image", "photo.on.rectangle.angled", .teal)
+            tile(.textTools, "Text Tools", "textformat.alt", .purple)
+            tile(.quickNote, "Quick Note", "note.text", .yellow)
+            tile(.countdownTimer, "Countdown", "timer", .orange)
+            tile(.keepAwake, awake.isActive ? "Awake · On" : "Keep Awake", awake.isActive ? "cup.and.saucer.fill" : "cup.and.saucer", .brown,
+                 highlighted: awake.isActive)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func tile(_ a: CaptureAction, _ title: String, _ symbol: String, _ tint: Color, highlighted: Bool = false) -> some View {
+        ToolTile(title: title, symbol: symbol, tint: tint, shortcut: hint(a), highlighted: highlighted) {
+            // Keep Awake toggles in place; everything else opens after the panel closes.
+            if a == .keepAwake { actions.perform(a) } else { run { actions.perform(a) } }
+        }
+    }
+
+    private var keepAwakeRow: some View {
+        HStack(spacing: 4) {
+            Image(systemName: awake.isActive ? "cup.and.saucer.fill" : "moon.zzz").font(.system(size: 11)).foregroundStyle(awake.isActive ? .orange : .secondary)
+                .frame(width: 16)
+            Text(awake.isActive ? awake.statusText : "Keep awake").font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
+            Spacer(minLength: 4)
+            ForEach(KeepAwakeMode.menuChoices, id: \.title) { m in
+                chip(label(for: m), selected: awake.isActive && awake.mode == m) { awake.start(m) }
+            }
+            if awake.isActive { chip("Off", selected: false) { awake.stop() } }
+        }
+        .padding(.horizontal, 8).padding(.vertical, 4)
+    }
+
+    private func label(for m: KeepAwakeMode) -> String {
+        switch m {
+        case .indefinitely: return "∞"
+        case .minutes(let n): return "\(n / 60)h"
+        case .untilTimerEnds: return "Timer"
+        }
+    }
+
+    private func chip(_ t: String, selected: Bool, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(t).font(.system(size: 11, weight: .semibold, design: .rounded))
+                .padding(.horizontal, 7).padding(.vertical, 2)
+                .foregroundStyle(selected ? .white : .primary)
+                .background(Capsule().fill(selected ? Color.orange : Color.primary.opacity(0.08)))
+        }
+        .buttonStyle(.plain)
+        .help(t == "Off" ? "Allow sleep again" : "Keep the Mac awake: \(t)")
     }
 
     private var pinnedList: some View {
@@ -252,6 +321,33 @@ private struct MenuRow: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .help(subtitle)
+    }
+}
+
+private struct ToolTile: View {
+    let title: String, symbol: String
+    let tint: Color
+    let shortcut: String?
+    var highlighted = false
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: symbol).font(.system(size: 13, weight: .semibold)).foregroundStyle(.white)
+                    .frame(width: 28, height: 28)
+                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(tint.gradient))
+                Text(title).font(.system(size: 11, weight: .medium)).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.85)
+            }
+            .frame(maxWidth: .infinity).padding(.vertical, 7)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(highlighted ? tint.opacity(0.22) : hovering ? Color.primary.opacity(0.09) : Color.primary.opacity(0.03)))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .help(shortcut.map { "\(title) (\($0))" } ?? title)
     }
 }
 

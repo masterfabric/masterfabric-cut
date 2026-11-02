@@ -110,6 +110,14 @@ final class ColorPickerTool: ObservableObject {
 
     func clear() { recents = []; save() }
 
+    #if DEBUG
+    /// Screenshot hook: in-memory sample colors (not saved).
+    func loadDemoColors() {
+        recents = [(79, 125, 243), (255, 107, 53), (46, 204, 113), (155, 89, 182), (241, 196, 15), (231, 76, 60),
+                   (52, 73, 94), (26, 188, 156), (236, 240, 241), (17, 17, 17)].map { PickedColor(r: $0.0, g: $0.1, b: $0.2) }
+    }
+    #endif
+
     private func save() {
         let s = (try? JSONEncoder().encode(recents)).flatMap { String(data: $0, encoding: .utf8) }
         AppStateStore.shared.set(s, forKey: Self.key)
@@ -153,10 +161,11 @@ struct ColorPickerView: View {
                     .keyboardShortcut("p", modifiers: .command)
                     .help("Show the loupe; click to copy the color, Esc to cancel (⌘P)")
                 Spacer()
+                Text("Copy as").font(.system(size: 12)).foregroundStyle(.secondary)
                 Picker("Copy as", selection: Binding(get: { tool.format }, set: { tool.format = $0 })) {
                     ForEach(ColorFormat.allCases) { Text($0.title).tag($0) }
                 }
-                .pickerStyle(.segmented).frame(width: 190)
+                .labelsHidden().pickerStyle(.segmented).frame(width: 150)
                 .help("Format used when a picked color is copied")
             }
             if !tool.recents.isEmpty {

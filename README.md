@@ -95,13 +95,25 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 ### Floating button
 - One always-on-top app-icon squircle (default bottom-right; drag it to any screen edge, it snaps and remembers its spot)
 - Click: the action palette with every action (capture area/window/fullscreen/scrolling, OCR, Link to QR, record screen/GIF, Studio, pins, History)
-- Hover 2 s (a ring fills): a half-moon radial menu — Screenshot Area, Scrolling Capture, Record, Link to QR, Pin Image / PDF, All Actions, Settings — pointing away from the nearest edge
+- Hover 2 s (a ring fills): a half-moon radial menu — Screenshot Area, Scrolling Capture, Record, Link to QR, Pin Image / PDF, All Actions, Tools — pointing away from the nearest edge
 - Drop an image or PDF on it to pin the file
 
 ### Pin to screen
 - Pin any screenshot, image file (PNG, JPG, HEIC, GIF…) or PDF as a floating, always-on-top window in a screen corner (`⌃⇧⌘P`, drag a file onto the floating button, or Pin Clipboard)
 - Hover for controls: snap to a corner, resize keeping the aspect ratio, opacity, PDF pages, click-through (`⌃⇧⌘U`), close
 - Active pins are listed in the menu-bar panel with Close All
+
+### Tools
+Everyday utilities, all on-device, in the menu-bar panel's Utilities grid, the palette's Tools section and the radial menu's Tools bubble:
+- **Color Picker** (`⌃⇧⌘C`): loupe → copies HEX / RGB / HSL, keeps recent colors
+- **Screen Ruler**: drag to measure in points and pixels, ⇧ to snap, ⌘C to copy
+- **OCR Translate**: select text on screen and translate Turkish ⇄ English with Apple's Translation framework (macOS 15+)
+- **Clipboard History** (`⌃⇧⌘V`): last 50 texts and images, searchable, skips passwords; optional persistence
+- **Quick Notes**: always-on-top sticky notes that persist
+- **Countdown Timer**: floating pill with presets and an optional sound
+- **Keep Awake** (`⌃⇧⌘K`): ∞, 1 h, 2 h or until the timer ends; a cup on the menu-bar icon shows it is on
+- **Image Converter**: batch convert to PNG / JPG / HEIC / TIFF with optional resize (reads WebP, GIF, BMP…)
+- **Text Tools**: JSON pretty/minify/validate, Base64, URL encoding and case conversion
 
 ### Quick Access overlay
 - Stacked, rounded preview cards after every capture or recording
@@ -188,6 +200,11 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 | Record GIF | `⌃⇧⌘G` |
 | Recording Studio | `⌃⇧⌘S` |
 | Capture History | `⌃⇧⌘Y` |
+| Color Picker | `⌃⇧⌘C` |
+| Clipboard History | `⌃⇧⌘V` |
+| Keep Awake | `⌃⇧⌘K` |
+
+Screen Ruler, OCR Translate, Quick Note, Countdown Timer, Image Converter and Text Tools have no default shortcut; assign one in Settings › Shortcuts.
 
 ## Project layout
 

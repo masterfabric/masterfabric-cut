@@ -22,10 +22,11 @@ final class FloatingLauncher {
 
     func togglePalette(anchor: NSWindow) { palette == nil ? openPalette(anchor: anchor) : closePalette() }
 
-    func openPalette(anchor bp: NSWindow) {
+    /// `only` shows a single section (the radial menu's "Tools" bubble).
+    func openPalette(anchor bp: NSWindow, only: PaletteGroup? = nil) {
         guard palette == nil else { return }
         anchor = bp
-        let host = NSHostingView(rootView: ActionPalette(dismiss: { [weak self] in self?.closePalette() },
+        let host = NSHostingView(rootView: ActionPalette(only: only, dismiss: { [weak self] in self?.closePalette() },
                                                          run: { [weak self] a in self?.run(a) }))
         let size = host.fittingSize
         let p = FloatingPanel(contentRect: NSRect(origin: .zero, size: size),
@@ -94,18 +95,24 @@ private final class FloatingPanel: NSPanel {
 
 // MARK: - Actions
 
+enum PaletteGroup: String, CaseIterable {
+    case capture = "Capture", record = "Record", pin = "Pin & History", tools = "Tools"
+}
+
 struct LauncherAction: Identifiable {
     let id: String
     let title: String, subtitle: String, symbol: String
     let tint: Color
     let shortcut: String?
+    var group: PaletteGroup = .capture
     let perform: () -> Void
 
     @MainActor static var all: [LauncherAction] {
         func hint(_ a: CaptureAction) -> String? { HotkeyManager.shared.bindings[a]?.displayString }
-        func cap(_ a: CaptureAction, _ t: String, _ s: String, _ sym: String, _ c: Color) -> LauncherAction {
-            LauncherAction(id: a.rawValue, title: t, subtitle: s, symbol: sym, tint: c, shortcut: hint(a)) { AppCoordinator.shared.perform(a) }
+        func cap(_ a: CaptureAction, _ t: String, _ s: String, _ sym: String, _ c: Color, _ g: PaletteGroup = .capture) -> LauncherAction {
+            LauncherAction(id: a.rawValue, title: t, subtitle: s, symbol: sym, tint: c, shortcut: hint(a), group: g) { AppCoordinator.shared.perform(a) }
         }
+        let awake = KeepAwake.shared
         return [
             cap(.captureArea, "Capture Area", "Drag to select a region", "rectangle.dashed", .blue),
             cap(.captureWindow, "Capture Window", "Click a window to grab it", "macwindow", .indigo),
@@ -113,17 +120,31 @@ struct LauncherAction: Identifiable {
             cap(.captureScrolling, "Scrolling", "Stitch a long page", "arrow.up.and.down.text.horizontal", .purple),
             cap(.captureText, "OCR Text", "Copy text from the screen", "text.viewfinder", .green),
             cap(.linkToQR, "Link to QR", "Present a link as a QR code", "qrcode", .teal),
-            cap(.recordScreen, "Record Screen", "Save a region as MP4", "record.circle", .red),
-            cap(.recordGIF, "Record GIF", "Save a region as a GIF", "gift", .pink),
-            cap(.openStudio, "Recording Studio", "Webcam, mic and layouts", "video.badge.waveform", .orange),
-            cap(.pinFile, "Pin Image / PDF", "Float a file on screen (or drop it here)", "pin.square.fill", .mint),
-            LauncherAction(id: "pinClipboard", title: "Pin Clipboard", subtitle: "Float the copied image or PDF", symbol: "doc.on.clipboard", tint: .mint, shortcut: nil) {
+            cap(.recordScreen, "Record Screen", "Save a region as MP4", "record.circle", .red, .record),
+            cap(.recordGIF, "Record GIF", "Save a region as a GIF", "gift", .pink, .record),
+            cap(.openStudio, "Recording Studio", "Webcam, mic and layouts", "video.badge.waveform", .orange, .record),
+            cap(.pinFile, "Pin Image / PDF", "Float a file on screen (or drop it here)", "pin.square.fill", .mint, .pin),
+            LauncherAction(id: "pinClipboard", title: "Pin Clipboard", subtitle: "Float the copied image or PDF", symbol: "doc.on.clipboard", tint: .mint, shortcut: nil, group: .pin) {
                 PinnedScreenshotController.shared.pinFromClipboard()
             },
-            LauncherAction(id: "pinLast", title: "Pin Last", subtitle: "Float your latest capture", symbol: "pin.fill", tint: .mint, shortcut: nil) {
+            LauncherAction(id: "pinLast", title: "Pin Last", subtitle: "Float your latest capture", symbol: "pin.fill", tint: .mint, shortcut: nil, group: .pin) {
                 PinnedScreenshotController.shared.pinLastCapture()
             },
-            cap(.openHistory, "History", "Screenshots, recordings, text", "clock.arrow.circlepath", .brown),
+            cap(.openHistory, "History", "Screenshots, recordings, text", "clock.arrow.circlepath", .brown, .pin),
+            cap(.colorPicker, "Color Picker", "Pick any pixel, copy HEX/RGB", "eyedropper.halffull", .pink, .tools),
+            cap(.screenRuler, "Screen Ruler", "Measure in points and pixels", "ruler", .yellow, .tools),
+            cap(.ocrTranslate, "OCR Translate", "Translate on-screen text TR ⇄ EN", "character.bubble.fill", .blue, .tools),
+            cap(.clipboardHistory, "Clipboard History", "Your last 50 copies, searchable", "list.clipboard.fill", .indigo, .tools),
+            cap(.imageConverter, "Image Converter", "HEIC, PNG, JPG — resize in batches", "photo.on.rectangle.angled", .teal, .tools),
+            cap(.textTools, "Text Tools", "JSON, Base64, URL, case", "textformat.alt", .purple, .tools),
+            cap(.quickNote, "Quick Note", "A sticky note on top of everything", "note.text", .yellow, .tools),
+            cap(.countdownTimer, "Countdown", "Always-on-top timer", "timer", .orange, .tools),
+            LauncherAction(id: CaptureAction.keepAwake.rawValue, title: awake.isActive ? "Keep Awake · On" : "Keep Awake",
+                           subtitle: awake.isActive ? awake.statusText + " — click to stop" : "Stop the Mac from sleeping",
+                           symbol: awake.isActive ? "cup.and.saucer.fill" : "cup.and.saucer", tint: .brown,
+                           shortcut: hint(.keepAwake), group: .tools) { awake.toggle() },
+            LauncherAction(id: "settings", title: "Settings", subtitle: "Shortcuts, capture and tools", symbol: "gearshape.fill", tint: .gray,
+                           shortcut: nil, group: .tools) { (NSApp.delegate as? AppDelegate)?.showPreferences() },
         ]
     }
 }
@@ -131,10 +152,13 @@ struct LauncherAction: Identifiable {
 // MARK: - Views
 
 private struct ActionPalette: View {
+    var only: PaletteGroup? = nil
     let dismiss: () -> Void
     let run: (LauncherAction) -> Void
     private let actions = LauncherAction.all
-    private let columns = [GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6)]
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 3)
+
+    private var groups: [PaletteGroup] { only.map { [$0] } ?? PaletteGroup.allCases }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -142,19 +166,27 @@ private struct ActionPalette: View {
                 BrandIcon(size: 24)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("MasterFabric Cut").font(.system(size: 13, weight: .semibold))
-                    Text("What would you like to do?").font(.system(size: 10)).foregroundStyle(.secondary)
+                    Text(only == .tools ? "Tools" : "What would you like to do?").font(.system(size: 10)).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Text("esc").font(.system(size: 10, weight: .medium, design: .rounded)).foregroundStyle(.secondary)
                     .padding(.horizontal, 6).padding(.vertical, 2).background(.quaternary, in: Capsule())
             }
             .padding(.horizontal, 6).padding(.top, 2)
-            LazyVGrid(columns: columns, spacing: 6) {
-                ForEach(actions) { a in PaletteTile(action: a) { run(a) } }
+            ForEach(groups, id: \.self) { g in
+                VStack(alignment: .leading, spacing: 4) {
+                    if only == nil {
+                        Text(g.rawValue.uppercased()).font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                    }
+                    LazyVGrid(columns: columns, spacing: 6) {
+                        ForEach(actions.filter { $0.group == g }) { a in PaletteTile(action: a) { run(a) } }
+                    }
+                }
             }
         }
         .padding(12)
-        .frame(width: 460)
+        .frame(width: 660)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).strokeBorder(.white.opacity(0.12), lineWidth: 0.5))
         .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
@@ -183,7 +215,7 @@ private struct PaletteTile: View {
                 Spacer(minLength: 0)
             }
             .padding(8)
-            .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(hovering ? Color.primary.opacity(0.1) : Color.primary.opacity(0.03)))
             .scaleEffect(hovering ? 1.02 : 1)
             .contentShape(Rectangle())

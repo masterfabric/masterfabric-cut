@@ -57,27 +57,37 @@ struct BrandHeader: View {
 
 /// Scissors SF Symbol template image for the menu bar; draws a red dot while recording.
 enum MenuBarIcon {
-    static func image(recording: Bool) -> NSImage {
+    /// `recording` adds a red dot (top right); `awake` (Keep Awake on) adds a small orange cup (bottom right).
+    static func image(recording: Bool, awake: Bool = false) -> NSImage {
         let base = NSImage(systemSymbolName: "scissors", accessibilityDescription: "MasterFabric Cut") ?? NSImage()
-        guard recording else {
+        guard recording || awake else {
             base.isTemplate = true
             return base
         }
-        // Template images are tinted as a whole, so the recording variant is non-template with a red dot.
-        let size = base.size
+        // Template images are tinted as a whole, so the badged variants are non-template.
+        let size = NSSize(width: base.size.width + (awake ? 4 : 0), height: base.size.height)
         let out = NSImage(size: size, flipped: false) { rect in
-            let mark = NSImage(size: size, flipped: false) { r in
+            let mark = NSImage(size: base.size, flipped: false) { r in
                 base.draw(in: r)
                 NSColor.labelColor.set(); r.fill(using: .sourceIn); return true
             }
-            mark.draw(in: rect)
-            let d: CGFloat = 6
-            let dot = NSRect(x: rect.maxX - d, y: rect.maxY - d, width: d, height: d)
-            NSColor.systemRed.setFill(); NSBezierPath(ovalIn: dot).fill()
+            mark.draw(in: NSRect(origin: .zero, size: base.size))
+            if recording {
+                let d: CGFloat = 6
+                let dot = NSRect(x: rect.maxX - d, y: rect.maxY - d, width: d, height: d)
+                NSColor.systemRed.setFill(); NSBezierPath(ovalIn: dot).fill()
+            }
+            if awake, let cup = NSImage(systemSymbolName: "cup.and.saucer.fill", accessibilityDescription: nil)?
+                .withSymbolConfiguration(.init(pointSize: 7, weight: .bold)) {
+                let c = NSImage(size: cup.size, flipped: false) { r in
+                    cup.draw(in: r); NSColor.systemOrange.set(); r.fill(using: .sourceIn); return true
+                }
+                c.draw(in: NSRect(x: rect.maxX - cup.size.width, y: rect.minY, width: cup.size.width, height: cup.size.height))
+            }
             return true
         }
         out.isTemplate = false
-        out.accessibilityDescription = "MasterFabric Cut (recording)"
+        out.accessibilityDescription = recording ? "MasterFabric Cut (recording)" : "MasterFabric Cut (keeping the Mac awake)"
         return out
     }
 }

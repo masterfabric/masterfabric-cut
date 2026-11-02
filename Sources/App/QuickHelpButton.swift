@@ -107,9 +107,9 @@ final class QuickHelpButton {
     }
 
     /// "All Actions" in the radial menu.
-    func openPalette() {
+    func openPalette(only group: PaletteGroup? = nil) {
         guard let p = panel else { return }
-        FloatingLauncher.shared.openPalette(anchor: p)
+        FloatingLauncher.shared.openPalette(anchor: p, only: group)
     }
 
     // MARK: Drag & edge snapping
@@ -169,7 +169,8 @@ final class QuickHelpButton {
         .init(id: "qr", title: "Link to QR", symbol: "qrcode", tint: .teal) { AppCoordinator.shared.perform(.linkToQR) },
         .init(id: "pin", title: "Pin Image / PDF", symbol: "pin.square.fill", tint: .mint) { AppCoordinator.shared.perform(.pinFile) },
         .init(id: "all", title: "All Actions", symbol: "square.grid.2x2.fill", tint: .indigo) { QuickHelpButton.shared.openPalette() },
-        .init(id: "settings", title: "Settings", symbol: "gearshape.fill", tint: .gray) { (NSApp.delegate as? AppDelegate)?.showPreferences() },
+        // Settings moved into the palette (Tools section) to keep the radial menu at 7 bubbles.
+        .init(id: "tools", title: "Tools", symbol: "wrench.and.screwdriver.fill", tint: .orange) { QuickHelpButton.shared.openPalette(only: .tools) },
     ]
 
     /// `autoClose: false` is only for the debug snapshot hook (the real cursor is elsewhere).
@@ -242,6 +243,7 @@ final class QuickHelpButton {
 
     #if DEBUG
     var debugMenuView: NSView? { menuPanel?.contentView }
+    var debugButtonWindow: NSWindow? { panel }
     #endif
 }
 

@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import PDFKit
 import SwiftUI
 
@@ -8,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var prefsWindow: NSWindow?
     private var aboutWindow: NSWindow?
     private let panel = MenuBarPanelController()
+    private var awakeSub: AnyCancellable?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -22,6 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         if !AppSettings.shared.onboardingCompleted { OnboardingWindow.shared.show() }
         AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
+        awakeSub = KeepAwake.shared.$isActive.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] _ in self?.rebuildMenu() }
         #if DEBUG
         // Dev/screenshot hook: MFC_DEMO_QR=<link> opens the QR tool prefilled; MFC_DEMO_QR_PRESENT=1 also presents it.
         let env = ProcessInfo.processInfo.environment
@@ -101,8 +104,63 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 }
             }
         }
+        // MFC_DEMO_TOOL=<name> opens a tool with in-memory sample data (nothing is saved); with MFC_DEMO_SNAPSHOT_DIR
+        // writes <name>.png. Names: tools-panel, menu-bar, color-picker, text-tools, ocr-translate, clipboard-history,
+        // countdown, image-converter, screen-ruler.
+        if let tool = env["MFC_DEMO_TOOL"] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { Self.openDemoTool(tool) }
+            if let dir = env["MFC_DEMO_SNAPSHOT_DIR"] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) { Self.snapshotDemoTool(tool, dir: dir) }
+            }
+        }
         #endif
     }
+
+    #if DEBUG
+    private static var demoWindow: NSWindow?
+
+    private static func openDemoTool(_ name: String) {
+        switch name {
+        case "tools-panel": QuickHelpButton.shared.openPalette()
+        case "menu-bar":
+            let host = NSHostingView(rootView: MenuBarView(actions: MenuBarActions()))
+            host.setFrameSize(host.fittingSize)
+            let w = NSWindow(contentRect: NSRect(origin: NSPoint(x: -4000, y: 0), size: host.fittingSize),
+                             styleMask: [.borderless], backing: .buffered, defer: false)
+            w.contentView = host; w.isReleasedWhenClosed = false; w.orderFrontRegardless()
+            demoWindow = w
+        case "color-picker": ColorPickerTool.shared.loadDemoColors(); ColorPickerTool.shared.showWindow()
+        case "text-tools":
+            let m = TextToolsWindow.model
+            m.input = #"{"app":"MasterFabric Cut","version":"0.1.3","tools":["color","ruler","ocr","clipboard"],"free":true}"#
+            TextToolsWindow.show(); m.run(.jsonPretty)
+        case "ocr-translate":
+            OCRTranslateTool.shared.show(text: "Ekran görüntüsünü al, metni seç ve tek tıkla çevir. Toplantı Perşembe saat 14:00'te.")
+        case "clipboard-history": ClipboardHistory.shared.loadDemoItems(); ClipboardPicker.shared.show()
+        case "countdown": CountdownTimer.shared.start(minutes: 25)
+        case "image-converter": ImageConverterTool.show()
+        case "screen-ruler": ScreenRuler.shared.start()
+        default: break
+        }
+    }
+
+    /// Writes the frontmost visible window of this app (largest if several) onto a dark backdrop.
+    private static func snapshotDemoTool(_ name: String, dir: String) {
+        let candidates = NSApp.windows.filter { $0.isVisible && $0.frame.width > 150 && $0.frame.height > 100
+            && !String(describing: type(of: $0)).contains("StatusBar") && $0 !== QuickHelpButton.shared.debugButtonWindow }
+        guard let w = (name == "menu-bar" ? demoWindow : candidates.max { $0.frame.width * $0.frame.height < $1.frame.width * $1.frame.height }),
+              let v = w.contentView?.superview ?? w.contentView,
+              let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { return }
+        v.cacheDisplay(in: v.bounds, to: rep)
+        let img = NSImage(size: v.bounds.size, flipped: false) { r in
+            NSGradient(starting: NSColor(white: 0.30, alpha: 1), ending: NSColor(white: 0.16, alpha: 1))?.draw(in: r, angle: -90)
+            rep.draw(in: r); return true
+        }
+        if let tiff = img.tiffRepresentation, let out = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) {
+            try? out.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+    }
+    #endif
 
     // MARK: Menu bar
 
@@ -117,7 +175,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func rebuildMenu() {
         // The dropdown is a custom SwiftUI panel (MenuBarPanel.swift); it observes state itself.
-        statusItem?.button?.image = MenuBarIcon.image(recording: AppCoordinator.shared.recorder.state.isActive)
+        statusItem?.button?.image = MenuBarIcon.image(recording: AppCoordinator.shared.recorder.state.isActive,
+                                                      awake: KeepAwake.shared.isActive)
     }
 
     @objc private func togglePanel() {
