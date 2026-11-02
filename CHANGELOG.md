@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Link to QR Code tool (Tools section, launcher, `⌃⇧⌘L`): paste a link (bare domains get `https://`), generate a crisp Core Image QR code, then Present it full screen — a clean white view with the QR and the link underneath, above full-screen apps on the display under the cursor; Esc, Space, Return or a click closes it. Copy image, Save PNG and Copy link included; a link on the clipboard is prefilled.
+- Settings › Capture › Scrolling capture speed: Gentle (default), Normal, Fast.
+
+### Changed
+- Scrolling capture is slower and smoother: each step scrolls 35% of the region as an eased stream of small continuous scroll events (~0.55 s) instead of one 60% jump, then waits until the page stops changing before grabbing the frame, giving cleaner stitches with lazy-loaded content.
+
 ## [0.1.2] - 2026-10-17
 
 ### Added

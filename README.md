@@ -81,6 +81,7 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 - Repeat the previous area
 - Scrolling capture that stitches a long page into one image
 - OCR text capture (Apple Vision) straight to the clipboard
+- Link to QR Code with a full-screen presentation mode for showing a link on stage
 - Self-timer capture
 - Toggle desktop icons before you shoot
 
@@ -172,6 +173,7 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 | Capture Window | `⌃⇧⌘6` |
 | Scrolling Capture | `⌃⇧⌘7` |
 | Capture Text (OCR) | `⌃⇧⌘8` |
+| Link to QR Code | `⌃⇧⌘L` |
 | Toggle Desktop Icons | `⌃⇧⌘H` |
 | Record Screen | `⌃⇧⌘R` |
 | Record GIF | `⌃⇧⌘G` |
@@ -185,6 +187,7 @@ Global defaults (all rebindable in Settings › Shortcuts). They use ⌃⇧⌘ t
 | `Sources/App` | App entry, menu bar panel, onboarding, floating launcher, Settings, About |
 | `Sources/Shared` | Settings, permissions, SQLite storage, utilities |
 | `Sources/Modules/Capture` | Area/window/fullscreen capture, scrolling, OCR, timer, hotkeys |
+| `Sources/Modules/Tools` | Link to QR Code generator and presentation mode |
 | `Sources/Modules/Annotate` | Editor, Quick Access, pins, history and media player |
 | `Sources/Modules/Recording` | Recording engine, Studio, webcam bubble, controls, trim, export |
 
