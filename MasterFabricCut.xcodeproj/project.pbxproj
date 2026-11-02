@@ -53,6 +53,7 @@
 		D73E8CEC1CA251470F511786 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD29755E2F08AEE691D0CB6 /* LaunchAtLogin.swift */; };
 		DB1AF8F850E66D9AA0862ED1 /* RecordingChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267AF76AAFEE7F7535337A12 /* RecordingChrome.swift */; };
 		E08C65A1A6DAA064987FDAFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC0ABDE42992331A3B77B0 /* AppDelegate.swift */; };
+		EB7FBEE2920D9EB3CA6DD161 /* ClipboardHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E47799AD431797FABFFD79 /* ClipboardHistory.swift */; };
 		EDC71C3388E49783C81428F0 /* AnnotateImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEAE5F855EADF92EE64AC69 /* AnnotateImageUtil.swift */; };
 		F1087621F17DB226DD1940B9 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */; };
 		F664D2529C15C4F6CF1426D6 /* ColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */; };
@@ -71,6 +72,7 @@
 		39A12783D66B8F60FC69DA42 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		3A47A08C8A7A8AE5FBC42F3A /* ToolKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolKit.swift; sourceTree = "<group>"; };
 		439606C0AA84E07B8DB37A78 /* MasterFabricCut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterFabricCut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		48E47799AD431797FABFFD79 /* ClipboardHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistory.swift; sourceTree = "<group>"; };
 		4CD7B4F89CAAEF02EB5BEB40 /* RecordingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingEngine.swift; sourceTree = "<group>"; };
 		4D89A24DA62DA5C1954F9856 /* AnnotateModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateModule.swift; sourceTree = "<group>"; };
 		50961E49C3F39ABDE5ACDF78 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 		56181784650F3E333789AFD7 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				48E47799AD431797FABFFD79 /* ClipboardHistory.swift */,
 				BCF6701BC0F93473A7FBAE40 /* ColorPicker.swift */,
 				D65041912FBFDF50E42959A7 /* OCRTranslate.swift */,
 				E1AFF95CF61B8A0A5AD352B1 /* PinOverlay.swift */,
@@ -355,6 +358,7 @@
 				A89CFF990FF65BE4484BE2D1 /* CaptureHistory.swift in Sources */,
 				70060C7E58A5C7F58B6D98CE /* CaptureHistoryView.swift in Sources */,
 				181DCDFC19462D9B7ACA0B99 /* CaptureTypes.swift in Sources */,
+				EB7FBEE2920D9EB3CA6DD161 /* ClipboardHistory.swift in Sources */,
 				F664D2529C15C4F6CF1426D6 /* ColorPicker.swift in Sources */,
 				CAF5FA2261B8339C101E3807 /* Countdown.swift in Sources */,
 				D2BD8CEA7CD94D30CD3B3B96 /* Database.swift in Sources */,

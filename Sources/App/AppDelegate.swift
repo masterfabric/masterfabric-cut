@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setupStatusItem()
         AppCoordinator.shared.start()
         QuickHelpButton.shared.refresh()
+        ClipboardHistory.shared.applySettings()
         // Already trusted (e.g. after an update with a stable signature): no onboarding, no prompts.
         if !AppSettings.shared.onboardingCompleted, PermissionManager.shared.isGranted(.screen) {
             AppSettings.shared.onboardingCompleted = true

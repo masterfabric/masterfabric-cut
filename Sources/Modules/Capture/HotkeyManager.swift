@@ -15,6 +15,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case colorPicker
     case screenRuler
     case ocrTranslate
+    case clipboardHistory
 
     public var title: String {
         switch self {
@@ -35,6 +36,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .colorPicker: return "Color Picker"
         case .screenRuler: return "Screen Ruler"
         case .ocrTranslate: return "OCR Translate"
+        case .clipboardHistory: return "Clipboard History"
         }
     }
 
@@ -59,6 +61,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .colorPicker: return .init(keyCode: kVK_ANSI_C, modifiers: m)
         case .screenRuler: return nil
         case .ocrTranslate: return nil
+        case .clipboardHistory: return .init(keyCode: kVK_ANSI_V, modifiers: m)
         }
     }
 }

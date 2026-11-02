@@ -50,6 +50,7 @@ final class AppCoordinator: ObservableObject {
         case .colorPicker: ColorPickerTool.shared.pick()
         case .screenRuler: ScreenRuler.shared.toggle()
         case .ocrTranslate: OCRTranslateTool.shared.captureAndTranslate()
+        case .clipboardHistory: ClipboardPicker.shared.toggle()
         }
     }
 
