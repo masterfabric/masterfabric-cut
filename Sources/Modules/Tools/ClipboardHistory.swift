@@ -237,7 +237,7 @@ final class ClipboardPicker {
         model.selection = 0
         let p = panel ?? makePanel()
         panel = p
-        let screen = NSScreen.underMouse ?? NSScreen.main
+        let screen: NSScreen? = NSScreen.underMouse
         if let vf = screen?.visibleFrame {
             p.setFrameOrigin(NSPoint(x: vf.midX - p.frame.width / 2, y: vf.midY - p.frame.height / 2 + vf.height * 0.12))
         }

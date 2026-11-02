@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import Carbon.HIToolbox
 
 enum PrefsPane: String, CaseIterable, Identifiable {

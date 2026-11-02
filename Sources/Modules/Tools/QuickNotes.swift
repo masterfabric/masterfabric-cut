@@ -47,7 +47,7 @@ final class QuickNotes: ObservableObject {
     func newNote() {
         var note = QuickNote()
         note.color = NoteColor.allCases[notes.count % NoteColor.allCases.count]
-        if let vf = (NSScreen.underMouse ?? NSScreen.main)?.visibleFrame {
+        if let vf = Optional(NSScreen.underMouse)?.visibleFrame {
             let k = CGFloat(notes.count % 6) * 26
             note.frame.origin = CGPoint(x: vf.maxX - note.frame.width - 40 - k, y: vf.maxY - note.frame.height - 40 - k)
         }

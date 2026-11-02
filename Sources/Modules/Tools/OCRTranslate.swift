@@ -97,8 +97,8 @@ final class OCRTranslateTool {
     let model = OCRTranslateModel()
 
     func captureAndTranslate() {
-        Task {
-            await AppCoordinator.shared.capture.recognizeTextInArea(languages: ["tr-TR", "en-US"]) { [weak self] text in
+        Task { [weak self] in
+            await AppCoordinator.shared.capture.recognizeTextInArea(languages: ["tr-TR", "en-US"]) { text in
                 DispatchQueue.main.async { self?.show(text: text) }
             }
         }

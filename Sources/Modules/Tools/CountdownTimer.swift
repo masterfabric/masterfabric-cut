@@ -36,7 +36,7 @@ final class CountdownTimer: ObservableObject {
     func show() {
         let p = panel ?? makePanel()
         panel = p
-        if !p.isVisible, let vf = (NSScreen.underMouse ?? NSScreen.main)?.visibleFrame {
+        if !p.isVisible, let vf = Optional(NSScreen.underMouse)?.visibleFrame {
             p.setFrameOrigin(NSPoint(x: vf.midX - p.frame.width / 2, y: vf.maxY - p.frame.height - 24))
         }
         p.orderFrontRegardless()
