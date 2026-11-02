@@ -109,6 +109,15 @@ final class PermissionStore {
             """, [.text(name), .double(Date().timeIntervalSince1970)])
     }
 
+    /// Forget that we already prompted, so an explicit "Reset & Ask Again" can show the system prompt once more.
+    func clearRequested(_ name: String) {
+        db.run("UPDATE permissions SET requested = 0, updated_at = ?2 WHERE name = ?1", [.text(name), .double(Date().timeIntervalSince1970)])
+    }
+
+    /// Whether this permission has ever been granted to any build of the app (survives updates).
+    func everGranted(_ name: String) -> Bool { AppStateStore.shared.bool(forKey: "perm.everGranted.\(name)") }
+    func setEverGranted(_ name: String, _ value: Bool) { AppStateStore.shared.set(value, forKey: "perm.everGranted.\(name)") }
+
     func lastStatus(_ name: String) -> String? {
         var result: String?
         db.run("SELECT last_status FROM permissions WHERE name = ?1", [.text(name)]) { s in result = Database.text(s, 0) }

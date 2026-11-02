@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pinned screenshots (Quick Access, history, editor, launcher "Pin Last") now use the new pin windows with corner snapping, opacity and click-through.
 - Scrolling capture is slower and smoother: each step scrolls 35% of the region as an eased stream of small continuous scroll events (~0.55 s) instead of one 60% jump, then waits until the page stops changing before grabbing the frame, giving cleaner stitches with lazy-loaded content.
 
+### Fixed
+- Permissions no longer nag on every launch: Screen Recording and Accessibility are checked silently (no prompt) and cached, the system prompt only appears after an explicit action, and onboarding is skipped when the app is already allowed. After an update macOS can keep the switch ON while ignoring the new build (ad-hoc signatures change on every build); the app now spots this and the permission sheet and Settings › Permissions offer **Reset & Ask Again**, which clears the stale entry (`tccutil reset`) and asks once more, falling back to remove/re-add instructions.
+- `scripts/make-dmg.sh [tag]` builds a Release DMG and signs with `MFC_SIGN_IDENTITY` when set (a stable Apple Development / Developer ID identity keeps permissions across updates).
+
 ## [0.1.2] - 2026-10-17
 
 ### Added

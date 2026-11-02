@@ -15,6 +15,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         AppCoordinator.shared.start()
         FloatingLauncher.shared.refresh()
         QuickHelpButton.shared.refresh()
+        // Already trusted (e.g. after an update with a stable signature): no onboarding, no prompts.
+        if !AppSettings.shared.onboardingCompleted, PermissionManager.shared.isGranted(.screen) {
+            AppSettings.shared.onboardingCompleted = true
+        }
         if !AppSettings.shared.onboardingCompleted { OnboardingWindow.shared.show() }
         AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
         #if DEBUG

@@ -87,19 +87,37 @@ private struct PermissionSheetView: View {
     let onGranted: () -> Void
     let onClose: () -> Void
     @State private var granted = false
+    @State private var stale = false
+    @State private var resetting = false
+    @State private var resetFailed = false
+    private var canReset: Bool { permission == .screen || permission == .accessibility }
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 18) {
             BrandHeader(iconSize: 44, font: .headline)
-            Image(systemName: granted ? "checkmark.circle.fill" : "lock.open.fill")
+            Image(systemName: granted ? "checkmark.circle.fill" : (stale ? "arrow.triangle.2.circlepath" : "lock.open.fill"))
                 .font(.system(size: 26, weight: .semibold)).foregroundStyle(granted ? .green : Color.accentColor)
-            Text("\(permission.title) is turned off").font(.title2.bold())
-            Text("MasterFabric Cut needs \(permission.title) access for this. Nothing leaves your Mac.")
+            Text(stale ? "\(permission.title) needs a quick refresh" : "\(permission.title) is turned off").font(.title2.bold())
+            Text(stale
+                 ? "You allowed an earlier version of MasterFabric Cut, but macOS doesn't recognise this update yet — even if the switch in System Settings still looks on. Reset it once and allow it again."
+                 : "MasterFabric Cut needs \(permission.title) access for this. Nothing leaves your Mac.")
                 .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 10) {
-                step(1, "Click **Open System Settings** and turn on **MasterFabric Cut**.")
-                step(2, "Click **Restart App** (or **Quit & Reopen** if macOS asks), then try again.")
+                if stale {
+                    step(1, "Click **Reset & Ask Again**, then click **Open System Settings** in the macOS prompt and turn on **MasterFabric Cut**.")
+                    step(2, "Click **Restart App** (or **Quit & Reopen** if macOS asks), then try again.")
+                } else {
+                    step(1, "Click **Open System Settings** and turn on **MasterFabric Cut**.")
+                    step(2, "Click **Restart App** (or **Quit & Reopen** if macOS asks), then try again.")
+                    if canReset {
+                        Text("Switch already on, or keeps asking after an update? Use **Reset & Ask Again**.")
+                            .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                if resetFailed {
+                    step(3, "Reset didn't work here: in System Settings select **MasterFabric Cut**, remove it with **−**, then add it again with **+**.")
+                }
             }
             .padding(14).frame(maxWidth: .infinity, alignment: .leading)
             .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -108,12 +126,31 @@ private struct PermissionSheetView: View {
                 Spacer()
                 Button("Restart App") { AppRelauncher.relaunch() }
                     .help("macOS applies a new Screen Recording grant only after the app is relaunched")
-                Button("Open System Settings") { NSWorkspace.shared.open(permission.settingsURL) }
-                    .keyboardShortcut(.defaultAction)
+                if canReset {
+                    Button("Open System Settings") { NSWorkspace.shared.open(permission.settingsURL) }
+                        .keyboardShortcut(stale ? nil : .defaultAction)
+                    Button(resetting ? "Resetting…" : "Reset & Ask Again") {
+                        resetting = true
+                        Task {
+                            let ok = await PermissionManager.shared.resetAndRequest(permission)
+                            resetting = false; resetFailed = !ok
+                            if ok { stale = false }
+                            if !ok { NSWorkspace.shared.open(permission.settingsURL) }
+                        }
+                    }
+                    .disabled(resetting)
+                    .keyboardShortcut(stale ? .defaultAction : nil)
+                    .help("Clears the old \(permission.title) entry for MasterFabric Cut and shows the macOS prompt once more")
+                } else {
+                    Button("Open System Settings") { NSWorkspace.shared.open(permission.settingsURL) }
+                        .keyboardShortcut(.defaultAction)
+                }
             }
         }
+        .onAppear { stale = PermissionManager.shared.isStale(permission) }
         .padding(24).frame(width: 460)
         .onReceive(timer) { _ in
+            PermissionManager.shared.invalidateCache()
             if PermissionManager.shared.isGranted(permission) { granted = true; onGranted() }
         }
     }

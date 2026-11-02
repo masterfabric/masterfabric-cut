@@ -153,7 +153,7 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 4. Grant **Screen Recording** (and optionally **Camera**, **Microphone** and **Accessibility**) when asked, in System Settings › Privacy & Security.
 5. **Relaunch the app after granting Screen Recording**; macOS only applies it to a fresh process. The permission window has a *Restart MasterFabric Cut* button.
 
-> Builds are ad-hoc signed, so macOS may ask you to re-grant permissions after an update. To reset a stale entry: `tccutil reset ScreenCapture com.masterfabric.cut`.
+> Builds are ad-hoc signed, so macOS identifies each build by its code hash and may ask you to re-grant permissions after an update (the switch can stay ON while the new build is refused). Use **Reset & Ask Again** in the permission sheet or Settings › Permissions, or run `tccutil reset ScreenCapture com.masterfabric.cut` / `tccutil reset Accessibility com.masterfabric.cut`, allow once and relaunch. To stop this for good, build with a stable identity: `MFC_SIGN_IDENTITY="Apple Development: …" scripts/make-dmg.sh` (free with an Apple ID in Xcode › Settings › Accounts).
 
 ### Build from source
 Requires macOS 14+, Xcode and [XcodeGen](https://github.com/yonaskolb/XcodeGen).

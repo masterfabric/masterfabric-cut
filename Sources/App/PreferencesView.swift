@@ -351,7 +351,10 @@ private struct PermissionsPane: View {
             }
             Spacer()
             badge(status)
-            if status != .granted {
+            if status == .denied && (p == .screen || p == .accessibility) {
+                Button("Fix…") { PermissionManager.shared.showDenied(p) { tick += 1 } }
+                    .help("Open System Settings, or reset and allow it once more if an earlier version was allowed")
+            } else if status != .granted {
                 Button(status == .notDetermined ? "Grant" : "Open Settings") {
                     if status == .notDetermined { Task { await PermissionManager.shared.request(p); tick += 1 } }
                     else { NSWorkspace.shared.open(p.settingsURL) }
