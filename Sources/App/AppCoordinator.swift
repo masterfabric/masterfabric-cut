@@ -67,6 +67,7 @@ final class AppCoordinator: ObservableObject {
         let s = AppSettings.shared
         capture.selfTimerSeconds = 0
         capture.hideDesktopIconsDuringCapture = s.hideDesktopIcons
+        capture.scrollingSpeed = s.scrollingSpeed
         let qa = QuickAccessOverlayController.shared
         qa.configuration.position = QuickAccessPosition(rawValue: s.overlayCorner.rawValue) ?? .bottomLeft
         qa.configuration.autoCloseDelay = TimeInterval(s.overlayAutoCloseSeconds)

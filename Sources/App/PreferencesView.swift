@@ -154,6 +154,13 @@ private struct CapturePane: View {
                         .help("Seconds to count down before a self-timer capture")
                 }
             }
+            Section("Scrolling capture") {
+                Option(hint: "Gentle scrolls in small eased steps and waits for the page to settle before each frame. Fast is quicker but can miss lazy-loaded content.") {
+                    Picker("Scroll speed", selection: Binding(get: { s.scrollingSpeed }, set: { s.scrollingSpeed = $0 })) {
+                        ForEach(ScrollingCaptureSpeed.allCases) { Text($0.displayName).tag($0) }
+                    }.help("How fast scrolling capture moves through the page")
+                }
+            }
             Section("Image") {
                 Option(hint: "File format for saved screenshots.") {
                     Picker("Format", selection: Binding(get: { s.imageFormat }, set: { s.imageFormat = $0 })) {

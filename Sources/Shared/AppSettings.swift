@@ -35,7 +35,7 @@ final class AppSettings: ObservableObject {
             "freezeScreen": false, "showMagnifier": true, "showCrosshair": true,
             "imageFormat": ImageFormat.png.rawValue, "jpegQuality": 0.9,
             "retina": true, "copyToClipboard": false, "saveAutomatically": true,
-            "windowShadow": true, "timerSeconds": 5,
+            "windowShadow": true, "timerSeconds": 5, "scrollingSpeed": ScrollingCaptureSpeed.gentle.rawValue,
             "overlayEnabled": true, "overlayCorner": OverlayCorner.bottomLeft.rawValue,
             "overlayAutoCloseSeconds": 6, "overlayCloseAfterAction": true,
             "recordFPS": 30, "gifFPS": 15, "recordMic": false, "recordSystemAudio": true,
@@ -62,6 +62,10 @@ final class AppSettings: ObservableObject {
     var copyToClipboard: Bool { get { d.bool(forKey: "copyToClipboard") } set { set(newValue, "copyToClipboard") } }
     var saveAutomatically: Bool { get { d.bool(forKey: "saveAutomatically") } set { set(newValue, "saveAutomatically") } }
     var windowShadow: Bool { get { d.bool(forKey: "windowShadow") } set { set(newValue, "windowShadow") } }
+    var scrollingSpeed: ScrollingCaptureSpeed {
+        get { ScrollingCaptureSpeed(rawValue: d.string(forKey: "scrollingSpeed") ?? "") ?? .gentle }
+        set { set(newValue.rawValue, "scrollingSpeed") }
+    }
     var timerSeconds: Int { get { d.integer(forKey: "timerSeconds") } set { set(newValue, "timerSeconds") } }
     var overlayEnabled: Bool { get { d.bool(forKey: "overlayEnabled") } set { set(newValue, "overlayEnabled") } }
     var overlayCorner: OverlayCorner {

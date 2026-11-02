@@ -44,5 +44,5 @@ Menu items call `capture.perform(.captureArea)` etc. (or the `async` methods dir
 - All rects are in global AppKit coordinates (origin bottom-left); `CaptureResult.rect` too. Previous area is persisted in `UserDefaults`.
 - Own-app windows (Quick Access, overlays) are excluded from captures (`service.excludeOwnApp`).
 - Window shadow: `service.includeWindowShadow`; cursor: `service.showsCursor`.
-- Scrolling capture: `ScrollingCapture` stops at end of content, at `maxFrames`, or on Esc / `coordinator.stopScrolling()`. Sticky headers/footers may cause imperfect stitches.
+- Scrolling capture: `ScrollingCapture` stops at end of content, at `maxFrames`, or on Esc / `coordinator.stopScrolling()`. Sticky headers/footers may cause imperfect stitches. Speed is `ScrollingCaptureSpeed` (`CaptureCoordinator.scrollingSpeed`, Preferences › Capture): default **Gentle** scrolls 35% of the region per frame as an eased (ease-in-out, ~0.55 s) stream of continuous pixel scroll events, then waits until two consecutive frames match (max 1.2 s) before stitching.
 - Type-checks cleanly with `swiftc -typecheck -target arm64-apple-macos14.0 *.swift`; not yet exercised at runtime.

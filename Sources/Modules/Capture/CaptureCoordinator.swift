@@ -19,6 +19,8 @@ public final class CaptureCoordinator {
     public var selfTimerSeconds = 0
     public var hideDesktopIconsDuringCapture = false
     public var copyOCRToPasteboard = true
+    /// Pace of scrolling capture (default: gentle — slow, eased scrolling with settle checks).
+    public var scrollingSpeed: ScrollingCaptureSpeed = .gentle
 
     private let previousAreaKey = "com.masterfabric.cut.previousArea"
     private let overlay = SelectionOverlayController()
@@ -81,6 +83,7 @@ public final class CaptureCoordinator {
             self.previousArea = rect
             guard await SelfTimer.countdown(seconds: self.selfTimerSeconds) else { return }
             let sc = ScrollingCapture(service: self.service)
+            sc.speed = self.scrollingSpeed
             self.scrolling = sc
             defer { self.scrolling = nil }
             let r = try await self.withDesktopPrep { try await sc.capture(rect: rect) }
