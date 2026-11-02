@@ -42,7 +42,7 @@ final class AppSettings: ObservableObject {
             "recordDimEnabled": true, "recordDimOpacity": 0.45, "showClicks": true, "showKeystrokes": false, "hideDesktopIcons": false,
             "historyLimit": 200, "studioCountdown": 3, "studioMirror": true, "studioShape": "circle", "onboardingCompleted": false, "showLauncher": true, "filenameTemplate": "MasterFabric Cut %Y-%m-%d at %H.%M.%S",
             "saveDirectory": NSString(string: "~/Desktop").expandingTildeInPath,
-            "pinCorner": PinCorner.topRight.rawValue, "pinWidth": 360.0, "pinOpacity": 1.0,
+            "pinCorner": PinCorner.topRight.rawValue, "showQuickHelp": true, "pinWidth": 360.0, "pinOpacity": 1.0,
         ])
     }
 
@@ -93,6 +93,11 @@ final class AppSettings: ObservableObject {
     var pinCorner: PinCorner {
         get { PinCorner(rawValue: d.string(forKey: "pinCorner") ?? "") ?? .topRight }
         set { set(newValue.rawValue, "pinCorner") }
+    }
+    var showQuickHelp: Bool { get { d.bool(forKey: "showQuickHelp") } set { set(newValue, "showQuickHelp") } }
+    var quickHelpOrigin: CGPoint? {
+        get { d.string(forKey: "quickHelpOrigin").map { NSPointFromString($0) } }
+        set { d.set(newValue.map { NSStringFromPoint($0) }, forKey: "quickHelpOrigin") }
     }
     var pinWidth: Double { get { d.double(forKey: "pinWidth") } set { set(newValue, "pinWidth") } }
     var pinOpacity: Double { get { d.double(forKey: "pinOpacity") } set { set(newValue, "pinOpacity") } }

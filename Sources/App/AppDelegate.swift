@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setupStatusItem()
         AppCoordinator.shared.start()
         FloatingLauncher.shared.refresh()
+        QuickHelpButton.shared.refresh()
         if !AppSettings.shared.onboardingCompleted { OnboardingWindow.shared.show() }
         AppCoordinator.shared.onRecordingStateChange = { [weak self] in self?.rebuildMenu() }
         #if DEBUG
@@ -70,6 +71,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                         hidden?.isHidden = false
                         guard let cg = ctx.makeImage() else { continue }
                         try? NSBitmapImageRep(cgImage: cg).representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dir).appendingPathComponent("pin-\(i + 1).png"))
+                    }
+                }
+            }
+        }
+        // MFC_DEMO_QUICKHELP=1 opens the Quick Help radial menu with one bubble hovered; with MFC_DEMO_SNAPSHOT_DIR writes quick-help.png.
+        if env["MFC_DEMO_QUICKHELP"] == "1" {
+            let qh = QuickHelpButton.shared
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { qh.openMenu(autoClose: false) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { qh.model.hovered = env["MFC_DEMO_QUICKHELP_HOVER"] ?? "qr" }
+            if let dir = env["MFC_DEMO_SNAPSHOT_DIR"] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+                    guard let v = qh.debugMenuView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { return }
+                    v.cacheDisplay(in: v.bounds, to: rep)
+                    // Flatten onto a dark desktop-like backdrop so the transparent panel reads in the PNG.
+                    let img = NSImage(size: v.bounds.size, flipped: false) { r in
+                        NSGradient(starting: NSColor(white: 0.30, alpha: 1), ending: NSColor(white: 0.16, alpha: 1))?.draw(in: r, angle: -90)
+                        rep.draw(in: r)
+                        return true
+                    }
+                    if let tiff = img.tiffRepresentation, let out = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) {
+                        try? out.write(to: URL(fileURLWithPath: dir).appendingPathComponent("quick-help.png"))
                     }
                 }
             }

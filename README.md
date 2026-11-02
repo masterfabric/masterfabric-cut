@@ -92,6 +92,10 @@ or record a screen/GIF with a webcam bubble in **Recording Studio**. Everything 
 - Backgrounds: preset chips, custom colors, gradients, padding, corner radius, shadow size and window title text
 - One render path, so the preview matches the exported/copied image
 
+### Quick Help button
+- Floating squircle with a radial tools menu: hover for 2 s or click; drag it to any screen edge
+- Screenshot Area, Scrolling Capture, Record, Link to QR, Pin Image / PDF and Settings in one arc
+
 ### Pin to screen
 - Pin any screenshot, image file (PNG, JPG, HEIC, GIF…) or PDF as a floating, always-on-top window in a screen corner (`⌃⇧⌘P`, drag a file onto the launcher, or Pin Clipboard)
 - Hover for controls: snap to a corner, resize keeping the aspect ratio, opacity, PDF pages, click-through (`⌃⇧⌘U`), close

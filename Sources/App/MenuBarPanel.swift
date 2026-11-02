@@ -81,6 +81,7 @@ struct MenuBarView: View {
     @ObservedObject private var recorder = AppCoordinator.shared.recorder
     @ObservedObject private var history = CaptureHistoryStore.shared
     @ObservedObject private var pinStore = PinnedScreenshotController.shared
+    @ObservedObject private var settings = AppSettings.shared
 
     private func hint(_ a: CaptureAction) -> String? { HotkeyManager.shared.bindings[a]?.displayString }
 
@@ -126,6 +127,12 @@ struct MenuBarView: View {
                     recents
                     action(.openHistory, "Show All History", "Screenshots, recordings and text", "clock.arrow.circlepath", .brown)
                     section("Help")
+                    MenuRow(title: settings.showQuickHelp ? "Hide Quick Help Button" : "Show Quick Help Button",
+                            subtitle: "Floating button with a radial tools menu", symbol: "circle.grid.cross.fill", tint: .indigo,
+                            shortcut: settings.showQuickHelp ? "On" : "Off") {
+                        settings.showQuickHelp.toggle()
+                        QuickHelpButton.shared.refresh()
+                    }
                     MenuRow(title: "Welcome & Permissions", subtitle: "Permission status, tips and tricks", symbol: "hand.wave.fill", tint: .blue, shortcut: nil) {
                         run(actions.welcome)
                     }
