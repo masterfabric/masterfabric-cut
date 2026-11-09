@@ -56,6 +56,7 @@ final class AppCoordinator: ObservableObject {
         case .keepAwake: KeepAwake.shared.toggle()
         case .imageConverter: ImageConverterTool.show()
         case .textTools: TextToolsWindow.show()
+        case .mediaStudio: BatchMediaStudio.show()
         }
     }
 

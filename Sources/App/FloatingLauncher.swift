@@ -123,6 +123,7 @@ struct LauncherAction: Identifiable {
             cap(.recordScreen, "Record Screen", "Save a region as MP4", "record.circle", .red, .record),
             cap(.recordGIF, "Record GIF", "Save a region as a GIF", "gift", .pink, .record),
             cap(.openStudio, "Recording Studio", "Webcam, mic and layouts", "video.badge.waveform", .orange, .record),
+            cap(.mediaStudio, "Media Studio", "Batch, silence, portrait, captions", "film.stack", .orange, .record),
             cap(.pinFile, "Pin Image / PDF", "Float a file on screen (or drop it here)", "pin.square.fill", .mint, .pin),
             LauncherAction(id: "pinClipboard", title: "Pin Clipboard", subtitle: "Float the copied image or PDF", symbol: "doc.on.clipboard", tint: .mint, shortcut: nil, group: .pin) {
                 PinnedScreenshotController.shared.pinFromClipboard()

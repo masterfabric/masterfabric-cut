@@ -128,6 +128,14 @@ Everyday utilities, all on-device, in the menu-bar panel's Utilities grid, the p
 - **Notch-aware controls** pill: timer, pause/resume, stop, restart and cancel, centered under the notch (or the menu bar); excluded from the video
 - Exact pause timing, plus MP4 or GIF export and a trim editor
 
+### Media Studio
+Local post-production for recordings and other media files (menu bar › Record › Media Studio):
+- **Batch** queue with shared trim, silence, portrait and platform/quality settings; writes new files only
+- **Silence** analysis preview (threshold / min length / padding) before non-destructive export
+- **Portrait** crop: Vision face-guided when faces are detected, otherwise manual center (no fake speaker tracking)
+- **Captions**: on-device Speech transcription when the locale supports it (Turkish if system assets allow), editable cues, SRT/VTT
+- **Queue**: progress, cancel, retry and reveal outputs in Finder
+
 ### Capture History
 - Screenshots, recordings, GIFs and OCR text in one searchable, filterable grid
 - Hover GIF previews, play badges and durations

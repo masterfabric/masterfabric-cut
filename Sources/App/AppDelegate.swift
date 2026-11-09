@@ -106,11 +106,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         // MFC_DEMO_TOOL=<name> opens a tool with in-memory sample data (nothing is saved); with MFC_DEMO_SNAPSHOT_DIR
         // writes <name>.png. Names: tools-panel, menu-bar, color-picker, text-tools, ocr-translate, clipboard-history,
-        // countdown, image-converter, screen-ruler.
+        // countdown, image-converter, screen-ruler, media-studio.
         if let tool = env["MFC_DEMO_TOOL"] {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { Self.openDemoTool(tool) }
             if let dir = env["MFC_DEMO_SNAPSHOT_DIR"] {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) { Self.snapshotDemoTool(tool, dir: dir) }
+                let delay: Double = tool == "media-studio" ? 1.4 : 2.6
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { Self.snapshotDemoTool(tool, dir: dir) }
             }
         }
         #endif
@@ -140,6 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case "countdown": CountdownTimer.shared.start(minutes: 25)
         case "image-converter": ImageConverterTool.show()
         case "screen-ruler": ScreenRuler.shared.start()
+        case "media-studio": BatchMediaStudio.show()
         default: break
         }
     }

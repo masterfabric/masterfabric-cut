@@ -45,6 +45,7 @@ targets:
         NSScreenCaptureUsageDescription: "MasterFabric Cut needs screen recording access to capture screenshots and record your screen."
         NSCameraUsageDescription: "MasterFabric Cut uses the camera to show your webcam bubble in Recording Studio."
         NSMicrophoneUsageDescription: "MasterFabric Cut uses the microphone to record voice narration with your screen recordings."
+        NSSpeechRecognitionUsageDescription: "MasterFabric Cut transcribes your local recordings on this Mac to create editable captions. Audio is not uploaded."
         NSAppleEventsUsageDescription: "MasterFabric Cut uses Apple Events to hide and show desktop icons."
         NSDesktopFolderUsageDescription: "MasterFabric Cut saves captures to your Desktop by default."
         NSDocumentsFolderUsageDescription: "MasterFabric Cut can save captures to your Documents folder."

@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Media Studio** (menu bar › Record, Utilities grid, floating palette › Record): on-device batch media processing without uploading files.
+  - **Batch export** with shared trim / silence / portrait / platform profile settings applied to every queued file; originals are never overwritten.
+  - **Silence removal** with adjustable threshold, min duration and padding, timeline preview, then a new export.
+  - **Portrait reframe** using Vision face boxes when faces are found on sampled frames, with an honest manual crop fallback (not speaker diarization).
+  - **Export profiles** for Original, YouTube, X/Twitter, LinkedIn, TikTok, Instagram Reel/Feed, plus Custom size, quality and optional target MB guidance.
+  - **Captions**: Speech framework file transcription with locale availability reporting (Turkish when on-device assets exist), editable cues, SRT/VTT export; refuses cloud Speech.
+  - **Processing queue** with per-job progress, cancel, retry failed, and reveal-in-Finder on success.
+
 ## [0.1.3] - 2026-11-09
 
 ### Added

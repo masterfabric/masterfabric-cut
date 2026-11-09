@@ -21,6 +21,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
     case keepAwake
     case imageConverter
     case textTools
+    case mediaStudio
 
     public var title: String {
         switch self {
@@ -47,6 +48,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .keepAwake: return "Keep Awake"
         case .imageConverter: return "Image Converter"
         case .textTools: return "Text Tools"
+        case .mediaStudio: return "Media Studio"
         }
     }
 
@@ -77,6 +79,7 @@ public enum CaptureAction: String, CaseIterable, Codable, Sendable {
         case .keepAwake: return .init(keyCode: kVK_ANSI_K, modifiers: m)
         case .imageConverter: return nil
         case .textTools: return nil
+        case .mediaStudio: return nil
         }
     }
 }
