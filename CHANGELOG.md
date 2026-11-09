@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-09
+
 ### Added
 - General tools (menu-bar panel › Utilities grid, the floating button's palette › Tools section, and the radial menu's new **Tools** bubble; every tool has a rebindable shortcut in Settings › Shortcuts):
   - **Color Picker** (`⌃⇧⌘C`): system magnifier loupe; a click copies the color as HEX, RGB or HSL (Settings › Tools) with a swatch toast. The tool window shows every format with copy buttons and the last 16 colors.
