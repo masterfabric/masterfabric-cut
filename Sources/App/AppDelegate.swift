@@ -142,7 +142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case "color-picker": ColorPickerTool.shared.loadDemoColors(); ColorPickerTool.shared.showWindow()
         case "text-tools":
             let m = TextToolsWindow.model
-            m.input = #"{"app":"MasterFabric Cut","version":"0.1.3","tools":["color","ruler","ocr","clipboard"],"free":true}"#
+            m.input = #"{"app":"MasterFabric Cut","version":"0.1.4","tools":["color","ruler","ocr","clipboard"],"free":true}"#
             TextToolsWindow.show(); m.run(.jsonPretty)
         case "ocr-translate":
             OCRTranslateTool.shared.show(text: "Ekran görüntüsünü al, metni seç ve tek tıkla çevir. Toplantı Perşembe saat 14:00'te.")

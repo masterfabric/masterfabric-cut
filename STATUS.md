@@ -2,7 +2,7 @@
 
 Build: `xcodegen generate && xcodebuild -project MasterFabricCut.xcodeproj -scheme MasterFabricCut -configuration Debug -derivedDataPath build build` — **succeeds** (Xcode 27.2 on this machine, macOS 14 target). The app launches as a menu bar item.
 
-## Media Studio (Unreleased, branch work)
+## Media Studio (0.1.4)
 - Wired as `CaptureAction.mediaStudio` into menu bar Record section, Utilities grid, floating palette Record group, and `AppCoordinator`.
 - Debug: `MFC_DEMO_TOOL=media-studio` (+ `MFC_DEMO_MEDIA_TAB=…`) · E2E: `MFC_VALIDATE_DIR=<dir> MFC_VALIDATE_EXIT=1` (synthetic fixtures + real MediaExporter/Silence/Portrait/Queue pipelines).
 - **Validated locally (17/17):** synthetic AV MP4 fixtures; silence analyze+export (shorter, audio kept, original intact); trim ~1.5s; YouTube 1920×1080 batch profile non-destructive; time-varying portrait crop (720×1280) via animated transforms (Vision miss on cartoon fixture → injected centers + manual path); SRT/VTT; queue cancel + retry; Turkish on-device Speech **unavailable** on this Mac (`supportsOnDeviceRecognition=false`, auth not determined) — honest gate kept, no download/upload.

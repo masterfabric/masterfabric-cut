@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-09
+
 ### Added
 - **Media Studio** (menu bar › Record, Utilities grid, floating palette › Record): on-device batch media processing without uploading files.
   - **Batch export** with shared trim / silence / portrait / platform profile settings applied to every queued file; originals are never overwritten.
@@ -15,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Captions**: Speech framework file transcription with locale availability reporting (Turkish when on-device assets exist), editable cues, SRT/VTT export; refuses cloud Speech.
   - **Processing queue** with per-job progress, cancel (without aborting siblings), retry failed, and reveal-in-Finder on success.
   - DEBUG `MFC_VALIDATE_DIR` harness generates synthetic fixtures and runs encode/queue checks into that folder.
+
+### Notes / limitations (tested on Apple Silicon Mac, Xcode 27.2)
+- **Turkish on-device Speech transcription is unavailable** on the tested Mac (`SFSpeechRecognizer` for `tr-TR` reports `supportsOnDeviceRecognition = false`). The UI keeps an honest gate and does not fall back to cloud Speech or upload media.
+- **Real-face Vision detection was not verified** on camera footage. Synthetic cartoon-face fixtures did **not** trigger Vision face boxes; time-varying portrait crop was verified with **injected centers** (keyed transforms), not successful cartoon face recognition.
+- Portrait framing is **not** continuous speaker / identity tracking — only Vision face-box samples (when present) or manual / injected crop centers.
+- Local E2E harness: **17/17** encode/queue checks passed on synthetic fixtures (silence, trim, batch profile, portrait export, subtitles, cancel/retry).
 
 ## [0.1.3] - 2026-11-09
 
