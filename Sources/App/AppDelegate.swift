@@ -114,6 +114,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) { Self.snapshotDemoTool(tool, dir: dir) }
             }
         }
+        // MFC_VALIDATE_DIR=<dir>: generate synthetic fixtures and run Media Studio encode/queue validation into that folder.
+        // Optional MFC_VALIDATE_EXIT=1 exits the process with 0/1 after the report is written.
+        if let dir = env["MFC_VALIDATE_DIR"] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                Task { @MainActor in
+                    await MediaStudioValidator.run(into: URL(fileURLWithPath: dir))
+                }
+            }
+        }
         #endif
     }
 

@@ -4,9 +4,10 @@ Build: `xcodegen generate && xcodebuild -project MasterFabricCut.xcodeproj -sche
 
 ## Media Studio (Unreleased, branch work)
 - Wired as `CaptureAction.mediaStudio` into menu bar Record section, Utilities grid, floating palette Record group, and `AppCoordinator`.
-- Debug screenshots: `MFC_DEMO_TOOL=media-studio` (+ optional `MFC_DEMO_MEDIA_TAB=batch|silence|reframe|captions|queue`) with `MFC_DEMO_SNAPSHOT_DIR`.
-- Verified: Debug **BUILD SUCCEEDED**; UI snapshots for all five tabs; silence-detection algorithm smoke on a synthetic 3 s WAV (2 silence segments). Turkish Speech locale is listed but **on-device recognition is false** on this Mac — Transcribe stays disabled until assets/permission allow it (by design, no cloud fallback).
-- Not yet E2E verified on real recordings: full batch export encode, face-guided portrait export frames, live Speech transcription after granting permission + language assets.
+- Debug: `MFC_DEMO_TOOL=media-studio` (+ `MFC_DEMO_MEDIA_TAB=…`) · E2E: `MFC_VALIDATE_DIR=<dir> MFC_VALIDATE_EXIT=1` (synthetic fixtures + real MediaExporter/Silence/Portrait/Queue pipelines).
+- **Validated locally (17/17):** synthetic AV MP4 fixtures; silence analyze+export (shorter, audio kept, original intact); trim ~1.5s; YouTube 1920×1080 batch profile non-destructive; time-varying portrait crop (720×1280) via animated transforms (Vision miss on cartoon fixture → injected centers + manual path); SRT/VTT; queue cancel + retry; Turkish on-device Speech **unavailable** on this Mac (`supportsOnDeviceRecognition=false`, auth not determined) — honest gate kept, no download/upload.
+- Portrait limitation: animates crop between Vision face-box samples (or manual/injected centers). Not speaker ID / lip tracking. Evidence under `build/ss/validate/` and promoted PNGs in `build/ss/`.
+- Still open: live Vision face hit on real camera footage; live Turkish transcription after user installs on-device assets + grants Speech permission (not done here).
 
 ## Implemented (compiles; wired in `AppCoordinator`)
 - Menu bar app (LSUIElement; custom SwiftUI dropdown panel, see below), configurable global hotkeys (Carbon), Preferences (General, Shortcuts, Output, Format, Quick Access, Recording), About window with author credit, Info.plist copyright/usage strings, entitlements.

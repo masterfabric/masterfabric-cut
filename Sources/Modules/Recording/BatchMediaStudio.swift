@@ -583,7 +583,7 @@ struct BatchMediaStudioView: View {
 
     private var reframeTab: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Crop landscape video into a portrait frame. Face-guided uses Vision face boxes on sampled frames — not speaker identification.")
+            Text("Crop landscape video into a portrait frame. Face-guided samples Vision face boxes over time and animates the crop between them. Not speaker identification.")
                 .font(.callout).foregroundStyle(.secondary)
             Picker("Mode", selection: $model.settings.reframeMode) {
                 ForEach(PortraitReframeMode.allCases) { Text($0.title).tag($0) }
@@ -617,7 +617,7 @@ struct BatchMediaStudioView: View {
                         Text("Source \(Int(plan.sourceSize.width))×\(Int(plan.sourceSize.height)) → \(Int(plan.outputSize.width))×\(Int(plan.outputSize.height))")
                             .font(.caption).foregroundStyle(.secondary)
                         Text(plan.facesDetected
-                             ? "Faces sampled at \(plan.centers.count) time point(s); export uses median center."
+                             ? "Faces sampled at \(plan.centers.count) time point(s); export animates crop between centers."
                              : "No faces sampled — manual center will be used.")
                             .font(.caption).foregroundStyle(.secondary)
                     }.padding(4)

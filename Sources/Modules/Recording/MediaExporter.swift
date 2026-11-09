@@ -258,15 +258,7 @@ public enum MediaExporter {
             throw RecordingError.exportFailed("No video track")
         }
         let duration = try await asset.load(.duration)
-        let aspect = plan.outputSize.width / max(1, plan.outputSize.height)
-        let centerX: Double = {
-            if plan.modeUsed == .faceGuided, let mid = plan.centers.sorted(by: { $0.time < $1.time }).dropFirst(plan.centers.count / 2).first {
-                return mid.x
-            }
-            return plan.fallbackCenterX
-        }()
-        // Single crop for the clip: face-guided uses the median center (honest: not per-frame warp in this increment).
-        let crop = PortraitReframer.cropRect(source: plan.sourceSize, outputAspect: aspect, centerX: centerX)
+        let preferred = try await track.load(.preferredTransform)
 
         let comp = AVMutableComposition()
         guard let cv = comp.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
@@ -284,12 +276,24 @@ public enum MediaExporter {
         let instruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
         let layer = AVMutableVideoCompositionLayerInstruction(assetTrack: cv)
-        let scale = plan.outputSize.width / crop.width
-        let preferred = try await track.load(.preferredTransform)
-        var t = preferred
-        t = t.concatenating(CGAffineTransform(translationX: -crop.minX, y: -crop.minY))
-        t = t.concatenating(CGAffineTransform(scaleX: scale, y: scale))
-        layer.setTransform(t, at: .zero)
+
+        // Time-varying crop: key transforms at each face sample (AVFoundation interpolates between them).
+        // Limitation: tracks Vision face boxes only — not speaker identity; gaps without faces hold the nearest sample.
+        let times: [Double]
+        if plan.modeUsed == .faceGuided, plan.centers.count >= 2 {
+            times = plan.centers.map(\.time).sorted()
+        } else {
+            times = [0]
+        }
+        for tSec in times {
+            let cx = PortraitReframer.centerX(at: tSec, plan: plan)
+            let transform = PortraitReframer.transform(for: plan, preferred: preferred, centerX: cx)
+            layer.setTransform(transform, at: CMTime(seconds: max(0, tSec), preferredTimescale: 600))
+        }
+        // Ensure the last frame holds the final crop through the end of the clip.
+        let endCX = PortraitReframer.centerX(at: duration.seconds, plan: plan)
+        layer.setTransform(PortraitReframer.transform(for: plan, preferred: preferred, centerX: endCX), at: duration)
+
         instruction.layerInstructions = [layer]
         videoComp.instructions = [instruction]
 

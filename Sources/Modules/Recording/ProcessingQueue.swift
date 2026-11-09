@@ -109,7 +109,8 @@ public final class ProcessingQueue: ObservableObject {
             default: break
             }
         }
-        if activeJobID == id { workTask?.cancel() }
+        // Do not cancel the whole work Task — remaining queued jobs must keep running.
+        // Active handlers poll `isCancelled(id)` and throw CancellationError for this id only.
         recomputeOverall()
     }
 
@@ -135,7 +136,7 @@ public final class ProcessingQueue: ObservableObject {
     }
 
     public func isCancelled(_ id: UUID) -> Bool {
-        cancelRequested || cancelledIDs.contains(id) || Task.isCancelled
+        cancelRequested || cancelledIDs.contains(id)
     }
 
     public func updateProgress(id: UUID, _ value: Double) {
@@ -175,19 +176,20 @@ public final class ProcessingQueue: ObservableObject {
                     self.jobs[i].status = .running(progress: 0)
                 }
                 do {
-                    try Task.checkCancellation()
                     if self.isCancelled(next.id) {
-                        self.markFailed(id: next.id, message: "Cancelled")
                         continue
                     }
                     let url = try await handler(next)
                     if self.isCancelled(next.id) {
-                        self.jobs[self.jobs.firstIndex(where: { $0.id == next.id })!].status = .cancelled
+                        if let i = self.jobs.firstIndex(where: { $0.id == next.id }) {
+                            self.jobs[i].status = .cancelled
+                        }
                     } else {
                         self.markSucceeded(id: next.id, url: url)
                     }
                 } catch is CancellationError {
                     self.cancel(id: next.id)
+                    // Continue with remaining queued jobs.
                 } catch {
                     if self.isCancelled(next.id) {
                         self.cancel(id: next.id)

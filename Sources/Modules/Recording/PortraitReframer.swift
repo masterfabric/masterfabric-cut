@@ -19,7 +19,7 @@ public enum PortraitReframeMode: String, CaseIterable, Identifiable, Sendable {
     public var detail: String {
         switch self {
         case .faceGuided:
-            return "Uses on-device Vision face detection on sampled frames. Not speaker diarization — if no face is found, falls back to the manual center."
+            return "Samples on-device Vision face boxes over time and animates the crop between those centers. Not speaker diarization or lip tracking — if no face is found, falls back to the manual center."
         case .manual:
             return "Fixed vertical crop centered on the position you set. No automatic tracking."
         }
@@ -89,10 +89,10 @@ public enum PortraitReframer {
         let note: String
         let modeUsed: PortraitReframeMode
         if mode == .faceGuided && faces {
-            note = "Face boxes detected on sampled frames. Crop follows smoothed face centers (not lip/speaker ID)."
+            note = "Face boxes detected on \(centers.count) sampled frame(s). Export animates crop between smoothed centers (Vision faces only — not lip/speaker ID)."
             modeUsed = .faceGuided
         } else if mode == .faceGuided {
-            note = "No face detected in sampled frames. Using manual crop center \(String(format: "%.0f%%", manualCenterX * 100))."
+            note = "No face detected in sampled frames. Using fixed manual crop center \(String(format: "%.0f%%", manualCenterX * 100))."
             modeUsed = .manual
         } else {
             note = "Manual crop center \(String(format: "%.0f%%", manualCenterX * 100))."
@@ -103,6 +103,32 @@ public enum PortraitReframer {
         return PortraitReframePlan(sourceSize: src, outputSize: outputSize, centers: centers,
                                    fallbackCenterX: min(1, max(0, manualCenterX)),
                                    facesDetected: faces, modeUsed: modeUsed, note: note)
+    }
+
+    /// Linear interpolation of normalized crop center X at `time` (seconds).
+    public static func centerX(at time: Double, plan: PortraitReframePlan) -> Double {
+        let pts = plan.centers.sorted { $0.time < $1.time }
+        guard plan.modeUsed == .faceGuided, !pts.isEmpty else { return plan.fallbackCenterX }
+        if time <= pts.first!.time { return pts.first!.x }
+        if time >= pts.last!.time { return pts.last!.x }
+        for i in 0..<(pts.count - 1) {
+            let a = pts[i], b = pts[i + 1]
+            if time >= a.time && time <= b.time {
+                let span = max(0.0001, b.time - a.time)
+                let t = (time - a.time) / span
+                return a.x + (b.x - a.x) * t
+            }
+        }
+        return plan.fallbackCenterX
+    }
+
+    public static func transform(for plan: PortraitReframePlan, preferred: CGAffineTransform, centerX: Double) -> CGAffineTransform {
+        let aspect = plan.outputSize.width / max(1, plan.outputSize.height)
+        let crop = cropRect(source: plan.sourceSize, outputAspect: aspect, centerX: centerX)
+        let scale = plan.outputSize.width / max(1, crop.width)
+        return preferred
+            .concatenating(CGAffineTransform(translationX: -crop.minX, y: -crop.minY))
+            .concatenating(CGAffineTransform(scaleX: scale, y: scale))
     }
 
     public static func export(source: URL, plan: PortraitReframePlan, destination: URL,
